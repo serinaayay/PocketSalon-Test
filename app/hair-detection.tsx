@@ -43,7 +43,7 @@ export default function HairDetectionPage() {
       name: 'photo.jpg',
     } as any);
     try {
-      const response = await fetch('http://192.168.0.239:8000/predict', {
+      const response = await fetch('http://192.168.1.101:8000/predict', {
         method: 'POST',
         body: formData,
         headers: {
