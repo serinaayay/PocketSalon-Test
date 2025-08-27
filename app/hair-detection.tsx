@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { View, Text, Pressable, Image, ScrollView, Dimensions } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
+import { useState } from "react";
+import { Dimensions, Image, Pressable, ScrollView, Text, View } from "react-native";
 
 const { width, height } = Dimensions.get('window');
 const frameSize = Math.min(width * 0.9, 350); // Responsive frame size
@@ -43,7 +43,7 @@ export default function HairDetectionPage() {
       name: 'photo.jpg',
     } as any);
     try {
-      const response = await fetch('http://192.168.1.101:8000/predict', {
+      const response = await fetch('http://172.17.53.25:8000/predict', {
         method: 'POST',
         body: formData,
         headers: {
