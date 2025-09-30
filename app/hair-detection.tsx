@@ -59,65 +59,63 @@ export default function HairDetectionPage() {
   };
 
   return (
-    <View className="flex-1 bg-[#FFEAD2]">
-      <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center', paddingBottom: 100, minHeight: height }}>
+    <View className="flex-1 bg-[#FFF2E4]">
+      <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: 'center', paddingBottom: 100,}}>
         {/* Header with back arrow */}
-        <View className="flex-row items-center mt-16 mb-4 w-full p-8 bg-[#6C4E31]">
-          <Pressable onPress={() => router.push('/homepage')} className="mr-4">
+        <View className="flex-row items-center w-full h-[35vh] bg-[#3F2305] rounded-b-3xl justify-center">
+          <Pressable onPress={() => router.push('/homepage')} className="absolute left-7">
             <Image
-              source={require('../assets/images/left-arrow.png')}
-              style={{ width: 32, height: 32 }}
-              resizeMode="contain"
-            />
+              source={require('../assets/images/arrow.png')} //change to white arrow
+              style={{ width: width * 0.07, height: height * 0.04, marginTop: height * -0.09}}
+              resizeMode="contain"/>
           </Pressable>
-          <Text className="text-[#FFEEDB] text-4xl font-bold text-center flex-1">Hair Type Detector</Text>
+          <Text className="text-[#FAF7F0] text-4xl font-bold text-center -mt-24">Hair Type and {'\n'} Damage Detector</Text>
+          {/* to center text */}
+          <View className="absolute items-center justify-center mt-16 px-10">
+          <Text className="text-[#FAF7F0] text-xl text-wrap-pretty w-96 mt-14 text-center">Take a picture or upload an image of your hair and we’ll identify your hair type!</Text>
+          </View>
         </View>
 
+
+
         {/* Image Frame */}
-        <View style={{ width: frameSize, height: frameSize }} className="relative mt-8 rounded-xl overflow-hidden items-center justify-center bg-white">
+        <View style={{ width: frameSize, height: frameSize, zIndex: 1, marginTop: -frameSize / 5}} className="relative rounded-xl overflow-hidden 
+        items-center justify-center bg-[#DFD7BF] top-12 shadow-lg">
           {image ? (
             <Image source={{ uri: image }} style={{ width: frameSize, height: frameSize }} resizeMode="cover" />
           ) : (
-            <View className="flex-1 w-full h-full items-center justify-center">
-              <Text className="text-gray-400 text-xl">No Image</Text>
+            <View className="flex-1 w-full h-full items-center justify-center align-middle">
+              <Text className="text-400 text-xl color-black">No Image</Text>
             </View>
           )}
-          {/* Four crisp corners using new assets, now larger for overlay effect */}
-          <Image source={require('../assets/images/top_left.png')} style={{ width: 60, height: 60 }} className="absolute top-0 left-0 z-12" />
-          <Image source={require('../assets/images/top_right.png')} style={{ width: 60, height: 60 }} className="absolute top-0 right-0 z-12" />
-          <Image source={require('../assets/images/bottom_left.png')} style={{ width: 60, height: 60 }} className="absolute bottom-0 left-0 z-12" />
-          <Image source={require('../assets/images/bottom_right.png')} style={{ width: 60, height: 60 }} className="absolute bottom-0 right-0 z-12" />
         </View>
 
         {/* Upload and Capture Buttons */}
-        <View style={{ width: frameSize, position: 'relative', minHeight: 100 }} className="mt-32 mb-4">
+        <View style={{ width: frameSize, minHeight: 100 }} className="mt-28 mb-6">
           {/* Upload Image button at lower left */}
-          <Pressable onPress={pickImage} style={{ position: 'absolute', left: 0, bottom: -40 }}>
-            <View className="w-20 h-20 bg-white rounded-lg items-center justify-center">
-              <Text className="text-[#6c4e31] font-bold text-center">{'Upload\nImage'}</Text>
+          <Pressable onPress={pickImage} style={{left: width * 0.06, bottom: height * 0.023}}>
+            <View className="w-20 h-20 bg-[#DFD7BF] rounded-lg justify-center shadow-md">
+              <Text className="text-black font-medium text-center">{'Upload\nImage'}</Text>
             </View>
           </Pressable>
           {/* Centered Capture Button */}
-          <View style={{ alignItems: 'center', width: '100%' }}>
-            <Pressable onPress={takePhoto}>
+            <Pressable onPress={takePhoto} style={{ bottom: height * 0.03 }} className="items-center justify-center -mt-20">
               <Image
                 source={require('../assets/images/capture_button.png')}
                 style={{ width: 80, height: 80 }}
-                resizeMode="contain"
-              />
+                resizeMode="contain"/>
             </Pressable>
+          <View className="items-center justify-center">
             {/* Analyze Button */}
             {image && (
               <Pressable
                 onPress={analyzeImage}
-                className="mt-6 bg-[#6C4E31] px-8 py-4 rounded-lg"
-                disabled={loading}
-              >
+                className="bg-[#6C4E31] rounded-lg w-48 h-14 items-center justify-center"
+                disabled={loading}>
                 <Text className="text-[#FFEEDB] text-lg font-bold text-center">{loading ? 'Analyzing...' : 'Analyze'}</Text>
-              </Pressable>
-            )}
+              </Pressable>)}
           </View>
-        </View>
+          </View>
         {error && <Text style={{ color: 'red', marginTop: 10 }}>{error}</Text>}
       </ScrollView>
     </View>

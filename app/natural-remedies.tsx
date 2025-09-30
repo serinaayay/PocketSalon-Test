@@ -39,19 +39,18 @@ const NaturalRemedies = () => {
   const filteredRemedies = remedies.filter(r => r.category === selectedCategory);
 
   return (
-    <View className="flex-1 bg-[#F9E5C6]">
+    <View className="flex-1 bg-[#FFF2E4]">
       <ScrollView contentContainerStyle={{ paddingBottom: 100, minHeight: height }}>
         {/* Header */}
-        <Text className="text-4xl font-extrabold text-[#5B3E20] mt-16 mb-4 mx-6">Natural Remedies</Text>
+        <Text className="text-4xl font-extrabold text-[#3F2305] mt-20 text-center mb-7">Natural Remedies</Text>
         {/* Category Selector */}
         <View className="flex-row justify-center mb-6">
           {categories.map(cat => (
             <Pressable
               key={cat.key}
               onPress={() => setSelectedCategory(cat.key)}
-              className={`px-4 py-2 mx-2 rounded-full ${selectedCategory === cat.key ? 'bg-[#8B6842]' : 'bg-[#E5CBAF]'}`}
-            >
-              <Text className={`text-base font-bold ${selectedCategory === cat.key ? 'text-white' : 'text-[#5B3E20]'}`}>{cat.label}</Text>
+              className={`px-2 py-2 mx-2 rounded-lg border-2 border-[#3F2305] ${selectedCategory === cat.key ? 'bg-[#74512D]' : 'bg-[#F2EAD3]'}`}>
+              <Text className={`text-lg font-bold ${selectedCategory === cat.key ? 'text-white' : 'text-[#5B3E20]'}`}>{cat.label}</Text>
             </Pressable>
           ))}
         </View>
@@ -59,19 +58,19 @@ const NaturalRemedies = () => {
         {filteredRemedies.map((remedy, idx) => (
           <View
             key={idx}
-            className="flex-row bg-[#8B6842] rounded-xl mx-4 mt-2 mb-6 p-4 shadow-lg"
-            style={{ alignItems: 'flex-start' }}
-          >
-            <View className="w-16 h-16 bg-gray-300 rounded-md mt-2 mr-4" />
+            className="flex-row bg-[#3F2305] rounded-lg mx-4 mt-2 mb-6 p-4 shadow-xl"
+            style={{ alignItems: 'flex-start' }}>
+
+            <View className="w-24 h-24 bg-gray-300 rounded-md mt-2 mr-4" />
             {/* Replace above View with <Image source={remedy.image} className="w-16 h-16 rounded-md mr-4" /> if you have images */}
             <View style={{ flex: 1 }}>
-              <Text className="text-white text-xl font-bold mb-1">{remedy.name}</Text>
-              <Text className="text-white text-xs">{remedy.description}</Text>
+              <Text className="text-white text-2xl font-bold mb-1">{remedy.name}</Text>
+              <Text className="text-white text-md text-wrap-pretty w-72">{remedy.description}</Text>
             </View>
           </View>
         ))}
       </ScrollView>
-      <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#6C4E31] rounded-full flex-row items-center px-2 py-2 shadow-lg">
+      <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 shadow-lg">
             {/* Home Icon */}
             <View className="flex-1 flex-row justify-around">
                 <View className="flex-col items-center">
