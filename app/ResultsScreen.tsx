@@ -1,4 +1,4 @@
-import {View, Text, Image, Pressable, ScrollView, Dimensions} from 'react-native';
+import {View, Text, Image, Pressable, ScrollView, Dimensions, ActivityIndicator} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,6 +7,7 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '@/constants/Colors';
 import { colorScheme } from 'nativewind';
+import { listSuggestedProducts, openDatabase, type SuggestedProduct } from '../lib/db';
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,6 +30,28 @@ const ResultsScreen = () => {
     const params = useLocalSearchParams();
     const hairType = params.hair_type as string | undefined;
     const confidence = params.confidence as string | number | undefined;
+    const [products, setProducts] = React.useState<SuggestedProduct[]>([]);
+    const [loading, setLoading] = React.useState(false);
+
+    React.useEffect(() => {
+        let mounted = true;
+        async function load() {
+            if (!hairType) return;
+            setLoading(true);
+            try {
+                await openDatabase();
+                const rows = await listSuggestedProducts({ hairType, limit: 20 });
+                if (mounted) setProducts(rows);
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.warn('Failed to load suggested products', e);
+            } finally {
+                if (mounted) setLoading(false);
+            }
+        }
+        load();
+        return () => { mounted = false; };
+    }, [hairType]);
     return (
         <View className="flex-1 bg-[#FFEAD2]">
             <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 100, minHeight: height }}>
@@ -112,17 +135,36 @@ const ResultsScreen = () => {
                 <View className="mx-8 my-16">
                     <Text className="text-xl font-black mb-4 text-[#5B3E20] text-center">What Hair Products Can You Use?</Text>
                     <View className="w-full flex items-center">
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                        <View className="w-64 bg-[#B39473] rounded-xl shadow-lg mx-4 p-4 items-center">
-                          <View className="w-full aspect-square bg-[#a88c6b] rounded-lg mb-4 flex justify-center items-center">
-                            <Text className="text-white text-lg font-bold text-center">Product Name</Text>
-                          </View>
-                          <Text className="text-white text-sm text-center">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ut ornare mi, vitae blandit odio. Nulla efficitur, dolor non vulputate malesuada, libero est rutrum urna, in pharetra arcu tortor in neque.
-                          </Text>
-                        </View>
-                        {/* ...other product cards */}
-                      </ScrollView>
+                      {loading ? (
+                        <ActivityIndicator color="#7A5E42" />
+                      ) : (
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                          {products.length === 0 ? (
+                            <View className="w-64 bg-[#B39473] rounded-xl shadow-lg mx-4 p-4 items-center">
+                              <View className="w-full aspect-square bg-[#a88c6b] rounded-lg mb-4 flex justify-center items-center">
+                                <Text className="text-white text-lg font-bold text-center">No suggestions yet</Text>
+                              </View>
+                              <Text className="text-white text-sm text-center">Try adding products for this hair type.</Text>
+                            </View>
+                          ) : (
+                            products.map((p) => (
+                              <View key={p.id} className="w-64 bg-[#B39473] rounded-xl shadow-lg mx-4 p-4 items-center">
+                                <View className="w-full aspect-square bg-[#a88c6b] rounded-lg mb-4 flex justify-center items-center overflow-hidden">
+                                  {p.imageUri ? (
+                                    <Image source={{ uri: p.imageUri }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
+                                  ) : (
+                                    <Text className="text-white text-lg font-bold text-center">{p.title}</Text>
+                                  )}
+                                </View>
+                                <Text className="text-white text-base font-bold text-center mb-1">{p.title}</Text>
+                                {!!p.description && (
+                                  <Text className="text-white text-sm text-center">{p.description}</Text>
+                                )}
+                              </View>
+                            ))
+                          )}
+                        </ScrollView>
+                      )}
                     </View>
                 </View>
                 <Text className="text-xl font-black mb-6 text-[#5B3E20] text-center">Natural Remedies for [Hair Damage]</Text>
