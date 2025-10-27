@@ -1,0 +1,14 @@
+# Ignore Python virtual environments
+venv/
+backend-files/venv/
+
+# Ignore Python cache and compiled files
+__pycache__/
+*.pyc
+
+# Ignore node modules (if using React Native / Expo)
+node_modules/
+
+# Ignore build and system files
+.DS_Store
+.env

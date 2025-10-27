@@ -71,37 +71,31 @@ const NaturalRemedies = () => {
         ))}
       </ScrollView>
       <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 shadow-lg">
-            {/* Home Icon */}
-            <View className="flex-1 flex-row justify-around">
-                <View className="flex-col items-center">
-                    <Pressable className="2 justify-center"
-                    onPress={() => router.push('/homepage')}>
-                        <Image
-                        source={require('../assets/images/home.png')}
-                        className="w-8 h-8"/>
-                    </Pressable>
-                </View>
-            {/* Detect Icon */}
-                <View className="flex-col items-center">
-                    <Pressable className="2 justify-center"
-                    onPress={() => router.push('/hair-detection')}>
-                    <Image
-                        source={require('../assets/images/camera.png')}
-                        className="w-9 h-9"/>
-                    </Pressable>
-                </View>
-            {/* About Us Icon */}
-                <View className="flex-col items-center">
-                    <Image
-                        source={require('../assets/images/about-us.png')}
-                        className="w-9 h-9"/>
-                </View>
-            {/* Settings Icon */}
-                <View className="flex-col items-center">
-                    <Image
-                        source={require('../assets/images/setting.png')}
-                        className="w-8 h-8"/>
-                </View>
+        {/* Home Icon */}
+                    <View className="flex-1 flex-row justify-around">
+                        <View className="flex-col items-center">
+                            <Pressable className="2 justify-center"
+                            onPress={() => router.push('/homepage')}>
+                                <Image
+                                source={require('../assets/images/house 1.png')}
+                                className="w-8 h-8"/>
+                            </Pressable>
+                        </View>
+                    {/* Detect Icon */}
+                        <View className="flex-col items-center">
+                            <Pressable className="2 justify-center"
+                            onPress={() => router.push('/hair-detection')}>
+                            <Image
+                                source={require('../assets/images/capture (1).png')}
+                                className="w-9 h-9"/>
+                            </Pressable>
+                        </View>
+                    {/* Journal Icon */}
+                        <View className="flex-col items-center">
+                            <Image
+                                source={require('../assets/images/agenda 1.png')}
+                                className="w-9 h-9"/>
+                        </View>
             </View>
       </View>
     </View>

@@ -1,6 +1,6 @@
 import { View, Text, Pressable, ScrollView, TextInput, Dimensions } from "react-native";
 import { Image } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { router } from "expo-router";
 import Accordion from "@/components/Accordion";
 import data from "./data";
@@ -10,7 +10,7 @@ const { width, height } = Dimensions.get('window');
 const HomePage = () => {
   return (
     <View className="flex-1 bg-transparent">
-      <ScrollView contentContainerStyle={{paddingBottom: 800}} showsVerticalScrollIndicator={true}>
+      <ScrollView contentContainerStyle={{paddingBottom: "auto"}} showsVerticalScrollIndicator={true}>
         <View className="bg-[#FFF2E4] rounded-xl w-full flex-1 px-6 py-6">
           <Image
             source={require('../assets/images/Hello_Good_morning.png')}
@@ -28,14 +28,14 @@ const HomePage = () => {
                 <View className="items-center w-40">
                   <Pressable className="active:opacity-70" onPress={() => router.push('/hair-detection')}>
                     <View className="w-24 h-24 rounded-full bg-[#3F2305] justify-center items-center">
-                      <Image source={require('../assets/images/camera.png')} className="w-14 h-14"/>
+                      <Image source={require('../assets/images/capture (2).png')} className="w-14 h-14"/>
                     </View>
                   </Pressable>
                   <Text className="text-xl text-[#5B3E20] mt-1 text-center">Detect</Text>
                 </View>
 
                 <View className="items-center w-40">
-                  <Pressable className="active:opacity-70">
+                    <Pressable className="active:opacity-70" onPress={() => router.push('/hair-damage-causes')}>
                     <View className="w-24 h-24 rounded-full bg-[#3F2305] justify-center items-center">
                       <Image source={require('../assets/images/question.png')} className="w-14 h-14"/>
                     </View>
@@ -44,7 +44,7 @@ const HomePage = () => {
                 </View>
 
                 <View className="items-center w-40">
-                  <Pressable className="active:opacity-70">
+                  <Pressable className="active:opacity-70" onPress={() => router.push('/healthy-hair-guide')}>
                     <View className="w-24 h-24 rounded-full bg-[#3F2305] justify-center items-center">
                       <Image source={require('../assets/images/hairdresser.png')} className="w-14 h-14"/>
                     </View>
@@ -120,7 +120,7 @@ const HomePage = () => {
                     <Pressable className="2 justify-center"
                     onPress={() => router.push('/homepage')}>
                         <Image
-                        source={require('../assets/images/home.png')}
+                        source={require('../assets/images/house 1.png')}
                         className="w-8 h-8"/>
                     </Pressable>
                 </View>
@@ -129,21 +129,18 @@ const HomePage = () => {
                     <Pressable className="2 justify-center"
                     onPress={() => router.push('/hair-detection')}>
                     <Image
-                        source={require('../assets/images/camera.png')}
+                        source={require('../assets/images/capture (1).png')}
                         className="w-9 h-9"/>
                     </Pressable>
                 </View>
-            {/* About Us Icon */}
+            {/* Journal Icon */}
                 <View className="flex-col items-center">
+                    <Pressable className="2 justify-center"
+                    onPress={() => router.push('/journal')}>
                     <Image
-                        source={require('../assets/images/about-us.png')}
+                        source={require('../assets/images/agenda 1.png')}
                         className="w-9 h-9"/>
-                </View>
-            {/* Settings Icon */}
-                <View className="flex-col items-center">
-                    <Image
-                        source={require('../assets/images/setting.png')}
-                        className="w-8 h-8"/>
+                    </Pressable>
                 </View>
             </View>
       </View>

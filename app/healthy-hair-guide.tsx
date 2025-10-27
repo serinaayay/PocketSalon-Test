@@ -1,0 +1,107 @@
+import React, { useState } from "react";
+import { View, Text, ScrollView, Image, Pressable, Dimensions } from "react-native";
+import { router } from "expo-router";
+
+const { width, height } = Dimensions.get('window');
+
+const productList = [
+  {
+    name: "Cause 1",
+    description:
+      "Aloe vera soothes the scalp, conditions hair, and can reduce dandruff. Apply fresh aloe gel to your scalp and hair, leave for 30 minutes, then rinse.",
+    category: "breakage",
+    image: null, // Replace with require('../assets/images/aloe-vera.png') if you have an image
+  },
+  {
+    name: "Cause 1",
+    description:
+      "Coconut oil deeply moisturizes and repairs damaged hair. Warm a small amount, massage into scalp and hair, leave for at least 1 hour, then wash out.",
+    category: "color damage",
+    image: null,
+  },
+  {
+    name: "Cause 1",
+    description:
+      "Eggs are rich in protein and help strengthen hair. Mix one egg with a tablespoon of olive oil, apply to hair, leave for 20 minutes, then rinse with cool water.",
+    category: "hair loss",
+    image: null,
+  },
+];
+
+const categories = [
+  { key: "all", label: "All" },
+  { key: "straight", label: "Straight" },
+  { key: "wavy", label: "Wavy" },
+  { key: "curly", label: "Curly" },
+  { key: "coily", label: "Coily" },
+];
+
+const healthyHairGuide = () => {
+  const [selectedCategory, setSelectedCategory] = useState("breakage");
+  const filteredRemedies = productList.filter(r => r.category === selectedCategory);
+
+  return (
+    <View className="flex-1 bg-[#FFF2E4]">
+      <ScrollView contentContainerStyle={{ paddingBottom: 100, minHeight: height }}>
+        {/* Header */}
+        <Text className="text-4xl font-extrabold text-[#3F2305] mt-20 text-center mb-7">Hair Damage Causes</Text>
+        {/* Category Selector */}
+        <View className="flex-row justify-center mb-6">
+          {categories.map(cat => (
+            <Pressable
+              key={cat.key}
+              onPress={() => setSelectedCategory(cat.key)}
+              className={`px-2 py-2 mx-2 rounded-lg border-2 border-[#3F2305] ${selectedCategory === cat.key ? 'bg-[#74512D]' : 'bg-[#F2EAD3]'}`}>
+              <Text className={`text-lg font-bold ${selectedCategory === cat.key ? 'text-white' : 'text-[#5B3E20]'}`}>{cat.label}</Text>
+            </Pressable>
+          ))}
+        </View>
+        {/* Remedy Cards */}
+        {filteredRemedies.map((productList, idx) => (
+          <View
+            key={idx}
+            className="flex-row bg-[#3F2305] rounded-lg mx-4 mt-2 mb-6 p-4 shadow-xl"
+            style={{ alignItems: 'flex-start' }}>
+
+            <View className="w-24 h-24 bg-gray-300 rounded-md mt-2 mr-4" />
+            {/* Replace above View with <Image source={remedy.image} className="w-16 h-16 rounded-md mr-4" /> if you have images */}
+            <View style={{ flex: 1 }}>
+              <Text className="text-white text-2xl font-bold mb-1">{productList.name}</Text>
+              <Text className="text-white text-md text-wrap-pretty w-72">{productList.description}</Text>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+      <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 shadow-lg">
+        {/* Home Icon */}
+                    <View className="flex-1 flex-row justify-around">
+                        <View className="flex-col items-center">
+                            <Pressable className="2 justify-center"
+                            onPress={() => router.push('/homepage')}>
+                                <Image
+                                source={require('../assets/images/house 1.png')}
+                                className="w-8 h-8"/>
+                            </Pressable>
+                        </View>
+                    {/* Detect Icon */}
+                        <View className="flex-col items-center">
+                            <Pressable className="2 justify-center"
+                            onPress={() => router.push('/hair-detection')}>
+                            <Image
+                                source={require('../assets/images/capture (1).png')}
+                                className="w-9 h-9"/>
+                            </Pressable>
+                        </View>
+                    {/* Journal Icon */}
+                        <View className="flex-col items-center">
+                            <Image
+                                source={require('../assets/images/agenda 1.png')}
+                                className="w-9 h-9"/>
+                        </View>
+            </View>
+      </View>
+    </View>
+  );
+};
+
+export default healthyHairGuide; 
