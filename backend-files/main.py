@@ -5,6 +5,15 @@ import io
 import torch
 from model import HairTypeClassifier
 import numpy as np
+import os
+
+# Optional: Import Keras model functions
+try:
+    from keras_model import load_keras_model, preprocess_image_for_keras, predict_hair_damage
+    KERAS_AVAILABLE = True
+except ImportError:
+    KERAS_AVAILABLE = False
+    print("Keras not available or model helpers not imported")
 
 app = FastAPI()
 
@@ -21,6 +30,19 @@ app.add_middleware(
 model = HairTypeClassifier()
 model.load_state_dict(torch.load('model/hair_type_model.pth', map_location=torch.device('cpu')))
 model.eval()
+
+keras_model = None
+is_keras_saved_model = False
+
+try:
+    if KERAS_AVAILABLE:
+        model_path = 'model/hair_damage_model'
+        keras_model = load_keras_model(model_path)
+        print("Keras model loaded successfully")
+        is_keras_saved_model = os.path.isdir(model_path) and os.path.exists(os.path.join(model_path, 'saved_model.pb'))
+
+except Exception as e:
+    print(f"Error loading Keras model: {e}")
 
 @app.post("/predict")
 async def predict_hair_type(file: UploadFile = File(...)):
@@ -61,6 +83,38 @@ async def predict_hair_type(file: UploadFile = File(...)):
     return {
         "hair_type": hair_types[predicted_class],
         "confidence": confidence
+    }
+
+@app.post("/predict-damage")
+async def predict_hair_damage_endpoint(file: UploadFile = File(...)):
+    # YOUR TASK: Write this endpoint (see hints above!)
+    if not keras_model:
+        return {"error": "Hair damage model not loaded"}
+    
+    # Read and preprocess the image
+    contents = await file.read()
+    image = Image.open(io.BytesIO(contents))
+    
+    # Convert to RGB if necessary
+    if image.mode != 'RGB':
+        image = image.convert('RGB')
+    
+    # Preprocess for Keras model
+    preprocessed_image = preprocess_image_for_keras(image)
+    predicted_class_idx, confidence, all_predictions = predict_hair_damage(keras_model, preprocessed_image, is_keras_saved_model)
+    
+    # Map class index to damage level
+    damage_levels = {
+        0: "None",
+        1: "Low",
+        2: "Moderate",
+        3: "High"
+    }
+    
+    return {
+        "damage_level": damage_levels[predicted_class_idx],
+        "confidence": confidence,
+        "all_probabilities": all_predictions.tolist()
     }
 
 if __name__ == "__main__":

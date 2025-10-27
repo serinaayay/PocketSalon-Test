@@ -1,26 +1,46 @@
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { useState } from "react";
-import { Dimensions, Image, Pressable, ScrollView, Text, View } from "react-native";
+import { useState, useEffect } from "react";
+import { Alert, Dimensions, Image, Pressable, ScrollView, Text, View } from "react-native";
 
 const { width, height } = Dimensions.get('window');
-const frameSize = Math.min(width * 0.9, 350); // Responsive frame size
+const frameSize = Math.min(width * 0.9, 350); 
 
 export default function HairDetectionPage() {
   const [image, setImage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { status: galleryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+
+      if (galleryStatus !== "granted" || cameraStatus !== "granted") {
+        Alert.alert(
+          "Permissions required",
+          "Please grant camera and photo library access in your settings to use this feature."
+        );
+      }
+    })();
+  }, []);
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+  try {
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true, // allow cropping
+      allowsEditing: true,
       quality: 1,
     });
-    if (!result.canceled && result.assets.length > 0) {
+    console.log("Picker result:", result);
+    if (!result.canceled && result.assets && result.assets.length > 0) {
       setImage(result.assets[0].uri);
     }
-  };
+  } catch (error) {
+    console.error("Error launching image picker:", error);
+    Alert.alert("Error", "Failed to open image picker.");
+  }
+};
 
   const takePhoto = async () => {
     let result = await ImagePicker.launchCameraAsync({
@@ -76,8 +96,6 @@ export default function HairDetectionPage() {
           </View>
         </View>
 
-
-
         {/* Image Frame */}
         <View style={{ width: frameSize, height: frameSize, zIndex: 1, marginTop: -frameSize / 5}} className="relative rounded-xl overflow-hidden 
         items-center justify-center bg-[#DFD7BF] top-12 shadow-lg">
@@ -93,11 +111,13 @@ export default function HairDetectionPage() {
         {/* Upload and Capture Buttons */}
         <View style={{ width: frameSize, minHeight: 100 }} className="mt-28 mb-6">
           {/* Upload Image button at lower left */}
-          <Pressable onPress={pickImage} style={{left: width * 0.06, bottom: height * 0.023}}>
+          <Pressable 
+          onPress={pickImage} style={{left: width * 0.06, bottom: height * 0.023}}>
             <View className="w-20 h-20 bg-[#DFD7BF] rounded-lg justify-center shadow-md">
               <Text className="text-black font-medium text-center">{'Upload\nImage'}</Text>
             </View>
           </Pressable>
+          
           {/* Centered Capture Button */}
             <Pressable onPress={takePhoto} style={{ bottom: height * 0.03 }} className="items-center justify-center -mt-20">
               <Image
