@@ -15,8 +15,8 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 
 const journal = () => {
-  const size = width * 0.4;
-  const strokeWidth = 20;
+  const size = width * 0.40;
+  const strokeWidth = 18;
   const center = size / 2;
   const max = 100;
   const delay = 0;
@@ -24,12 +24,12 @@ const journal = () => {
   const radius = (size - strokeWidth) / 2;
   const percentage = 75;
   const circumference = 2 * Math.PI * radius;
-  const circleRef = React.useRef();
+const circleRef = React.useRef<Circle | null>(null)
 
 
   const animatedValue = React.useRef(new Animated.Value(0)).current;
 
-  const animation = (toValue) => {
+  const animation = (toValue: any) => {
     return Animated.timing(animatedValue,{
       toValue,
       duration,
@@ -63,6 +63,13 @@ const journal = () => {
         {/* test chart */}
         
       <View className="flex-row justify-end items-center mr-7 py-3">
+        <View className="flex-1 bg-[#3F2305] rounded-md mt-2 mr-4 ml-4">
+          <Text className="text-white text-lg font-medium mb-1 ml-3 align-left">
+            Lorem ipsum dolor sit amet consectetur adipiscing elit. Consectetur adipiscing 
+            elit quisque faucibus ex sapien vitae. Ex sapien vitae pellentesque sem placerat in id. 
+            Placerat in id cursus mi pretium tellus duis.
+          </Text>
+        </View>
         <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
           <G rotation='-90' origin={`${center}, ${center}`}>
           <Circle
@@ -84,9 +91,7 @@ const journal = () => {
             fill={"transparent"}
             strokeDasharray = {circumference}
             strokeDashoffset={circumference / 2}
-            strokeLinecap="round"
-            
-            />
+            strokeLinecap="round"/>
           </G>
         </Svg>
       </View>
