@@ -1,32 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, Image, Pressable, Dimensions } from "react-native";
+import { View, Text, ScrollView, Image, Pressable, Dimensions, FlatList} from "react-native";
 import { router } from "expo-router";
 
 const { width, height } = Dimensions.get('window');
 
-const causes = [
-  {
-    name: "Cause 1",
-    description:
-      "Aloe vera soothes the scalp, conditions hair, and can reduce dandruff. Apply fresh aloe gel to your scalp and hair, leave for 30 minutes, then rinse.",
-    category: "breakage",
-    image: null, // Replace with require('../assets/images/aloe-vera.png') if you have an image
-  },
-  {
-    name: "Cause 1",
-    description:
-      "Coconut oil deeply moisturizes and repairs damaged hair. Warm a small amount, massage into scalp and hair, leave for at least 1 hour, then wash out.",
-    category: "color damage",
-    image: null,
-  },
-  {
-    name: "Cause 1",
-    description:
-      "Eggs are rich in protein and help strengthen hair. Mix one egg with a tablespoon of olive oil, apply to hair, leave for 20 minutes, then rinse with cool water.",
-    category: "hair loss",
-    image: null,
-  },
-];
+const myData = [
+      { id: 'breakage', title: 'Heat Damage', description: 'Overuse of hair styling tools, such as curling or flat irons and hair dryers, increases risks of damaging the hair cuticle from high heat.' },
+      { id: 'breakage', title: 'Over Washing', description: 'Having an oily scalp does not mean washing your hair more often than you need to! Overwashing removes the hair\'s natural sebum which helps in keeping our hair moisturized.'},
+      { id: 'breakage', title: 'Aggressive Brushing', description: 'Aggressive brushing while your hair is wet is a key cause of hair breakage, especially if you brush while hair is still tangled. Instead, use a wide-tooth comb to detangle, and comb later on. ' }
+    ];
 
 const categories = [
   { key: "breakage", label: "Breakage" },
@@ -34,15 +16,30 @@ const categories = [
   { key: "hair loss", label: "Hair Loss" },
 ];
 
+const MyFlatList = () => {
+      return (
+        <FlatList
+          data={myData}
+          renderItem={({ item }) => (
+            <View>
+              <Text>{item.title}</Text>
+            </View>
+          )}
+          keyExtractor={(item) => item.id}
+        />
+      );
+    };
+
 const hairDmgCauses = () => {
   const [selectedCategory, setSelectedCategory] = useState("breakage");
-  const filteredRemedies = causes.filter(r => r.category === selectedCategory);
+  const filteredRemedies = myData.filter(r => r.id === selectedCategory);
 
   return (
     <View className="flex-1 bg-[#FFF2E4]">
       <ScrollView contentContainerStyle={{ paddingBottom: 100, minHeight: height }}>
         {/* Header */}
         <Text className="text-4xl font-extrabold text-[#3F2305] mt-20 text-center mb-7">Hair Damage Causes</Text>
+
         {/* Category Selector */}
         <View className="flex-row justify-center mb-6">
           {categories.map(cat => (
@@ -54,22 +51,26 @@ const hairDmgCauses = () => {
             </Pressable>
           ))}
         </View>
-        {/* Remedy Cards */}
+
+        {/* Cards */}
         {filteredRemedies.map((remedy, idx) => (
           <View
             key={idx}
-            className="flex-row bg-[#3F2305] rounded-lg mx-4 mt-2 mb-6 p-4 shadow-xl"
-            style={{ alignItems: 'flex-start' }}>
-
-            <View className="w-24 h-24 bg-gray-300 rounded-md mt-2 mr-4" />
+            className="flex-row bg-[#3F2305] rounded-lg mx-4 mt-2 mb-4 p-4 shadow-xl">
+          
+          <View className="flex-1 flex-row">
+            <View className="w-24 h-24 bg-gray-300 rounded-md mt-2 mr-4"/>
             {/* Replace above View with <Image source={remedy.image} className="w-16 h-16 rounded-md mr-4" /> if you have images */}
-            <View style={{ flex: 1 }}>
-              <Text className="text-white text-2xl font-bold mb-1">{remedy.name}</Text>
+            <View className="flex-1 mb-5">
+              <Text className="text-white text-2xl font-bold">{remedy.title}</Text>
               <Text className="text-white text-md text-wrap-pretty w-72">{remedy.description}</Text>
             </View>
+          </View>            
           </View>
         ))}
       </ScrollView>
+
+
       <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 shadow-lg">
         {/* Home Icon */}
                     <View className="flex-1 flex-row justify-around">

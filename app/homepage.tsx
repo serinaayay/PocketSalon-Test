@@ -66,30 +66,28 @@ const HomePage = () => {
 
           {/* Info Cards */}
           <View className=" mt-6">
-            <View className="bg-[#3F2305] rounded-xl p-4 mb-4 w-11/12 self-center">
-              <Text className="text-white text-2xl font-bold mb-1">Info</Text>
+            <View className="bg-[#3F2305] rounded-xl p-4 mb-7 w-11/12 self-center">
+              <Text className="text-white text-2xl font-bold mb-1">Did you know?</Text>
               <Text className="text-white text-xs mb-2">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ut ornare mi, vitae blandit odio...
+                Did you know that knowing your hair type and hair damage level is crucial for effective hair care? 
+                By understanding these factors, you can choose the right products and treatments to maintain healthy hair!
               </Text>
               <View className="flex-row justify-end">
-                <Pressable className="bg-[#F2EAD3] px-4 py-2 rounded-lg flex-row items-center w-32 justify-center">
-                  <Text className="text-[#6C4E31] text-lg font-bold mr-2">Try now!</Text>
-                  <Text className="text-[#6C4E31] text-lg">→</Text>
+                <Pressable className="bg-[#F2EAD3] px-4 py-3 rounded-lg flex-row items-center w-50 justify-center align-middle" onPress={() => router.push('/hair-detection')}>
+                  <Text className="text-[#3F2305] text-xl font-extrabold">Start hair analysis</Text>
                 </Pressable>
               </View>
             </View>
             <View className="bg-[#3F2305] rounded-xl p-4 w-11/12 self-center">
-              <Text className="text-white text-2xl font-bold mb-1">Info</Text>
+              <Text className="text-white text-2xl font-bold mb-1">Did you know?</Text>
               <Text className="text-white text-xs mb-2">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                Maecenas ut ornare mi, vitae blandit odio...
+                Did you know that using right hair care products based on your hair type can significantly improve your hair health? 
+                Different hair types have different needs, and using products tailored to your hair type can help maintain moisture, reduce damage, and enhance overall appearance!
               </Text>
               <View className="flex-row justify-end">
-                <Pressable className="bg-[#F2EAD3] px-4 py-2 rounded-lg flex-row items-center w-32 justify-center"
-                onPress={() => router.push('/hair-detection')}>
-                  
-                  <Text className="text-[#6C4E31] text-m font-bold mr-2">Read more</Text>
-                  <Text className="text-[#6C4E31] text-lg">→</Text>
+                <Pressable className="bg-[#F2EAD3] px-4 py-3 rounded-lg flex-row items-center w-50 justify-center"
+                onPress={() => router.push('/healthy-hair-guide')}>
+                    <Text className="text-[#3F2305] text-xl font-extrabold">Read more</Text>
                 </Pressable>
               </View>
             </View>
