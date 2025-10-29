@@ -26,6 +26,17 @@ web-build/
 *.key
 *.mobileprovision
 
+# Android
+android/build/
+android/app/build/
+android/.gradle/
+*.apk
+*.aab
+
+# iOS
+ios/Pods/
+ios/build/
+
 # Metro
 .metro-health-check*
 

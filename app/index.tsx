@@ -21,17 +21,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     button: {
-        backgroundColor: '#6C4E31',
+        backgroundColor: '#FFF2E4',
         paddingVertical: 15,
-        paddingHorizontal: 45,
-        borderRadius: 25,
+        paddingHorizontal: 30,
+        borderRadius: 15,
         alignItems: 'center',
         marginBottom: 20,
         marginTop: height * 0.60,
     },
     buttonText: {
-        color: '#FFFFFF',
-        fontSize: 18,
+        color: '#6C4E31',
+        fontSize: 23,
         fontWeight: 'bold',
     },
 });
@@ -40,18 +40,12 @@ const LoginScreen = () => {
     return (
         <View style={styles.mainContainer}>
             <ImageBackground
-                source={require('../assets/images/Group 15.png')} // Your background image
+                source={require('../assets/images/Startup-Page.png')} // Your background image
                 style={styles.background}
                 imageStyle={{ resizeMode: 'cover' }}>
                 
-                <View style={styles.title}>
-                    <Image 
-                        source={require('../assets/images/Pocket Salon.png')} 
-                        style={{ width: width * 0.91, height: height * 0.067 }}/>
-                </View>
-
                 <TouchableOpacity style={styles.button} onPress={() => router.push('/homepage')}>
-                    <Text style={styles.buttonText}>GET STARTED</Text>
+                    <Text style={styles.buttonText}>Get Started</Text>
                 </TouchableOpacity>
             </ImageBackground>
         </View>

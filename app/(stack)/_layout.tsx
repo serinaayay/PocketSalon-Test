@@ -8,6 +8,11 @@ export default function StackLayout() {
       <Stack.Screen name="homepage" />
       <Stack.Screen name="ResultsScreen" />
       <Stack.Screen name="hair-detection" />
+      <Stack.Screen name="hair-damage-causes" />
+      <Stack.Screen name="healthy-hair-guide" />
+      <Stack.Screen name="journal" />
+      <Stack.Screen name="chatbot" />
+      <Stack.Screen name="layout" />
       <Stack.Screen name="modal" options={{ presentation: "modal" }} />
     </Stack>
   );

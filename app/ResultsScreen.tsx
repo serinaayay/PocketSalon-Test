@@ -1,4 +1,4 @@
-import {View, Text, Image, Pressable, ScrollView, Dimensions, ActivityIndicator} from 'react-native';
+import {View, Text, Image, Pressable, ScrollView, Dimensions} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,7 +7,6 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '@/constants/Colors';
 import { colorScheme } from 'nativewind';
-import { listSuggestedProducts, openDatabase, type SuggestedProduct } from '../lib/db';
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,29 +28,9 @@ const hairTypeDescriptions: { [key: string]: string } = {
 const ResultsScreen = () => {
     const params = useLocalSearchParams();
     const hairType = params.hair_type as string | undefined;
-    const confidence = params.confidence as string | number | undefined;
-    const [products, setProducts] = React.useState<SuggestedProduct[]>([]);
-    const [loading, setLoading] = React.useState(false);
-
-    React.useEffect(() => {
-        let mounted = true;
-        async function load() {
-            if (!hairType) return;
-            setLoading(true);
-            try {
-                await openDatabase();
-                const rows = await listSuggestedProducts({ hairType, limit: 20 });
-                if (mounted) setProducts(rows);
-            } catch (e) {
-                // eslint-disable-next-line no-console
-                console.warn('Failed to load suggested products', e);
-            } finally {
-                if (mounted) setLoading(false);
-            }
-        }
-        load();
-        return () => { mounted = false; };
-    }, [hairType]);
+    const hairConfidence = params.hair_confidence as string | number | undefined;
+    const damageLevel = params.damage_level as string | undefined;
+    const damageConfidence = params.damage_confidence as string | number | undefined;
     return (
         <View className="flex-1 bg-[#FFEAD2]">
             <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 100, minHeight: height }}>
@@ -99,7 +78,7 @@ const ResultsScreen = () => {
                 </View>
 
                 <View className="mx-8 my-8">
-                    <Text className="text-m font-m mb-4 mr-5 text-[#5B3E20]">Confidence: {confidence ? `${(parseFloat(confidence as string) * 100).toFixed(2)}%` : ''}</Text>
+                    <Text className="text-m font-m mb-4 mr-5 text-[#5B3E20]">Confidence: {hairConfidence ? `${(parseFloat(hairConfidence as string) * 100).toFixed(2)}%` : ''}</Text>
                 </View>
 
                 {/* Hair Damage Row */}
@@ -113,7 +92,7 @@ const ResultsScreen = () => {
                                     width: width * 0.30,
                                     height: width * 0.30,
                                 }}/>
-                            <Text className="text-base font-semibold mt-2 text-[#2D2D2D] mr-4">[Damage Type]</Text>
+                            <Text className="text-base font-semibold mt-2 text-[#2D2D2D] mr-4">{damageLevel || 'Damage'}</Text>
                         </View>
                         {/* Hair Damage description */}
                         <View 
@@ -124,8 +103,8 @@ const ResultsScreen = () => {
                                 marginLeft: width * 0.02
                             }}>
                             <Text className="text-white text-sm font-medium p-4 text-justify">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ut ornare mi, vitae blandit odio. 
-                                Nulla efficitur, dolor non vulputate malesuada, libero est rutrum urna, in pharetra arcu tortor in neque. 
+                                Damage Level: {damageLevel || 'Unknown'}{'\n'}
+                                Confidence: {damageConfidence ? `${(parseFloat(damageConfidence as string) * 100).toFixed(2)}%` : 'N/A'}
                             </Text>
                         </View>
                     </View>
@@ -135,36 +114,17 @@ const ResultsScreen = () => {
                 <View className="mx-8 my-16">
                     <Text className="text-xl font-black mb-4 text-[#5B3E20] text-center">What Hair Products Can You Use?</Text>
                     <View className="w-full flex items-center">
-                      {loading ? (
-                        <ActivityIndicator color="#7A5E42" />
-                      ) : (
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                          {products.length === 0 ? (
-                            <View className="w-64 bg-[#B39473] rounded-xl shadow-lg mx-4 p-4 items-center">
-                              <View className="w-full aspect-square bg-[#a88c6b] rounded-lg mb-4 flex justify-center items-center">
-                                <Text className="text-white text-lg font-bold text-center">No suggestions yet</Text>
-                              </View>
-                              <Text className="text-white text-sm text-center">Try adding products for this hair type.</Text>
-                            </View>
-                          ) : (
-                            products.map((p) => (
-                              <View key={p.id} className="w-64 bg-[#B39473] rounded-xl shadow-lg mx-4 p-4 items-center">
-                                <View className="w-full aspect-square bg-[#a88c6b] rounded-lg mb-4 flex justify-center items-center overflow-hidden">
-                                  {p.imageUri ? (
-                                    <Image source={{ uri: p.imageUri }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
-                                  ) : (
-                                    <Text className="text-white text-lg font-bold text-center">{p.title}</Text>
-                                  )}
-                                </View>
-                                <Text className="text-white text-base font-bold text-center mb-1">{p.title}</Text>
-                                {!!p.description && (
-                                  <Text className="text-white text-sm text-center">{p.description}</Text>
-                                )}
-                              </View>
-                            ))
-                          )}
-                        </ScrollView>
-                      )}
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        <View className="w-64 bg-[#B39473] rounded-xl shadow-lg mx-4 p-4 items-center">
+                          <View className="w-full aspect-square bg-[#a88c6b] rounded-lg mb-4 flex justify-center items-center">
+                            <Text className="text-white text-lg font-bold text-center">Product Name</Text>
+                          </View>
+                          <Text className="text-white text-sm text-center">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ut ornare mi, vitae blandit odio. Nulla efficitur, dolor non vulputate malesuada, libero est rutrum urna, in pharetra arcu tortor in neque.
+                          </Text>
+                        </View>
+                        {/* ...other product cards */}
+                      </ScrollView>
                     </View>
                 </View>
                 <Text className="text-xl font-black mb-6 text-[#5B3E20] text-center">Natural Remedies for [Hair Damage]</Text>
@@ -180,39 +140,33 @@ const ResultsScreen = () => {
 
             <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#6C4E31] rounded-full flex-row items-center px-2 py-2 shadow-lg">
             {/* Home Icon */}
-            <View className="flex-1 flex-row justify-around">
-                <View className="flex-col items-center">
-                    <Pressable className="2 justify-center"
-                    onPress={() => router.push('/homepage')}>
-                        <Image
-                        source={require('../assets/images/home.png')}
-                        className="w-8 h-8"/>
-                    </Pressable>
-                </View>
-            {/* Detect Icon */}
-                <View className="flex-col items-center">
-                    <Pressable className="2 justify-center"
-                    onPress={() => router.push('/hair-detection')}>
-                    <Image
-                        source={require('../assets/images/camera.png')}
-                        className="w-9 h-9"/>
-                    </Pressable>
-                </View>
-            {/* About Us Icon */}
-                <View className="flex-col items-center">
-                    <Image
-                        source={require('../assets/images/about-us.png')}
-                        className="w-9 h-9"/>
-                </View>
-            {/* Settings Icon */}
-                <View className="flex-col items-center">
-                    <Image
-                        source={require('../assets/images/setting.png')}
-                        className="w-8 h-8"/>
-                </View>
+                        <View className="flex-1 flex-row justify-around">
+                            <View className="flex-col items-center">
+                                <Pressable className="2 justify-center"
+                                onPress={() => router.push('/homepage')}>
+                                    <Image
+                                    source={require('../assets/images/home_icon.png')}
+                                    className="w-8 h-8"/>
+                                </Pressable>
+                            </View>
+                        {/* Detect Icon */}
+                            <View className="flex-col items-center">
+                                <Pressable className="2 justify-center"
+                                onPress={() => router.push('/hair-detection')}>
+                                <Image
+                                    source={require('../assets/images/capture (1).png')}
+                                    className="w-9 h-9"/>
+                                </Pressable>
+                            </View>
+                        {/* Journal Icon */}
+                            <View className="flex-col items-center">
+                                <Image
+                                    source={require('../assets/images/like.png')}
+                                    className="w-9 h-9"/>
+                            </View>
+                        </View>
             </View>
             </View>
-        </View>
     );
 };
 

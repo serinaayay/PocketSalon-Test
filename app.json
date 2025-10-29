@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "nativewind-expo-router",
-    "slug": "nativewind-expo-router",
+    "name": "PocketSalon",
+    "slug": "pocket-salon",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -30,11 +30,13 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.nativewindexporouter",
+      "package": "com.pocketsalon.app",
       "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -44,6 +46,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-dev-client",
       [
         "expo-screen-orientation",
         {
@@ -54,13 +57,13 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+          "cameraPermission": "Allow PocketSalon to access your camera for hair type detection."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos."
+          "photosPermission": "Allow PocketSalon to access your photos for hair type analysis."
         }
       ]
     ],
@@ -71,6 +74,9 @@
     "extra": {
       "router": {
         "origin": false
+      },
+      "eas": {
+        "projectId": "73447ed6-23eb-4a82-a320-866fe1c5a315"
       }
     }
   }
