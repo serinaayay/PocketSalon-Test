@@ -1,9 +1,4 @@
-"""
-Export hair type and hair damage Keras models to ONNX format
-This script exports:
-- mobnetv3_hairtype_1.keras -> hair_type_model.onnx
-- mobnetv3_hairdmg_2_POST.keras -> hair_damage_model_2.onnx (multilabel)
-"""
+
 
 import os
 import sys
@@ -49,10 +44,8 @@ def convert_keras_to_onnx(keras_path, onnx_path, model_name):
     # Convert to ONNX
     print(f"\n2. Converting to ONNX format...")
     try:
-        # Get input signature
         spec = (tf.TensorSpec(model.input_shape, tf.float32, name="input"),)
-        
-        # Convert with opset 13 (compatible with onnxruntime-react-native)
+    
         onnx_model, _ = tf2onnx.convert.from_keras(
             model,
             input_signature=spec,
@@ -63,7 +56,7 @@ def convert_keras_to_onnx(keras_path, onnx_path, model_name):
         print(f"   [OK] Conversion successful")
         print(f"   Saved to: {onnx_path}")
         
-        # Verify ONNX model
+
         print(f"\n3. Verifying ONNX model...")
         onnx_model = onnx.load(str(onnx_path))
         onnx.checker.check_model(onnx_model)
@@ -83,17 +76,15 @@ def convert_keras_to_onnx(keras_path, onnx_path, model_name):
 
 
 def main():
-    # Paths
+
     backend_dir = Path(__file__).parent
     project_root = backend_dir.parent
-    
-    # Create output directories
+
     hair_type_dir = project_root / "assets" / "models" / "hair_type"
     hair_damage_dir = project_root / "assets" / "models" / "hair_damage"
     hair_type_dir.mkdir(parents=True, exist_ok=True)
     hair_damage_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Models to convert
+
     models = [
         {
             "name": "Hair Type Model (MobileNetV3)",
@@ -133,34 +124,10 @@ def main():
         else:
             print(f"\n[ERROR] Model not found: {model_info['keras']}")
     
-    # Summary
-    print(f"\n{'='*70}")
-    print(f"Conversion Summary: {success_count}/{len(models)} successful")
-    print(f"{'='*70}")
-    
-    if success_count > 0:
-        print("\n[Converted Models]")
-        for model_info in converted_models:
-            print(f"\n  {model_info['name']}")
-            print(f"    Source: {model_info['keras'].name}")
-            print(f"    Output: {model_info['onnx']}")
-            print(f"    Info:   {model_info['description']}")
-        
-        print("\n[Next Steps for React Native Integration]")
-        print("  1. Metro bundler already configured to include .onnx files")
-        print("  2. Models will be loaded from assets/models/")
-        print("  3. Use lib/onnx-helpers-native.ts for inference")
-        print("\n[Image Preprocessing Requirements]")
-        print("  - Input size: 224x224 pixels")
-        print("  - Format: RGB (3 channels)")
-        print("  - Normalization: 0-1 range (divide by 255)")
-        print("  - Tensor format: NCHW (batch, channels, height, width)")
-    
     return success_count == len(models)
 
 
 if __name__ == "__main__":
-    # Check if tf2onnx is installed
     try:
         import tf2onnx
     except ImportError:
