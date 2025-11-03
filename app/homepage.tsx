@@ -1,6 +1,6 @@
 import { View, Text, Pressable, ScrollView, TextInput, Dimensions } from "react-native";
 import { Image } from "react-native";
-import React, { useState } from "react";
+import React from "react";
 import { router } from "expo-router";
 import Accordion from "@/components/Accordion";
 import data from "./data";
@@ -21,7 +21,6 @@ const HomePage = () => {
             className="w-48 h-40 -mt-24 -mb-10"
             resizeMode="contain"/>
           
-          {/* Detect */}
           <View className="mb-6">
             <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-4" contentContainerStyle={{ paddingLeft: 8 }}>
               <View className="flex-row space-x-20">
@@ -64,7 +63,6 @@ const HomePage = () => {
             </ScrollView>
           </View>
 
-          {/* Info Cards */}
           <View className=" mt-6">
             <View className="bg-[#3F2305] rounded-xl p-4 mb-7 w-11/12 self-center">
               <Text className="text-white text-2xl font-bold mb-1">Did you know?</Text>
@@ -92,7 +90,6 @@ const HomePage = () => {
               </View>
             </View>
 
-            {/* faqs part */}
             <View className="flex items-center justify-center mt-20">
               <Text className="text-[#3F2305] text-4xl font-bold text-center wrap-1 mb-5">Frequently Asked Questions (FAQs)</Text>
                 {data.map((value, index) => {
@@ -101,18 +98,20 @@ const HomePage = () => {
             </View>
 
             <Text className="text-[#3F2305] text-3xl font-bold text-center wrap-1 mb-5 mt-5">Chatbot</Text>
-            <View className="rounded-xl border-2 border-[#6C4E31] px-4 py-2 flex-row items-center self-center">
+            <Pressable 
+              onPress={() => router.push('/chatbot')}
+              className="rounded-xl border-2 border-[#6C4E31] px-4 py-2 flex-row items-center self-center">
                 <TextInput
                     placeholder="Still have other concerns? Ask me!"
                     placeholderTextColor="#666262ff"
                     className="flex-1 text-base"
-                    keyboardType="default"/>
-                </View>
+                    editable={false}
+                    pointerEvents="none"/>
+                </Pressable>
           </View>
         </View>
       </ScrollView>
       <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 shadow-lg">
-            {/* Home Icon */}
             <View className="flex-1 flex-row justify-around">
                 <View className="flex-col items-center">
                     <Pressable className="2 justify-center"
@@ -122,7 +121,6 @@ const HomePage = () => {
                         className="w-8 h-8"/>
                     </Pressable>
                 </View>
-            {/* Detect Icon */}
                 <View className="flex-col items-center">
                     <Pressable className="2 justify-center"
                     onPress={() => router.push('/hair-detection')}>
@@ -131,7 +129,6 @@ const HomePage = () => {
                         className="w-9 h-9"/>
                     </Pressable>
                 </View>
-            {/* Journal Icon */}
                 <View className="flex-col items-center">
                     <Pressable className="2 justify-center"
                     onPress={() => router.push('/journal')}>
