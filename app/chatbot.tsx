@@ -1,8 +1,8 @@
-import { View, Text, Pressable, ScrollView, TextInput, KeyboardAvoidingView, Platform, Dimensions } from "react-native";
+import { View, Text, Pressable, ScrollView, TextInput, KeyboardAvoidingView, Platform, Dimensions, Image} from "react-native";
 import { useState, useRef, useEffect } from "react";
 import { router } from "expo-router";
 
-const { height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 interface Message {
   id: string;
@@ -197,16 +197,22 @@ export default function ChatbotScreen() {
       keyboardVerticalOffset={0}>
       
       {/* Header */}
-      <View className="bg-[#3F2305] pt-12 pb-6 px-6 rounded-b-3xl">
-        <View className="flex-row items-center mb-2">
-          <Pressable onPress={() => router.back()} className="mr-4">
-            <Text className="text-[#FAF7F0] text-2xl">←</Text>
+      <View className="flex-row items-center w-full h-[25vh] bg-[#3F2305] rounded-b-3xl justify-center">
+          <Pressable onPress={() => router.push('/homepage')} className="absolute left-7">
+            <Image
+              source={require('../assets/images/arrow.png')}
+              style={{ width: width * 0.07, height: height, marginTop: height * -0.09}}
+              resizeMode="contain"/>
           </Pressable>
-          <Text className="text-[#FAF7F0] text-3xl font-bold">PocketSalon Assistant</Text>
+          
+          <Text className="text-[#FAF7F0] text-3xl font-bold -mt-20 self-center">PocketSalon Assistant</Text>
+          {/* to center text */}
+          <View className="absolute items-center justify-center mt-16 px-10">
+            <Text className="text-[#FAF7F0] text-m ml-15 text-center">Ask about hair types, care routines & health tips</Text>
+            <Text className="text-[#FAF7F0] text-s italic text-wrap-pretty w-96 mt-3 text-center">Disclaimer: This application is experimental. Consult an expert.</Text>
+          </View>
         </View>
         <Text className="text-[#FAF7F0] text-sm ml-10">Ask about hair types, care routines & health tips</Text>
-      </View>
-
       {/* Messages */}
       <ScrollView
         ref={scrollViewRef}
@@ -218,7 +224,7 @@ export default function ChatbotScreen() {
             className={`mb-4 ${message.isUser ? 'items-end' : 'items-start'}`}>
             <View
               className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                message.isUser ? 'bg-[#6C4E31]' : 'bg-[#DFD7BF]'
+                message.isUser ? 'bg-[#3F2305]' : 'bg-[#F2EAD3]'
               }`}>
               <Text className={`text-base ${message.isUser ? 'text-white' : 'text-[#3F2305]'}`}>
                 {message.text}
@@ -234,18 +240,20 @@ export default function ChatbotScreen() {
           value={inputText}
           onChangeText={setInputText}
           placeholder="Ask me anything about hair care..."
-          placeholderTextColor="#666"
-          className="flex-1 bg-[#F5F5F5] rounded-full px-4 py-3 mr-2 text-base"
+          placeholderTextColor="#3F2305"
+          className="flex-1 bg-[#F5F5F5] rounded-full px-4 py-4 mr-2 text-base mb-5"
           multiline
           maxLength={200}
           onSubmitEditing={sendMessage}
           returnKeyType="send"
         />
-        <Pressable
-          onPress={sendMessage}
-          className="bg-[#6C4E31] rounded-full w-12 h-12 items-center justify-center">
-          <Text className="text-white text-xl font-bold">→</Text>
-        </Pressable>
+        <Pressable onPress={sendMessage} className="bg-[#3F2305] rounded-full items-center justify-center mb-4"   
+          style={{width: 50, height: 50 }}>
+            <Image
+              source={require('../assets/images/arrow.png')}
+              style={{ width: '50%', height: '50%', resizeMode: 'contain', transform: [{ rotate: '180deg' }]}}
+              resizeMode="contain"/>
+          </Pressable>
       </View>
     </KeyboardAvoidingView>
   );

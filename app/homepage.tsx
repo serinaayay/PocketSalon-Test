@@ -10,7 +10,7 @@ const { width, height } = Dimensions.get('window');
 const HomePage = () => {
   return (
     <View className="flex-1 bg-transparent">
-      <ScrollView contentContainerStyle={{paddingBottom: "auto"}} showsVerticalScrollIndicator={true}>
+      <ScrollView contentContainerStyle={{paddingBottom: 800 }} showsVerticalScrollIndicator={true}>
         <View className="bg-[#FFF2E4] rounded-xl w-full flex-1 px-6 py-6">
           <Image
             source={require('../assets/images/Hello_Good_morning.png')}
