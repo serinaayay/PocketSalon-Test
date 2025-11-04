@@ -1,7 +1,8 @@
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
-import { Alert, Dimensions, Image, Pressable, ScrollView, Text, View, Modal} from "react-native";
+import { Alert, Dimensions, Image, Pressable, ScrollView, Text, View } from "react-native";
+import { analyzeHair } from "../lib/onnx-helpers-native";
 
 const { width, height } = Dimensions.get('window');
 const frameSize = Math.min(width * 0.9, 350); 
@@ -10,7 +11,6 @@ export default function HairDetectionPage() {
   const [image, setImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -29,7 +29,7 @@ export default function HairDetectionPage() {
   const pickImage = async () => {
   try {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: true,
       quality: 1,
     });
@@ -57,26 +57,27 @@ export default function HairDetectionPage() {
     if (!image) return;
     setLoading(true);
     setError(null);
-    const formData = new FormData();
-    formData.append('file', {
-      uri: image,
-      type: 'image/jpeg',
-      name: 'photo.jpg',
-    } as any);
+    
     try {
-      const response = await fetch('http://172.17.53.25:8000/predict', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
+      // Run local on-device inference using ONNX models
+      const result = await analyzeHair(image);
+      
+      // Navigate to results with both hair type and damage analysis
+      router.push({
+        pathname: '/ResultsScreen',
+        params: {
+          hair_type: result.hairType.type,
+          hair_confidence: result.hairType.confidence.toString(),
+          damage_level: result.hairDamage.level,
+          damage_confidence: result.hairDamage.confidence.toString(),
         },
       });
-      const data = await response.json();
-      router.push({ pathname: '/ResultsScreen', params: { hair_type: data.hair_type, confidence: data.confidence } });
     } catch (e) {
-      setError('Failed to analyze image.');
+      console.error('Analysis error:', e);
+      setError(`Failed to analyze image: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -90,75 +91,16 @@ export default function HairDetectionPage() {
               style={{ width: width * 0.07, height: height * 0.04, marginTop: height * -0.09}}
               resizeMode="contain"/>
           </Pressable>
-          <Text className="text-[#FAF7F0] text-4xl font-bold text-center -mt-28">Hair Type and {'\n'} Damage Detector</Text>
+          <Text className="text-[#FAF7F0] text-4xl font-bold text-center -mt-24">Hair Type and {'\n'} Damage Detector</Text>
           {/* to center text */}
           <View className="absolute items-center justify-center mt-16 px-10">
-          <Text className="text-[#FAF7F0] text-lg text-wrap-pretty w-96 mt-20 text-center mb-5 ">Take a picture or upload an image of your hair and we’ll identify your hair type!</Text>
-          <Text className="text-[#FAF7F0] text-s italic text-wrap-pretty w-96 mt-3 text-center">Disclaimer: This application is experimental. Consult an expert.</Text>
+          <Text className="text-[#FAF7F0] text-xl text-wrap-pretty w-96 mt-14 text-center">Take a picture or upload an image of your hair and we’ll identify your hair type!</Text>
           </View>
         </View>
 
-        {/* Pop up for Scalp */}
-        <Modal 
-          visible={modalVisible} 
-          animationType="slide" 
-          transparent={true} 
-          onRequestClose={() => setModalVisible(false)}>
-            <View style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "rgba(0, 0, 0, 0.3)" 
-            }}>
-
-          <View style={{backgroundColor: '#FFF2E4', width: 340, height: 390, alignSelf: "center", borderRadius: 10, paddingTop: 40}}>
-            <Text className="text-2xl text-center font-bold"> What is your Scalp Condition?</Text>
-            <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mt-5 mb-3"
-              onPress={() => {console.log("Oily Scalp selected")
-              setModalVisible(false)}}>
-
-              <Text className="text-[#FAF7F0] text-xl font-bold">Oily</Text>
-            </Pressable>
-
-            <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mb-3"
-              onPress={() => {console.log("Dry Scalp selected")
-              setModalVisible(false)}}>
-              <Text className="text-[#FAF7F0] text-xl font-bold">Dry</Text>
-            </Pressable>
-
-            <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mb-3"
-              onPress={() => {console.log("Dandruff Scalp selected")
-              setModalVisible(false)}}>
-              <Text className="text-[#FAF7F0] text-xl font-bold">Dandruff</Text>
-            </Pressable>
-
-            <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mb-12"
-              onPress={() => {console.log("Unknown Scalp selected")
-              setModalVisible(false)}}>
-              <Text className="text-[#FAF7F0] text-xl font-bold">I don't know</Text>
-            </Pressable>
-            
-          {/* Cancel button */}
-          <Pressable 
-            className="bg-[#A72703] py-2 px-4 rounded-xl w-60 self-center items-center"
-            onPress={() => {setModalVisible(false)
-              router.back()
-            }}>
-
-            <Text className="text-[#FAF7F0] text-xl font-bold">Cancel</Text>
-          </Pressable>
-          </View>
-          </View>
-        </Modal>
-
-        
         {/* Image Frame */}
         <View style={{ width: frameSize, height: frameSize, zIndex: 1, marginTop: -frameSize / 5}} className="relative rounded-xl overflow-hidden 
-        items-center justify-center bg-[#DFD7BF] top-16 shadow-lg">
+        items-center justify-center bg-[#DFD7BF] top-12 shadow-lg">
           {image ? (
             <Image source={{ uri: image }} style={{ width: frameSize, height: frameSize }} resizeMode="cover" />
           ) : (
