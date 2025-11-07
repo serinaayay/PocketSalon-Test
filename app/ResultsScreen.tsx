@@ -196,21 +196,21 @@ const ResultsScreen = () => {
              
                 {/* Product Recommendations Row */}
                 <View className="mx-8 my-16">
-                    <Text className="text-xl font-black mb-4 text-[#5B3E20] text-center">What Hair Products Can You Use?</Text>
+                    <Text className="text-[27px] font-bold mb-4 text-[#3F2305] text-center">Product Suggestions</Text>
                     <View className="w-full flex items-center">
                       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         {recommendProducts({ hairType, scalpCondition, hairDamage: damageLevel, limit: 10 }).map((product) => (
-                          <View key={product.id} className="w-64 bg-[#B39473] rounded-xl shadow-lg mx-4 p-4 items-center">
-                            <View className="w-full aspect-square bg-[#a88c6b] rounded-lg mb-4 flex justify-center items-center">
+                          <View key={product.id} className="w-64 bg-[#3F2305] rounded-xl shadow-lg mx-4 p-4 items-center">
+                            <View className="w-full aspect-square bg-[#f3ddc5] rounded-lg mb-4 flex justify-center items-center">
                               <Image
                                 source={getProductImage(product.imageKey)}
                                 style={{ width: '80%', height: '80%', resizeMode: 'contain' }}
                               />
                             </View>
-                            <Text className="text-white text-lg font-bold text-center mb-2">
+                            <Text className="text-white text-xl font-bold text-center mb-2">
                               {product.name}
                             </Text>
-                            <Text className="text-white text-sm text-center">
+                            <Text className="text-white text-m text-center">
                               {product.description}
                             </Text>
                           </View>
@@ -232,13 +232,37 @@ const ResultsScreen = () => {
                             }
                         })}>
                         <Text className="text-white text-xl font-bold text-center">
-                            📋 View Your Personalized Routine
+                            View Your Personalized Routine
                         </Text>
                         <Text className="text-white text-sm text-center mt-2">
                             Get detailed care instructions for your hair
                         </Text>
                     </Pressable>
                 </View>
+
+                <Text className="text-[27px] font-bold mb-4 text-[#3F2305] text-center">Natural Remedies</Text>
+                    <View className="w-full flex items-center">
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        {recommendProducts({ hairType, scalpCondition, hairDamage: damageLevel, limit: 10 }).map((product) => (
+                          <View key={product.id} className="w-64 bg-[#3F2305] rounded-xl shadow-lg mx-4 p-4 items-center">
+                            <View className="w-full aspect-square bg-[#f3ddc5] rounded-lg mb-4 flex justify-center items-center">
+                              <Image
+                                source={getProductImage(product.imageKey)}
+                                style={{ width: '80%', height: '80%', resizeMode: 'contain' }}
+                              />
+                            </View>
+                            <Text className="text-white text-xl font-bold text-center mb-2">
+                              {product.name}
+                            </Text>
+                            <Text className="text-white text-m text-center">
+                              {product.description}
+                            </Text>
+                          </View>
+                        ))}
+                      </ScrollView>
+                    </View>
+
+
             </ScrollView>
 
             <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 shadow-lg">

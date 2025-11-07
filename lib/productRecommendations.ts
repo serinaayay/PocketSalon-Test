@@ -28,7 +28,7 @@ export const sampleProducts: Product[] = [
     id: '1',
     name: 'Human Heart Nature - Moisturizing Shampoo',
     description:
-      '99.24% Natural | sulfate-free | paraben-free | Best for: Hydrating & softening dry, rough hair.',
+      '99.24% Natural \n Sulfate-Free \n Paraben-Free \n\n Best for: Hydrating & softening dry, rough hair.',
     imageKey: 'human-heart-moisturizing-shampoo',
     productType: 'Shampoo',
     scalpCondition: ['Dry'],

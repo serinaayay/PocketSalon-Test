@@ -171,13 +171,13 @@ export default function HairDetectionPage() {
             <Pressable 
               className="bg-[#3F2305] py-4 px-6 rounded-xl w-60 self-center items-center mb-4"
               onPress={handleCaptureOption}>
-              <Text className="text-[#FAF7F0] text-xl font-bold">📷 Capture Photo</Text>
+              <Text className="text-[#FAF7F0] text-xl font-bold">Capture Photo</Text>
             </Pressable>
 
             <Pressable 
               className="bg-[#3F2305] py-4 px-6 rounded-xl w-60 self-center items-center mb-4"
               onPress={handleUploadOption}>
-              <Text className="text-[#FAF7F0] text-xl font-bold">📁 Upload Image</Text>
+              <Text className="text-[#FAF7F0] text-xl font-bold"> Upload Image</Text>
             </Pressable>
           </View>
           </View>
