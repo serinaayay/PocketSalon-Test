@@ -12,6 +12,8 @@ export default function StackLayout() {
       <Stack.Screen name="healthy-hair-guide" />
       <Stack.Screen name="journal" />
       <Stack.Screen name="chatbot" />
+      <Stack.Screen name="PersonalizedRoutine" />
+      <Stack.Screen name="test-image-picker" />
       <Stack.Screen name="layout" />
       <Stack.Screen name="modal" options={{ presentation: "modal" }} />
     </Stack>

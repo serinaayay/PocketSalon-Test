@@ -39,17 +39,13 @@
 ```typescript
 import { loadHairDamageModel, predictHairDamage, preprocessImageForOnnx } from '@/lib/onnx-helpers-native';
 
-// Load model (do this once)
+// Load model 
 const session = await loadHairDamageModel();
 
-// Preprocess image (224x224)
 const tensor = await preprocessImageForOnnx(imageUri, 224);
 
-// Run inference
 const result = await predictHairDamage(session, tensor);
 console.log(result.damageLevel, result.confidence);
-// Example output: "Light Damage", 0.82
-```
 
 ## Model Training Information
 
@@ -68,23 +64,3 @@ console.log(result.damageLevel, result.confidence);
 - File: `hair_damage_model_2.onnx`
 - Source: `mobnetv3_hairdmg_2_POST.keras`
 - Classes: 4 (multilabel, current version)
-
-## Re-conversion
-
-To re-convert from Keras to ONNX:
-
-```bash
-cd backend-files
-..\venv\Scripts\python.exe export_all_models_to_onnx.py
-```
-
-This will regenerate `hair_damage_model_2.onnx` from the latest Keras file.
-
-## Image Dimensions Alignment
-
-Both hair type and hair damage models use the same input dimensions:
-- **Input Size**: 224×224 pixels
-- **Channels**: 3 (RGB)
-- **Format**: NCHW (channel-first)
-
-This ensures consistent preprocessing across both models.

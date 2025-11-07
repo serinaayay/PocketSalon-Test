@@ -3,35 +3,17 @@ import * as FileSystem from 'expo-file-system';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { Asset } from 'expo-asset';
 
-export async function loadModel(): Promise<InferenceSession> {
-  try {
-    // Load model from assets using expo-asset
-    const modelAsset = Asset.fromModule(require('../assets/models/hair_type/hair_type_model.onnx'));
-    await modelAsset.downloadAsync();
-    
-    if (!modelAsset.localUri) {
-      throw new Error('Failed to load model asset');
-    }
-    
-    console.log('Loading model from:', modelAsset.localUri);
-    const session = await InferenceSession.create(modelAsset.localUri);
-    console.log('Model loaded:', session.inputNames, session.outputNames);
-    return session;
-  } catch (error) {
-    console.error('Error loading model:', error);
-    throw error;
-  }
-}
-
 // Load hair type model (expects NCHW [1, 3, H, W])
 export async function loadHairTypeModel(): Promise<InferenceSession> {
   try {
-    const modelAsset = Asset.fromModule(require('../assets/models/hair_type/hair_type_model.onnx'));
+    // Load the merged model (all data embedded in single file)
+    const modelAsset = Asset.fromModule(require('../assets/models/hair_type/hair_type_merged.onnx'));
     await modelAsset.downloadAsync();
+    
     if (!modelAsset.localUri) {
       throw new Error('Failed to load hair type model asset');
     }
-    console.log('Hair type model loaded from:', modelAsset.localUri);
+    
     return await InferenceSession.create(modelAsset.localUri);
   } catch (error) {
     console.error('Error loading hair type model:', error);
@@ -39,16 +21,16 @@ export async function loadHairTypeModel(): Promise<InferenceSession> {
   }
 }
 
-// Load hair damage model (expects NHWC [1, H, W, 3])
+// Load hair damage model (expects NCHW [1, 3, 224, 224] according to README)
 export async function loadHairDamageModel(): Promise<InferenceSession> {
   try {
-    const modelAsset = Asset.fromModule(require('../assets/models/hair_damage/hair_damage_model_2.onnx'));
+    const modelAsset = Asset.fromModule(require('../assets/models/hair_damage/MobileNetV3Small.onnx'));
     await modelAsset.downloadAsync();
     if (!modelAsset.localUri) {
       throw new Error('Failed to load hair damage model asset');
     }
-    console.log('Hair damage model loaded from:', modelAsset.localUri);
-    return await InferenceSession.create(modelAsset.localUri);
+    const session = await InferenceSession.create(modelAsset.localUri);
+    return session;
   } catch (error) {
     console.error('Error loading hair damage model:', error);
     throw error;
@@ -158,43 +140,40 @@ export async function preprocessImageNHWC(imageUri: string, targetSize: number =
 
 export async function analyzeHair(imageUri: string): Promise<{
   hairType: { type: string; confidence: number };
-  hairDamage: { level: string; confidence: number };
+  hairDamage: { level: string; type: string; confidence: number };
+  hairHealth: { score: number };
+  predictions: number[]; // use hair damage raw probs as canonical predictions
+  modelLoadingTimeMs: number;
+  inferenceTimeMs: number;
 }> {
   try {
-    console.log('Starting hair analysis...');
-    
+    const t0Load = Date.now();
     // Load both models
     const [hairTypeSession, hairDamageSession] = await Promise.all([
       loadHairTypeModel(),
       loadHairDamageModel(),
     ]);
+    const modelLoadingTimeMs = Date.now() - t0Load;
     
-    console.log('Both models loaded successfully');
-    console.log('Hair Type Model - Input:', hairTypeSession.inputNames, 'Output:', hairTypeSession.outputNames);
-    console.log('Hair Damage Model - Input:', hairDamageSession.inputNames, 'Output:', hairDamageSession.outputNames);
-    
-    // BOTH models actually expect NHWC format [1, 224, 224, 3] (channels-last)
-    // The README was incorrect - the actual runtime shows they need channels-last format
+    // Hair type model expects NCHW format [1, 3, 224, 224] (channels-first)
+    // Hair damage model expects NHWC format [1, 224, 224, 3] (channels-last)
+    const tensorNCHW = await preprocessImageNCHW(imageUri, 224);
     const tensorNHWC = await preprocessImageNHWC(imageUri, 224);
     
-    console.log('Image preprocessed with shape:', tensorNHWC.dims);
-    
-    // Run inference on both models (both use the same NHWC tensor)
+    // Run inference on both models with their respective tensor formats
     const hairTypeInputName = hairTypeSession.inputNames[0];
     const hairDamageInputName = hairDamageSession.inputNames[0];
     
+    const t0Infer = Date.now();
     const [hairTypeOutputs, hairDamageOutputs] = await Promise.all([
-      hairTypeSession.run({ [hairTypeInputName]: tensorNHWC }),
+      hairTypeSession.run({ [hairTypeInputName]: tensorNCHW }),
       hairDamageSession.run({ [hairDamageInputName]: tensorNHWC }),
     ]);
-    
-    console.log('Inference completed on both models');
+    const inferenceTimeMs = Date.now() - t0Infer;
     
     // Process Hair Type results
     const hairTypeOutputName = hairTypeSession.outputNames[0];
     const hairTypeData = hairTypeOutputs[hairTypeOutputName].data as Float32Array;
-    
-    console.log('Hair Type raw output:', Array.from(hairTypeData));
     
     // Find the class with highest probability
     let maxIndex = 0;
@@ -207,42 +186,96 @@ export async function analyzeHair(imageUri: string): Promise<{
     }
     
     // Map to hair type labels from README
-    const hairTypeLabels = ['Straight', 'Wavy', 'Curly', 'Kinky'];
+    const hairTypeLabels = ['Straight', 'Wavy', 'Curly', 'Coily'];
     const hairType = hairTypeLabels[maxIndex] || `Type ${maxIndex + 1}`;
     const hairTypeConfidence = maxValue;
     
     // Process Hair Damage results
-    const hairDamageOutputName = hairDamageSession.outputNames[0];
-    const hairDamageData = hairDamageOutputs[hairDamageOutputName].data as Float32Array;
+    // The model has separate outputs for each damage type
+    // Map output names to damage types
+    const outputNameToDamageType: { [key: string]: string } = {
+      'healthy': 'Healthy',
+      'breakage': 'Breakage',
+      'hair_loss': 'Hair Loss',
+      'hairloss': 'Hair Loss',
+      'color_damage': 'Color Damage',
+      'colordamage': 'Color Damage',
+    };
     
-    console.log('Hair Damage raw output:', Array.from(hairDamageData));
+    // Process all outputs and find the one with highest value
+    let maxDamageValue = 0;
+    let maxDamageType = 'Healthy';
+    let allDamageValues: { [key: string]: number } = {};
     
-    // Find the class with highest probability
-    let maxDamageIndex = 0;
-    let maxDamageValue = hairDamageData[0];
-    for (let i = 1; i < hairDamageData.length; i++) {
-      if (hairDamageData[i] > maxDamageValue) {
-        maxDamageValue = hairDamageData[i];
-        maxDamageIndex = i;
+    for (const outputName of hairDamageSession.outputNames) {
+      const outputData = hairDamageOutputs[outputName].data as Float32Array;
+      const outputValue = outputData[0]; // Each output is a single value [1, 1]
+      
+      // Map output name to damage type (normalize to lowercase for matching)
+      const normalizedName = outputName.toLowerCase();
+      const damageType = outputNameToDamageType[normalizedName] || outputName;
+      
+      allDamageValues[damageType] = outputValue;
+      
+      // Track the highest value
+      if (outputValue > maxDamageValue) {
+        maxDamageValue = outputValue;
+        maxDamageType = damageType;
       }
     }
     
-    // Map to damage level labels from README
-    const damageLevels = ['Healthy', 'Light Damage', 'Moderate Damage', 'Severe Damage'];
-    const damageLevel = damageLevels[maxDamageIndex] || `Level ${maxDamageIndex}`;
-    const damageConfidence = maxDamageValue;
+    const baseDamageType = maxDamageType;
     
-    console.log('Results:', {
-      hairType: { type: hairType, confidence: hairTypeConfidence },
-      hairDamage: { level: damageLevel, confidence: damageConfidence },
-    });
+    // Convert to percentage and clamp to 0-100% range
+    // If value is already > 1, assume it's already a percentage (0-100)
+    // Otherwise, assume it's a probability (0-1) and multiply by 100
+    let damagePercentage: number;
+    if (maxDamageValue > 1.0) {
+      // Already in percentage form, just clamp it
+      damagePercentage = Math.max(0, Math.min(100, maxDamageValue));
+    } else {
+      // Probability form, convert to percentage
+      damagePercentage = Math.max(0, Math.min(100, maxDamageValue * 100));
+    }
     
-    // Clean up tensor
+    // Apply conditional interpretation based on percentage
+    let damageLevel = baseDamageType;
+    
+    if (baseDamageType !== 'Healthy' && damagePercentage > 50) {
+      if (damagePercentage >= 80) {
+        damageLevel = `High chance of ${baseDamageType}`;
+      } else if (damagePercentage >= 60) {
+        damageLevel = `Moderate chance of ${baseDamageType}`;
+      } else if (damagePercentage >= 50) {
+        damageLevel = `Likely ${baseDamageType}`;
+      }
+    }
+    
+    // Normalize confidence to 0-1 range for consistency
+    const damageConfidence = maxDamageValue > 1.0 ? maxDamageValue / 100 : maxDamageValue;
+    
+    // Calculate hair health score (inverse of damage confidence for non-healthy hair)
+    let healthScore: number;
+    if (baseDamageType === 'Healthy') {
+      healthScore = 100;
+    } else {
+      healthScore = Math.max(0, Math.min(100, (1 - damageConfidence) * 100));
+    }
+    
+    // Clean up tensors
+    tensorNCHW.dispose();
     tensorNHWC.dispose();
+    
+    // Create predictions array from all damage values (for compatibility)
+    const predictionsArray = Object.values(allDamageValues);
     
     return {
       hairType: { type: hairType, confidence: hairTypeConfidence },
-      hairDamage: { level: damageLevel, confidence: damageConfidence },
+      hairDamage: { level: damageLevel, type: baseDamageType, confidence: damageConfidence },
+      hairHealth: { score: healthScore },
+      predictions: predictionsArray, // All damage type probabilities
+      modelLoadingTimeMs,
+      inferenceTimeMs,
     };
   } catch (error) {
     console.error('Error analyzing hair:', error);

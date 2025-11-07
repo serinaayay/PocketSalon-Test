@@ -5,7 +5,8 @@ import { vars } from "nativewind";
 import { memo, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { Slot } from "expo-router";
-import { openDatabase, listSuggestedProducts } from "../lib/db";
+import { openDatabase } from "../lib/db";
+import { trySyncPendingAnalyses } from "../lib/sync";
 import * as FileSystem from "expo-file-system";
 
 export default function RootLayout() {
@@ -13,22 +14,12 @@ export default function RootLayout() {
     // DB is opened 
     openDatabase()
       .then(async () => {
+        try { await trySyncPendingAnalyses(); } catch {}
         if (__DEV__) {
-          try {
-            const rows = await listSuggestedProducts({ limit: 50 });
-            // Print a developer-only table of current rows to the Metro console
-            // so devs can see contents without a new screen.
-            // Note: this only runs in development.
-            // eslint-disable-next-line no-console
-            console.table(rows);
-            // Also log the expected on-device DB path for reference.
-            // eslint-disable-next-line no-console
-            console.log(
-              `SQLite path: ${FileSystem.documentDirectory}SQLite/pocketsalon.db`
-            );
-          } catch (e) {
-            console.warn("Failed to list suggested_products", e);
-          }
+          // eslint-disable-next-line no-console
+          console.log(
+            `SQLite path: ${FileSystem.documentDirectory}SQLite/pocketsalon.db`
+          );
         }
       })
       .catch((err) => console.warn("DB init failed", err));

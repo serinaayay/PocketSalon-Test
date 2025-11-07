@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": ">= 5.2.0"
+    "version": ">= 13.0.0"
   },
   "build": {
     "development": {
@@ -13,12 +13,18 @@
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "artifactType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_SYNC_URL": "http://YOUR_COMPUTER_LAN_IP:4000"
       }
     },
     "production": {
       "android": {
-        "buildType": "apk"
+        "artifactType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_SYNC_URL": "https://pocketsalon-upload-838334574163.us-central1.run.app"
       }
     }
   },
@@ -26,4 +32,3 @@
     "production": {}
   }
 }
-

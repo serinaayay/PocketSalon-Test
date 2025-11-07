@@ -38,31 +38,12 @@
 ```typescript
 import { loadHairTypeModel, predictHairType, preprocessImageForOnnx } from '@/lib/onnx-helpers-native';
 
-// Load model (do this once)
+// Load model
 const session = await loadHairTypeModel();
 
-// Preprocess image (224x224)
+// Preprocess image (
 const tensor = await preprocessImageForOnnx(imageUri, 224);
 
-// Run inference
+
 const result = await predictHairType(session, tensor);
 console.log(result.hairType, result.confidence);
-// Example output: "Wavy", 0.87
-```
-
-## Model Training Information
-
-- Based on MobileNetV3 architecture optimized for mobile deployment
-- Trained on hair type classification dataset
-- Output uses softmax activation for multi-class classification
-
-## Re-conversion
-
-To re-convert from Keras to ONNX:
-
-```bash
-cd backend-files
-..\venv\Scripts\python.exe export_all_models_to_onnx.py
-```
-
-This will regenerate `hair_type_model.onnx` from the latest Keras file.

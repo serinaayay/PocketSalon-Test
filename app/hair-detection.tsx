@@ -1,57 +1,55 @@
 import * as ImagePicker from "expo-image-picker";
-import { router } from "expo-router";
+import * as FileSystem from 'expo-file-system';
+import { router, useLocalSearchParams } from "expo-router";
 import { useState, useEffect } from "react";
 import { Alert, Dimensions, Image, Pressable, ScrollView, Text, View, Modal } from "react-native";
 import { analyzeHair } from "../lib/onnx-helpers-native";
+import { getOrCreateRespondentCode } from "../lib/respondent";
+import { saveAnalysisRecord } from "../lib/db";
+import { trySyncPendingAnalyses } from "../lib/sync";
+import { ScalpCondition } from "../lib/hairRoutines";
 
 const { width, height } = Dimensions.get('window');
 const frameSize = Math.min(width * 0.9, 350); 
 
 export default function HairDetectionPage() {
+  const params = useLocalSearchParams();
   const [image, setImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(true);
+  const [showImageSourceModal, setShowImageSourceModal] = useState(true); // First modal: Choose Capture or Upload
+  const [modalVisible, setModalVisible] = useState(false); // Second modal: Scalp condition
+  const [scalpCondition, setScalpCondition] = useState<ScalpCondition>('Normal Scalp');
+  const [showScalpModal, setShowScalpModal] = useState(false);
 
+  // Check if an image was selected from the test-image-picker page
   useEffect(() => {
-    (async () => {
-      const { status: galleryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
-
-      if (galleryStatus !== "granted" || cameraStatus !== "granted") {
-        Alert.alert(
-          "Permissions required",
-          "Please grant camera and photo library access in your settings to use this feature."
-        );
-      }
-    })();
-  }, []);
-
-  const pickImage = async () => {
-  try {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      quality: 1,
-    });
-    console.log("Picker result:", result);
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
+    if (params.selectedImage) {
+      setImage(params.selectedImage as string);
+      setError(null);
+      setShowImageSourceModal(false); // Hide image source modal
+      setModalVisible(true); // Show scalp condition modal after image is selected
+      console.log('Received image from picker:', params.selectedImage);
     }
-  } catch (error) {
-    console.error("Error launching image picker:", error);
-    Alert.alert("Error", "Failed to open image picker.");
-  }
-};
+  }, [params.selectedImage]);
 
-  const takePhoto = async () => {
+  const handleCaptureOption = async () => {
+    setShowImageSourceModal(false);
+    // Use camera directly
     let result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true, // allow cropping
+      allowsEditing: true,
       quality: 1,
     });
     if (!result.canceled && result.assets.length > 0) {
       setImage(result.assets[0].uri);
+      setModalVisible(true); // Show scalp condition modal
     }
+  };
+
+  const handleUploadOption = () => {
+    setShowImageSourceModal(false);
+    // Navigate to upload page
+    router.push('/test-image-picker');
   };
 
   const analyzeImage = async () => {
@@ -60,8 +58,20 @@ export default function HairDetectionPage() {
     setError(null);
     
     try {
+      // Prepare storage paths
+      const code = await getOrCreateRespondentCode();
+      const ts = new Date().toISOString().replace(/[:.]/g, '-');
+      const imagesDir = FileSystem.documentDirectory + 'images/';
+      const resultsDir = FileSystem.documentDirectory + 'results/';
+      await FileSystem.makeDirectoryAsync(imagesDir, { intermediates: true }).catch(() => {});
+      await FileSystem.makeDirectoryAsync(resultsDir, { intermediates: true }).catch(() => {});
+
+      const targetImagePath = imagesDir + `img_${code}_${ts}.jpg`;
+      // Move/copy captured asset to our managed path
+      await FileSystem.copyAsync({ from: image, to: targetImagePath });
+
       // Run local on-device inference using ONNX models
-      const result = await analyzeHair(image);
+      const result = await analyzeHair(targetImagePath);
       
       // Navigate to results with both hair type and damage analysis
       router.push({
@@ -71,8 +81,51 @@ export default function HairDetectionPage() {
           hair_confidence: result.hairType.confidence.toString(),
           damage_level: result.hairDamage.level,
           damage_confidence: result.hairDamage.confidence.toString(),
+          scalp_condition: scalpCondition,
         },
       });
+
+      // Create recommendations text based on damage level (simple rules)
+      const recommendations = result.hairDamage.level === 'Severe Damage'
+        ? 'Seek deep conditioning treatments, reduce heat and chemical exposure.'
+        : result.hairDamage.level === 'Moderate Damage'
+        ? 'Use moisturizing shampoo and weekly masks; limit heat exposure.'
+        : result.hairDamage.level === 'Light Damage'
+        ? 'Maintain hydration and gentle handling.'
+        : 'Keep a balanced routine and regular trims.';
+
+      // Consolidated JSON content
+      const consolidated = {
+        respondentCode: code,
+        timestamp: new Date().toISOString(),
+        modelPredictions: result.predictions,
+        recommendations,
+        deviceInfo: {
+          model: 'unknown', cpu: 'unknown', gpu: 'unknown', ram: 'unknown', cameraMP: 'unknown'
+        },
+        modelLoadingTime: result.modelLoadingTimeMs,
+        inferenceTime: result.inferenceTimeMs,
+      };
+
+      const resultPath = resultsDir + `result_${code}_${ts}.json`;
+      await FileSystem.writeAsStringAsync(resultPath, JSON.stringify(consolidated, null, 2));
+
+      // Save record to SQLite for offline history + sync
+      await saveAnalysisRecord({
+        respondentCode: code,
+        imagePath: targetImagePath,
+        resultPath,
+        timestamp: consolidated.timestamp,
+        modelLoadingTimeMs: result.modelLoadingTimeMs,
+        inferenceTimeMs: result.inferenceTimeMs,
+        predictionsJson: JSON.stringify(result.predictions),
+        recommendations,
+        deviceInfoJson: JSON.stringify(consolidated.deviceInfo),
+        synced: false,
+      });
+
+      // Attempt background sync (will no-op if no URL configured/offline)
+      try { await trySyncPendingAnalyses(); } catch {}
     } catch (e) {
       console.error('Analysis error:', e);
       setError(`Failed to analyze image: ${e instanceof Error ? e.message : String(e)}`);
@@ -100,7 +153,37 @@ export default function HairDetectionPage() {
           </View>
         </View>
 
-        {/* Pop up for Scalp */}
+        {/* First Modal: Choose Capture or Upload */}
+        <Modal 
+          visible={showImageSourceModal} 
+          animationType="fade" 
+          transparent={true} 
+          onRequestClose={() => setShowImageSourceModal(false)}>
+            <View style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.5)" 
+            }}>
+          <View style={{backgroundColor: '#FFF2E4', width: 340, height: 300, alignSelf: "center", borderRadius: 10, paddingTop: 40}}>
+            <Text className="text-2xl text-center font-bold mb-8">How would you like to add your image?</Text>
+            
+            <Pressable 
+              className="bg-[#3F2305] py-4 px-6 rounded-xl w-60 self-center items-center mb-4"
+              onPress={handleCaptureOption}>
+              <Text className="text-[#FAF7F0] text-xl font-bold">📷 Capture Photo</Text>
+            </Pressable>
+
+            <Pressable 
+              className="bg-[#3F2305] py-4 px-6 rounded-xl w-60 self-center items-center mb-4"
+              onPress={handleUploadOption}>
+              <Text className="text-[#FAF7F0] text-xl font-bold">📁 Upload Image</Text>
+            </Pressable>
+          </View>
+          </View>
+        </Modal>
+
+        {/* Second Modal: Scalp Condition */}
         <Modal 
           visible={modalVisible} 
           animationType="slide" 
@@ -117,30 +200,37 @@ export default function HairDetectionPage() {
             <Text className="text-2xl text-center font-bold"> What is your Scalp Condition?</Text>
             <Pressable 
               className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mt-5 mb-3"
-              onPress={() => {console.log("Oily Scalp selected")
-              setModalVisible(false)}}>
-
+              onPress={() => {
+                setScalpCondition('Oily Scalp');
+                setModalVisible(false);
+              }}>
               <Text className="text-[#FAF7F0] text-xl font-bold">Oily</Text>
             </Pressable>
 
             <Pressable 
               className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mb-3"
-              onPress={() => {console.log("Dry Scalp selected")
-              setModalVisible(false)}}>
+              onPress={() => {
+                setScalpCondition('Dry Scalp');
+                setModalVisible(false);
+              }}>
               <Text className="text-[#FAF7F0] text-xl font-bold">Dry</Text>
             </Pressable>
 
             <Pressable 
               className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mb-3"
-              onPress={() => {console.log("Dandruff Scalp selected")
-              setModalVisible(false)}}>
+              onPress={() => {
+                setScalpCondition('Dandruff');
+                setModalVisible(false);
+              }}>
               <Text className="text-[#FAF7F0] text-xl font-bold">Dandruff</Text>
             </Pressable>
 
             <Pressable 
               className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mb-12"
-              onPress={() => {console.log("Unknown Scalp selected")
-              setModalVisible(false)}}>
+              onPress={() => {
+                setScalpCondition('Normal Scalp');
+                setModalVisible(false);
+              }}>
               <Text className="text-[#FAF7F0] text-xl font-bold">I don't know</Text>
             </Pressable>
             
@@ -171,22 +261,7 @@ export default function HairDetectionPage() {
         </View>
 
         {/* Upload and Capture Buttons */}
-        <View style={{ width: frameSize, minHeight: 100 }} className="mt-28 mb-6">
-          {/* Upload Image button at lower left */}
-          <Pressable 
-          onPress={pickImage} style={{left: width * 0.06, bottom: height * 0.023}}>
-            <View className="w-20 h-20 bg-[#DFD7BF] rounded-lg justify-center shadow-md">
-              <Text className="text-black font-medium text-center">{'Upload\nImage'}</Text>
-            </View>
-          </Pressable>
-          
-          {/* Centered Capture Button */}
-            <Pressable onPress={takePhoto} style={{ bottom: height * 0.03 }} className="items-center justify-center -mt-20">
-              <Image
-                source={require('../assets/images/capture_button.png')}
-                style={{ width: 80, height: 80 }}
-                resizeMode="contain"/>
-            </Pressable>
+         <View style={{ width: frameSize, minHeight: 100, zIndex: 10 }} className="mt-28 mb-6">
           <View className="items-center justify-center">
             {/* Analyze Button */}
             {image && (

@@ -12,5 +12,9 @@ if (!config.resolver.assetExts.includes('bin')) {
 if (!config.resolver.assetExts.includes('onnx')) {
   config.resolver.assetExts.push('onnx');
 }
+// Add .data extension for ONNX model data files
+if (!config.resolver.assetExts.includes('data')) {
+  config.resolver.assetExts.push('data');
+}
 
 module.exports = withNativeWind(config, { input: './global.css' });

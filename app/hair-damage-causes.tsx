@@ -68,7 +68,7 @@ const hairDmgCauses = () => {
     <View className="flex-1 bg-[#FFF2E4]">
       <ScrollView contentContainerStyle={{ paddingBottom: 100, minHeight: height }}>
         {/* Header */}
-        <Text className="text-4xl font-extrabold text-[#3F2305] mt-20 text-center mb-7">Hair Damage Causes</Text>
+        <Text className="text-4xl font-extrabold text-[#3F2305] mt-20 text-center mb-7 mx-4">Hair Damage Causes</Text>
 
         {/* Category Selector */}
         <View className="flex-row justify-center mb-6">
@@ -86,16 +86,15 @@ const hairDmgCauses = () => {
         {filteredRemedies.map((remedy, idx) => (
           <View
             key={idx}
-            className="flex-row bg-[#3F2305] rounded-lg mx-4 mt-2 mb-4 p-4 shadow-xl">
-          
-          <View className="flex-1 flex-row">
-            <View className="w-24 h-24 bg-gray-300 rounded-md mt-2 mr-4"/>
-            {/* Replace above View with <Image source={remedy.image} className="w-16 h-16 rounded-md mr-4" /> if you have images */}
-            <View className="flex-1 mb-5">
-              <Text className="text-white text-2xl font-bold">{remedy.title}</Text>
-              <Text className="text-white text-md text-wrap-pretty w-72">{remedy.description}</Text>
+            className="bg-[#3F2305] rounded-lg mx-4 mt-2 mb-4 p-4 shadow-xl">
+            <View className="w-full flex-row items-center">
+              <View className="w-24 h-24 bg-gray-300 rounded-md mr-4 flex-shrink-0"/>
+              {/* Replace above View with <Image source={remedy.image} className="w-24 h-24 rounded-md mr-4 flex-shrink-0" /> */}
+              <View className="flex-1">
+                <Text className="text-white text-2xl font-bold mb-1">{remedy.title}</Text>
+                <Text className="text-white text-md leading-5">{remedy.description}</Text>
+              </View>
             </View>
-          </View>            
           </View>
         ))}
       </ScrollView>
