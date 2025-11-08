@@ -9,9 +9,9 @@ const { width, height } = Dimensions.get('window');
 
 const HomePage = () => {
   return (
-    <View className="flex-1 bg-transparent">
-      <ScrollView contentContainerStyle={{paddingBottom: "auto"}} showsVerticalScrollIndicator={true}>
-        <View className="bg-[#FFF2E4] rounded-xl w-full flex-1 px-6 py-6">
+    <View className="flex-1 h-full bg-[#FFF2E4]">
+      <ScrollView contentContainerStyle={{paddingBottom: 100}} showsVerticalScrollIndicator={true}>
+        <View className="bg-[#FFF2E4] w-full h-full flex-1 px-6 py-6">
           <Image
             source={require('../assets/images/Hello_Good_morning.png')}
             className="w-64 h-48 mb-0"
@@ -97,14 +97,14 @@ const HomePage = () => {
                 } )}
             </View>
 
-            <Text className="text-[#3F2305] text-3xl font-bold text-center wrap-1 mb-5 mt-5">Chatbot</Text>
+            <Text className="text-[#3F2305] text-3xl font-bold text-center wrap-1 mb-5 mt-5">PocketSalon Chatbot</Text>
             <Pressable 
               onPress={() => router.push('/chatbot')}
               className="rounded-xl border-2 border-[#6C4E31] px-4 py-2 flex-row items-center self-center">
                 <TextInput
                     placeholder="Still have other concerns? Ask me!"
-                    placeholderTextColor="#666262ff"
-                    className="flex-1 text-base"
+                    placeholderTextColor="#000000ff"
+                    className="flex-1 text-md"
                     editable={false}
                     pointerEvents="none"/>
                 </Pressable>

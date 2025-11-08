@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "814872962717",
+    "project_id": "pocket-salon-db",
+    "storage_bucket": "pocket-salon-db.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:814872962717:android:030a9de458dad9e3835674",
+        "android_client_info": {
+          "package_name": "com.pocketsalon.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEKbFejccBML9TZ2eSOwgJC7juwMlzAAs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

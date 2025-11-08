@@ -32,6 +32,7 @@
       },
       "package": "com.pocketsalon.app",
       "permissions": [
+        "INTERNET",
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.READ_MEDIA_IMAGES",

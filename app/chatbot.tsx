@@ -1,6 +1,7 @@
-import { View, Text, Pressable, ScrollView, TextInput, KeyboardAvoidingView, Platform, Dimensions, Image} from "react-native";
+import { View, Text, Pressable, ScrollView, TextInput, KeyboardAvoidingView, Platform, Dimensions, Image } from "react-native";
 import { useState, useRef, useEffect } from "react";
 import { router } from "expo-router";
+import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -11,16 +12,31 @@ interface Message {
   timestamp: Date;
 }
 
+interface Capability {
+  icon: keyof typeof Ionicons.glyphMap;
+  text: string;
+}
+
+const capabilities: Capability[] = [
+  { icon: 'water-outline', text: 'Care routines & washing tips' },
+  { icon: 'medical-outline', text: 'Hair health diagnosis' },
+  { icon: 'leaf-outline', text: 'Natural remedies' },
+  { icon: 'sunny-outline', text: 'Lifestyle & environmental effects' },
+  { icon: 'warning-outline', text: 'Myths & common mistakes' },
+  { icon: 'lock-closed-outline', text: 'Privacy & app features' },
+  { icon: 'pulse-outline', text: 'Hair types & damage info' },
+];
+
+const exampleQuestions = [
+  'How often should I wash curly hair?',
+  'Does trimming help hair grow faster?',
+  'How to prevent sun damage?',
+];
+
 export default function ChatbotScreen() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '0',
-      text: "Hello! I'm PocketSalon Assistant. I can help you with:\n\n• Hair care routines & washing tips\n• Hair health diagnosis\n• Natural remedies\n• Lifestyle & environmental effects\n• Hair myths & common mistakes\n• App features & privacy\n• Hair types & damage info\n\nTry these sample questions:\n• How often should I wash curly hair?\n• Is it true that trimming makes hair grow faster?\n• How to protect hair from sun damage?\n• Are natural remedies better than products?\n• Is my data being used somewhere?\n• How can I tell if my hair is damaged?",
-      isUser: false,
-      timestamp: new Date(),
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
+  const [showWelcome, setShowWelcome] = useState(true);
   const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -39,11 +55,11 @@ export default function ChatbotScreen() {
     }
 
     if (lowerQuestion.includes('thank you') || lowerQuestion.includes('thanks') || lowerQuestion === 'ty') {
-      return "You're welcome! Happy to help with your hair care journey!  Feel free to ask more questions anytime.";
+      return "You're welcome! Happy to help with your hair care journey! Feel free to ask more questions anytime.";
     }
 
     if (lowerQuestion === 'bye' || lowerQuestion === 'goodbye' || lowerQuestion.includes('see you') || lowerQuestion.includes('talk later')) {
-      return "Goodbye! Take care of your hair!  Come back anytime you have questions.";
+      return "Goodbye! Take care of your hair! Come back anytime you have questions.";
     }
 
     if ((lowerQuestion.includes('natural') || lowerQuestion.includes('organic') || lowerQuestion.includes('remedies') || lowerQuestion.includes('remedy')) && (lowerQuestion.includes('better') || lowerQuestion.includes('work') || lowerQuestion.includes('vs') || lowerQuestion.includes('versus') || lowerQuestion.includes('market') || lowerQuestion.includes('product'))) {
@@ -98,7 +114,7 @@ export default function ChatbotScreen() {
     }
 
     if (lowerQuestion.includes('routine') || lowerQuestion.includes('steps') || lowerQuestion.includes('daily') || lowerQuestion.includes('weekly')) {
-      return "Basic hair care routine:\n\n WEEKLY:\n1. Cleanse scalp thoroughly\n2. Condition mid-lengths to ends\n3. Deep condition (once/week)\n4. Trim every 6-8 weeks\n\nDAILY:\n• Gentle detangling\n• Protect from sun/heat\n• Sleep on silk/satin\n• Drink water, eat healthy\n\nCustomize based on YOUR hair type and needs!";
+      return "Basic hair care routine:\n\nWEEKLY:\n1. Cleanse scalp thoroughly\n2. Condition mid-lengths to ends\n3. Deep condition (once/week)\n4. Trim every 6-8 weeks\n\nDAILY:\n• Gentle detangling\n• Protect from sun/heat\n• Sleep on silk/satin\n• Drink water, eat healthy\n\nCustomize based on YOUR hair type and needs!";
     }
 
     if ((lowerQuestion.includes('refresh') || lowerQuestion.includes('revive')) && (lowerQuestion.includes('curl') || lowerQuestion.includes('wave'))) {
@@ -164,12 +180,23 @@ export default function ChatbotScreen() {
     return "I can help you with hair types, damage, care routines, natural remedies, and hair health tips! Could you rephrase your question?\n\nTry asking:\n• 'How often should I wash wavy hair?'\n• 'Is trimming good for growth?'\n• 'How to protect hair from sun?'\n• 'Are natural remedies better?'";
   };
 
-  const sendMessage = () => {
-    if (!inputText.trim()) return;
+  const handleExampleQuestion = (question: string) => {
+    setShowWelcome(false);
+    // Clear input immediately
+    setInputText("");
+    // Send the question (this will add to existing messages, not replace them)
+    sendMessage(question);
+  };
+
+  const sendMessage = (questionText?: string) => {
+    const textToSend = questionText || inputText.trim();
+    if (!textToSend) return;
+
+    setShowWelcome(false);
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: inputText.trim(),
+      text: textToSend,
       isUser: true,
       timestamp: new Date(),
     };
@@ -180,81 +207,136 @@ export default function ChatbotScreen() {
     setTimeout(() => {
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: getAIResponse(inputText),
+        text: getAIResponse(textToSend),
         isUser: false,
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, aiResponse]);
     }, 500);
 
-    setInputText("");
+    if (!questionText) {
+      setInputText("");
+    }
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-[#FFF2E4]"
-      keyboardVerticalOffset={0}>
-      
-      {/* Header */}
-      <View className="flex-row items-center w-full h-[25vh] bg-[#3F2305] rounded-b-3xl justify-center">
-          <Pressable onPress={() => router.push('/homepage')} className="absolute left-7">
+    <View className="flex-1 bg-[#FFF2E4]">
+      {/* Fixed Header */}
+      <View className="w-full bg-[#3F2305] rounded-b-3xl pt-12 pb-6">
+        <View className="flex-row items-center justify-center relative">
+          <Pressable 
+            onPress={() => router.push('/homepage')} 
+            className="absolute left-6"
+            style={{ top: '50%', transform: [{ translateY: -10 }] }}>
             <Image
               source={require('../assets/images/arrow.png')}
-              style={{ width: width * 0.07, height: height, marginTop: height * -0.09}}
+              style={{ width: 24, height: 24, tintColor: '#FAF7F0' }}
               resizeMode="contain"/>
           </Pressable>
           
-          <Text className="text-[#FAF7F0] text-3xl font-bold -mt-20 self-center">PocketSalon Assistant</Text>
-          {/* to center text */}
-          <View className="absolute items-center justify-center mt-16 px-10">
-            <Text className="text-[#FAF7F0] text-m ml-15 text-center">Ask about hair types, care routines & health tips</Text>
-            <Text className="text-[#FAF7F0] text-s italic text-wrap-pretty w-96 mt-3 text-center">Disclaimer: This application is experimental. Consult an expert.</Text>
+          <View className="items-center justify-center px-16">
+            <Text className="text-[#FAF7F0] text-3xl font-bold text-center">
+              PocketSalon Assistant
+            </Text>
+            <Text className="text-[#FAF7F0] text-base text-center mt-2">
+              Ask about hair types, care routines & health tips
+            </Text>
           </View>
         </View>
-        <Text className="text-[#FAF7F0] text-sm ml-10">Ask about hair types, care routines & health tips</Text>
-      {/* Messages */}
-      <ScrollView
-        ref={scrollViewRef}
-        className="flex-1 px-4 py-4"
-        contentContainerStyle={{ paddingBottom: 20 }}>
-        {messages.map((message) => (
-          <View
-            key={message.id}
-            className={`mb-4 ${message.isUser ? 'items-end' : 'items-start'}`}>
-            <View
-              className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                message.isUser ? 'bg-[#3F2305]' : 'bg-[#F2EAD3]'
-              }`}>
-              <Text className={`text-base ${message.isUser ? 'text-white' : 'text-[#3F2305]'}`}>
-                {message.text}
-              </Text>
-            </View>
-          </View>
-        ))}
-      </ScrollView>
+      </View>
 
-      {/* Input */}
-      <View className="bg-white border-t border-[#DFD7BF] px-4 py-3 flex-row items-center">
-        <TextInput
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder="Ask me anything about hair care..."
-          placeholderTextColor="#3F2305"
-          className="flex-1 bg-[#F5F5F5] rounded-full px-4 py-4 mr-2 text-base mb-5"
-          multiline
-          maxLength={200}
-          onSubmitEditing={sendMessage}
-          returnKeyType="send"
-        />
-        <Pressable onPress={sendMessage} className="bg-[#3F2305] rounded-full items-center justify-center mb-4"   
-          style={{width: 50, height: 50 }}>
+      {/* Scrollable Content */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+        keyboardVerticalOffset={0}>
+        {showWelcome && messages.length === 0 ? (
+          <ScrollView className="flex-1 px-6 pt-6" showsVerticalScrollIndicator={false}>
+            {/* What I can help you with */}
+            <Text className="text-[#3F2305] text-xl font-bold mb-4">What I can help you with:</Text>
+            <View className="mb-6">
+              {capabilities.map((capability, index) => (
+                <View key={index} className="flex-row items-center mb-3">
+                  <Ionicons name={capability.icon} size={20} color="#3F2305" style={{ marginRight: 12 }} />
+                  <Text className="text-[#3F2305] text-base flex-1">{capability.text}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Try asking */}
+            <Text className="text-[#3F2305] text-xl font-bold mb-4 mt-2">Try asking:</Text>
+            <View className="mb-6">
+              {exampleQuestions.map((question, index) => (
+                <Pressable
+                  key={index}
+                  onPress={() => handleExampleQuestion(question)}
+                  className="bg-gray-200 rounded-lg px-4 py-3 mb-3">
+                  <Text className="text-[#3F2305] text-base">{question}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </ScrollView>
+        ) : (
+          <ScrollView
+            ref={scrollViewRef}
+            className="flex-1 px-4 py-4"
+            contentContainerStyle={{ paddingBottom: 20 }}>
+            {messages.map((message) => (
+              <View
+                key={message.id}
+                className={`mb-4 ${message.isUser ? 'items-end' : 'items-start'}`}>
+                <View
+                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                    message.isUser ? 'bg-[#3F2305]' : 'bg-[#F2EAD3]'
+                  }`}>
+                  <Text className={`text-base ${message.isUser ? 'text-white' : 'text-[#3F2305]'}`}>
+                    {message.text}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        )}
+
+        {/* Input */}
+        <View className="bg-white border-t border-[#DFD7BF] px-4 py-3 flex-row items-center">
+          <TextInput
+            value={inputText}
+            onChangeText={setInputText}
+            placeholder="Ask me anything about hair care..."
+            placeholderTextColor="#3F2305"
+            className="flex-1 bg-[#F5F5F5] rounded-full px-4 py-4 mr-2 text-base"
+            multiline
+            maxLength={200}
+            onSubmitEditing={() => sendMessage()}
+            returnKeyType="send"
+          />
+          <Pressable 
+            onPress={() => sendMessage()} 
+            className="bg-[#3F2305] rounded-full items-center justify-center"   
+            style={{width: 50, height: 50 }}>
             <Image
               source={require('../assets/images/arrow.png')}
               style={{ width: '50%', height: '50%', resizeMode: 'contain', transform: [{ rotate: '180deg' }]}}
               resizeMode="contain"/>
           </Pressable>
-      </View>
-    </KeyboardAvoidingView>
+        </View>
+
+        {/* Bottom Bar - Feedback Icons (shown when in chat mode) */}
+        {!showWelcome && messages.length > 0 && (
+          <View className="bg-white border-t border-[#DFD7BF] px-4 py-2 flex-row justify-center items-center opacity-50">
+            <Pressable className="mx-4">
+              <Ionicons name="thumbs-up-outline" size={24} color="#3F2305" />
+            </Pressable>
+            <Pressable className="mx-4">
+              <Ionicons name="thumbs-down-outline" size={24} color="#3F2305" />
+            </Pressable>
+            <Pressable className="mx-4">
+              <Ionicons name="download-outline" size={24} color="#3F2305" />
+            </Pressable>
+          </View>
+        )}
+      </KeyboardAvoidingView>
+    </View>
   );
 }

@@ -5,9 +5,11 @@ import { useState, useEffect } from "react";
 import { Alert, Dimensions, Image, Pressable, ScrollView, Text, View, Modal } from "react-native";
 import { analyzeHair } from "../lib/onnx-helpers-native";
 import { getOrCreateRespondentCode } from "../lib/respondent";
-import { saveAnalysisRecord } from "../lib/db";
+import { saveAnalysisRecord, saveAnalysisToLocalDB } from "../lib/db";
 import { trySyncPendingAnalyses } from "../lib/sync";
 import { ScalpCondition } from "../lib/hairRoutines";
+import { uploadHairScan } from "../lib/firebaseService";
+import { getDeviceInfo } from "../lib/deviceInfo";
 
 const { width, height } = Dimensions.get('window');
 const frameSize = Math.min(width * 0.9, 350); 
@@ -123,6 +125,64 @@ export default function HairDetectionPage() {
         deviceInfoJson: JSON.stringify(consolidated.deviceInfo),
         synced: false,
       });
+
+      // Also save to hair_analyses table for journal display
+      await saveAnalysisToLocalDB({
+        hairHealthScore: result.hairHealth.score,
+        analysisDate: consolidated.timestamp,
+        localImagePath: targetImagePath,
+        recommendations,
+        hairType: result.hairType.type,
+        scalpCondition: scalpCondition,
+        damageLevel: result.hairDamage.level,
+      });
+
+      // Upload to Firebase (image + metadata + device info + results)
+      try {
+        const timestamp = new Date();
+        const damageScore = 100 - result.hairHealth.score; // Convert health score to damage score
+        
+        // Get device information
+        const deviceInfo = await getDeviceInfo();
+        
+        // Update consolidated data with actual device info
+        consolidated.deviceInfo = {
+          model: deviceInfo.model,
+          cpu: deviceInfo.cpuArchitecture || 'Unknown',
+          gpu: 'Unknown', // GPU info not available via expo-device
+          ram: deviceInfo.totalMemory ? `${(deviceInfo.totalMemory / 1024).toFixed(1)} GB` : 'Unknown',
+          cameraMP: 'Unknown', // Camera MP not available via expo-device
+        };
+        
+        // Prepare results JSON for upload
+        const resultsJson = JSON.stringify(consolidated, null, 2);
+        
+        // Upload with all metadata, results, and device info
+        const uploadResult = await uploadHairScan(
+          targetImagePath,
+          result.hairType.type,
+          result.hairDamage.level,
+          damageScore,
+          result.modelLoadingTimeMs, // Loading time
+          result.inferenceTimeMs,    // Inference time
+          deviceInfo,                // Device specs (model, RAM, CPU, GPU, etc.)
+          resultsJson,               // Complete results JSON
+          timestamp
+        );
+        
+        console.log('✅ Successfully uploaded to Firebase!');
+        console.log('📊 Firebase Document ID:', uploadResult.docId);
+        console.log('🖼️  Image URL:', uploadResult.imageUrl);
+        if (uploadResult.resultsUrl) {
+          console.log('📄 Results JSON URL:', uploadResult.resultsUrl);
+        }
+        if (uploadResult.deviceInfoUrl) {
+          console.log('📱 Device Info JSON URL:', uploadResult.deviceInfoUrl);
+        }
+      } catch (firebaseError) {
+        console.error('⚠️ Firebase upload failed (continuing anyway):', firebaseError);
+        // Don't block the user flow if Firebase upload fails
+      }
 
       // Attempt background sync (will no-op if no URL configured/offline)
       try { await trySyncPendingAnalyses(); } catch {}

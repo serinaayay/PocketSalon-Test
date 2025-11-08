@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, Pressable, Dimensions, Image, Modal } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { getHairRoutine, mapDamageLevelToRoutine, mapHairTypeToRoutine, ScalpCondition } from '../lib/hairRoutines';
+import { recommendProducts, getProductImage } from '../lib/productRecommendations';
 
 const { width, height } = Dimensions.get('window');
 
@@ -225,6 +226,67 @@ export default function PersonalizedRoutine() {
               <Text className="text-[#5B3E20] text-base">{formatBody(routine.damageRoutine.lifestyle)}</Text>
             </View>
           </View>
+        </View>
+
+        {/* Disclaimer */}
+        <Text className="text-base font-semibold mx-6 mt-10 mb-6 text-[#5B3E20] text-center">
+          Disclaimer: This study is experimental. The recommended products below are for guidance and suggestions only. Consult a professional.
+        </Text>
+
+        {/* Product Recommendations Section */}
+        <View className="mx-4 mt-6">
+          <Text className="text-2xl font-bold text-[#3F2305] text-center mb-4">Product Suggestions</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {recommendProducts({ 
+              hairType: params.hair_type as string, 
+              scalpCondition: scalpCondition, 
+              hairDamage: params.damage_level as string, 
+              limit: 10 
+            }).map((product) => (
+              <View key={product.id} className="w-64 bg-[#3F2305] rounded-xl shadow-lg mx-2 p-4 items-center">
+                <View className="w-full aspect-square bg-[#f3ddc5] rounded-lg mb-4 flex justify-center items-center">
+                  <Image
+                    source={getProductImage(product.imageKey)}
+                    style={{ width: '80%', height: '80%', resizeMode: 'contain' }}
+                  />
+                </View>
+                <Text className="text-white text-xl font-bold text-center mb-2">
+                  {product.name}
+                </Text>
+                <Text className="text-white text-sm text-center">
+                  {product.description}
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Natural Remedies Section */}
+        <View className="mx-4 mt-10 mb-6">
+          <Text className="text-2xl font-bold text-[#3F2305] text-center mb-4">Natural Remedies</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {recommendProducts({ 
+              hairType: params.hair_type as string, 
+              scalpCondition: scalpCondition, 
+              hairDamage: params.damage_level as string, 
+              limit: 10 
+            }).map((product) => (
+              <View key={`remedy-${product.id}`} className="w-64 bg-[#3F2305] rounded-xl shadow-lg mx-2 p-4 items-center">
+                <View className="w-full aspect-square bg-[#f3ddc5] rounded-lg mb-4 flex justify-center items-center">
+                  <Image
+                    source={getProductImage(product.imageKey)}
+                    style={{ width: '80%', height: '80%', resizeMode: 'contain' }}
+                  />
+                </View>
+                <Text className="text-white text-xl font-bold text-center mb-2">
+                  {product.name}
+                </Text>
+                <Text className="text-white text-sm text-center">
+                  {product.description}
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
         </View>
 
         {/* Bottom spacing */}

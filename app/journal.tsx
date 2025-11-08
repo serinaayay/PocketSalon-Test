@@ -119,16 +119,18 @@ const journal = () => {
     <View className="flex-1 bg-[#FFF2E4]">
       <ScrollView contentContainerStyle={{ paddingBottom: 100, minHeight: height }}>
         <View className="flex-row items-center justify-between px-4 mt-20 mb-4">
-          <Text className="text-[40px] font-extrabold text-[#3F2305] flex-1 text-center">Your Hair Journey</Text>
+          <Text className="text-[35px] font-extrabold text-[#3F2305] flex-1 text-center">Hair Health Journey</Text>
+          </View>
+
           {history.length > 0 && (
             <Pressable
               onPress={handleClearAll}
-              className="bg-[#E53935] px-4 py-2 rounded-xl"
-            >
+              className="bg-[#E53935] px-4 py-2 rounded-xl w-24 self-end mr-6 mb-4">
+                
+
               <Text className="text-white font-bold text-sm">Clear All</Text>
             </Pressable>
           )}
-        </View>
         {loading ? (
           <Text className="text-center text-[#3F2305]">Loading...</Text>
         ) : error ? (
@@ -144,10 +146,25 @@ const journal = () => {
               const damagePercentage = 100 - score;
               return (
                 <View key={item.id} className="mb-6">
-                  {/* Date header with line */}
+                  {/* Date header with line and recommendations button */}
                   <View className="flex-row items-center mb-3">
                     <Text className="text-[#3F2305] text-lg font-bold">Hair Health as of {dateStr}</Text>
                     <View className="flex-1 h-px bg-[#3F2305] ml-3" />
+                    {item.recommendations && item.hairType && item.scalpCondition && item.damageLevel && (
+                      <Pressable
+                        onPress={() => router.push({
+                          pathname: '/PersonalizedRoutine',
+                          params: {
+                            hair_type: item.hairType,
+                            scalp_condition: item.scalpCondition,
+                            damage_level: item.damageLevel,
+                          }
+                        })}
+                        className="bg-[#3F2305] px-3 py-1.5 rounded-lg ml-3"
+                      >
+                        <Text className="text-white text-xs font-semibold">View Recommendations</Text>
+                      </Pressable>
+                    )}
                   </View>
                   {/* Content row */}
                   <View className="flex-row items-start">

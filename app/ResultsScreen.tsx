@@ -1,7 +1,6 @@
 import {View, Text, Image, Pressable, ScrollView, Dimensions} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
-import { saveHairAnalysis } from '../lib/db';
 import { recommendProducts, getProductImage } from '../lib/productRecommendations';
 
 const { width, height } = Dimensions.get('window');
@@ -64,34 +63,8 @@ const ResultsScreen = () => {
     const imageUri = params.image_uri as string | undefined;
     const hairHealthScore = params.hair_health_score ? parseFloat(params.hair_health_score as string) : null;
 
-    // Auto-save a hair analysis when arriving on this screen (once)
-    React.useEffect(() => {
-        (async () => {
-            try {
-                const providedScore = params.hair_health_score as string | number | undefined;
-                let scoreNum: number | undefined;
-                
-                // If damage level is "Healthy", automatically set score to 100%
-                if (damageLevel && damageLevel.toLowerCase() === 'healthy') {
-                    scoreNum = 100;
-                } else if (providedScore !== undefined) {
-                    scoreNum = typeof providedScore === 'string' ? parseFloat(providedScore) : Number(providedScore);
-                } else if (damageConfidence !== undefined) {
-                    const dc = typeof damageConfidence === 'string' ? parseFloat(damageConfidence) : Number(damageConfidence);
-                    if (!Number.isNaN(dc)) {
-                        scoreNum = Math.max(0, Math.min(100, Math.round((1 - dc) * 100)));
-                    }
-                }
-                if (scoreNum === undefined || Number.isNaN(scoreNum)) {
-                    scoreNum = 85; // sensible default
-                }
-                const iso = new Date().toISOString();
-                await saveHairAnalysis(scoreNum, iso);
-            } catch (e) {
-               
-            }
-        })();
-    }, []);
+    // Note: Hair analysis is now saved in hair-detection.tsx to avoid duplicates
+    // This useEffect has been removed to prevent duplicate journal entries
 
     return (
         <View className="flex-1 bg-[#FFF2E4]">
