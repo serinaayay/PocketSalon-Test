@@ -8,7 +8,7 @@ export type Data = Category[];
 const data: Data = [
     {
         title: 'How can I identify my hair type?',
-        content: ['Answer Question 1']
+        content: ['There are 4 main hair types:\n\n• Type 1: Straight\n• Type 2: Wavy\n• Type 3: Curly\n• Type 4: Kinky/Coily \n\nUse our app\'s detection feature to identify YOUR hair type!']
     },
 
     {
@@ -18,7 +18,7 @@ const data: Data = [
 
     {
         title: 'Am I required to use the recommended products? ',
-        content: ['Answer Question 3']
+        content: ['No! The recommended products are suggestions based on your hair analysis. You can choose to use them or explore other options that suit your preferences and budget.']
     },
 ];
 

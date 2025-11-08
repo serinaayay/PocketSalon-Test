@@ -8,7 +8,7 @@ type chevronProps = {
 
 const Chevron = ({progress}: chevronProps) => {
     const iconAnimate = useAnimatedStyle(() => ({
-        transform: [{rotate: `${progress.value * -180}deg`}]
+        transform: [{rotate: `${progress.value * -90}deg`}]
     }))
     return (
         <Animated.View style={iconAnimate}>

@@ -20,8 +20,8 @@ const Accordion = ({ value }: AccordionProps) => {
 
   // animation
   const heightAnimation = useAnimatedStyle(() => ({
-    maxHeight: interpolate(progress.value, [0, 1], [0, value.content.length * 24]), // 24 = approx height per item
-    overflow: 'hidden',
+    maxHeight: interpolate(progress.value, [0, 1], [0, value.content.length * 200]), // 24 = approx height per item
+    overflow: 'scroll',
   }));
 
   return (
@@ -31,7 +31,7 @@ const Accordion = ({ value }: AccordionProps) => {
         onPress={toggle}>
         
         <View className="flex-row items-center">
-        <Text className="flex-1 text-xl text-[#5B3E20] font-semibold whitespace-normal">
+        <Text className="flex-1 text-xl text-[#3F2305] font-semibold whitespace-normal mt-2">
           {value.title}
         </Text>
         <Chevron progress={progress}/>
@@ -39,7 +39,7 @@ const Accordion = ({ value }: AccordionProps) => {
 
       </Pressable>
 
-      <Animated.View style={heightAnimation} className="text-xl">
+      <Animated.View style={heightAnimation} className="text-xl mb-2">
         {value.content.map((v, i) => (
           <View key={i} className="py-[-5] px-4">
             <Text>{v}</Text>

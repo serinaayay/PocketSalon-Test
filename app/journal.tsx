@@ -119,16 +119,18 @@ const journal = () => {
     <View className="flex-1 bg-[#FFF2E4]">
       <ScrollView contentContainerStyle={{ paddingBottom: 100, minHeight: height }}>
         <View className="flex-row items-center justify-between px-4 mt-20 mb-4">
-          <Text className="text-[40px] font-extrabold text-[#3F2305] flex-1 text-center">Your Hair Journey</Text>
+          <Text className="text-[35px] font-extrabold text-[#3F2305] flex-1 text-center">Hair Health Journey</Text>
+          </View>
+
           {history.length > 0 && (
             <Pressable
               onPress={handleClearAll}
-              className="bg-[#E53935] px-4 py-2 rounded-xl"
-            >
+              className="bg-[#E53935] px-4 py-2 rounded-xl w-24 self-end mr-6 mb-4">
+                
               <Text className="text-white font-bold text-sm">Clear All</Text>
             </Pressable>
           )}
-        </View>
+
         {loading ? (
           <Text className="text-center text-[#3F2305]">Loading...</Text>
         ) : error ? (
