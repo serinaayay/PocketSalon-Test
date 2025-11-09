@@ -6,26 +6,47 @@ const { width, height } = Dimensions.get('window');
 
 const productList = [
   {
-    name: "Cause 1",
+    name: "Davines OI Shampoo",
     description:
-      "Aloe vera soothes the scalp, conditions hair, and can reduce dandruff. Apply fresh aloe gel to your scalp and hair, leave for 30 minutes, then rinse.",
-    category: "breakage",
-    image: null, // Replace with require('../assets/images/aloe-vera.png') if you have an image
+      "A gentle daily shampoo, ideal for any hair type, that cleanses and nourishes the hair, leaving it soft and manageable.",
+    category: ["all", "straight", "wavy", "curly", "coily"],
+    image: require('../assets/images/healthy-hair-guide-images/davines ol shampoo.jpg')
   },
   {
-    name: "Cause 1",
+    name: "L'Oréal Paris EverPure Moisture Shampoo",
     description:
-      "Coconut oil deeply moisturizes and repairs damaged hair. Warm a small amount, massage into scalp and hair, leave for at least 1 hour, then wash out.",
-    category: "color damage",
-    image: null,
+      "",
+    category: "straight",
+    image: require('../assets/images/healthy-hair-guide-images/loreal everpure.png'),
   },
   {
-    name: "Cause 1",
+    name: "Kérastase Discipline Bain Fluidealiste Gentle Shampoo",
     description:
-      "Eggs are rich in protein and help strengthen hair. Mix one egg with a tablespoon of olive oil, apply to hair, leave for 20 minutes, then rinse with cool water.",
-    category: "hair loss",
-    image: null,
+      "",
+    category: ["straight", "curly"],
+    image: require('../assets/images/healthy-hair-guide-images/kerastase.jpg'),
   },
+  {
+    name: "Human Nature Revitalizing Shampoo",
+    description:
+      "",
+    category: "straight",
+    image: require('../assets/images/healthy-hair-guide-images/hhn revitalizing shampoo.jpg'),
+  },
+  {
+    name: "Zenutrients Coco Honey Nourishing Shampoo",
+    description:
+      "",
+    category: "straight",
+    image: require('../assets/images/healthy-hair-guide-images/coco honey zenutrients.png'),
+  },
+  {
+    name: "HairReve Sulfate-Free Shampoo",
+    description:
+      "",
+    category: "straight",
+    image: require('../assets/images/healthy-hair-guide-images/hairreve.jpg'),
+  }
 ];
 
 const categories = [
@@ -37,40 +58,50 @@ const categories = [
 ];
 
 export default function HealthyHairGuide() {
-  const [selectedCategory, setSelectedCategory] = useState("breakage");
-  const filteredRemedies = productList.filter(r => r.category === selectedCategory);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+    const filteredRemedies =
+    selectedCategory === "all"
+      ? productList
+      : productList.filter((r) => r.category.includes(selectedCategory));
 
   return (
     <View className="flex-1 bg-[#FFF2E4]">
       <ScrollView contentContainerStyle={{ paddingBottom: 100, minHeight: height }}>
         {/* Header */}
-        <Text className="text-4xl font-extrabold text-[#3F2305] mt-20 text-center mb-7">Hair Damage Causes</Text>
+        <Text className="text-4xl font-extrabold text-[#3F2305] mt-20 text-center mb-7">Healthy Hair Guide</Text>
+        
         {/* Category Selector */}
         <View className="flex-row justify-center mb-6">
-          {categories.map(cat => (
+          {categories.map((cat) => (
             <Pressable
               key={cat.key}
               onPress={() => setSelectedCategory(cat.key)}
-              className={`px-2 py-2 mx-2 rounded-lg border-2 border-[#3F2305] ${selectedCategory === cat.key ? 'bg-[#74512D]' : 'bg-[#F2EAD3]'}`}>
+              className={`px-2 py-2 mx-2 rounded-lg border-2 border-[#3F2305] 
+              ${selectedCategory === cat.key ? 'bg-[#74512D]' : 'bg-[#F2EAD3]'}`}>
+
               <Text className={`text-lg font-bold ${selectedCategory === cat.key ? 'text-white' : 'text-[#5B3E20]'}`}>{cat.label}</Text>
             </Pressable>
           ))}
         </View>
+
         {/* Remedy Cards */}
-        {filteredRemedies.map((productList, idx) => (
+
+        {filteredRemedies.map((item, idx) => (
           <View
             key={idx}
             className="flex-row bg-[#3F2305] rounded-lg mx-4 mt-2 mb-6 p-4 shadow-xl"
             style={{ alignItems: 'flex-start' }}>
-
-            <View className="w-24 h-24 bg-gray-300 rounded-md mt-2 mr-4" />
-            {/* Replace above View with <Image source={remedy.image} className="w-16 h-16 rounded-md mr-4" /> if you have images */}
+            
+            {item.image && (
+            <Image source={item.image} className="w-28 h-28 rounded-md mr-4 flex-center justify-center items-center" />
+            )}
             <View style={{ flex: 1 }}>
-              <Text className="text-white text-2xl font-bold mb-1">{productList.name}</Text>
-              <Text className="text-white text-md text-wrap-pretty w-72">{productList.description}</Text>
+              <Text className="text-white text-2xl font-bold mb-1">{item.name}</Text>
+              <Text className="text-white text-md leading-5 text-justify">{item.description}</Text>
             </View>
           </View>
         ))}
+
       </ScrollView>
       <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 shadow-lg">
         {/* Home Icon */}

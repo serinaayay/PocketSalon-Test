@@ -121,6 +121,7 @@ const HomePage = () => {
                         className="w-8 h-8"/>
                     </Pressable>
                 </View>
+
                 <View className="flex-col items-center">
                     <Pressable className="2 justify-center"
                     onPress={() => router.push('/hair-detection')}>
@@ -129,6 +130,7 @@ const HomePage = () => {
                         className="w-9 h-9"/>
                     </Pressable>
                 </View>
+
                 <View className="flex-col items-center">
                     <Pressable className="2 justify-center"
                     onPress={() => router.push('/journal')}>
@@ -137,6 +139,16 @@ const HomePage = () => {
                         className="w-9 h-9"/>
                     </Pressable>
                 </View>
+
+                <View className="flex-col items-center">
+                    <Pressable className="2 justify-center"
+                    onPress={() => router.push('/journal')}>
+                    <Image
+                        source={require('../assets/images/heart (1).png')}
+                        className="w-9 h-9"/>
+                    </Pressable>
+                </View>
+
             </View>
       </View>
     </View>
