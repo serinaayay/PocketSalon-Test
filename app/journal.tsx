@@ -209,6 +209,14 @@ const journal = () => {
                         className="w-9 h-9"/>
                     </Pressable>
                 </View>
+                <View className="flex-col items-center">
+                    <Pressable className="2 justify-center"
+                    onPress={() => router.push('/favorites')}>
+                    <Image
+                        source={require('../assets/images/heart (1).png')}
+                        className="w-9 h-9"/>
+                    </Pressable>
+                </View>
             </View>
       </View>
     </View>

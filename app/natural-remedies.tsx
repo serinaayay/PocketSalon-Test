@@ -10,21 +10,28 @@ const remedies = [
     description:
       "Aloe vera soothes the scalp, conditions hair, and can reduce dandruff. Apply fresh aloe gel to your scalp and hair, leave for 30 minutes, then rinse.",
     category: "breakage",
-    image: null, // Replace with require('../assets/images/aloe-vera.png') if you have an image
+    image: require('../assets/images/aloe.jpg'),
   },
   {
     name: "Coconut Oil",
     description:
       "Coconut oil deeply moisturizes and repairs damaged hair. Warm a small amount, massage into scalp and hair, leave for at least 1 hour, then wash out.",
     category: "color damage",
-    image: null,
+    image: require('../assets/images/coconut oil.jpg'),
   },
   {
     name: "Egg Mask",
     description:
       "Eggs are rich in protein and help strengthen hair. Mix one egg with a tablespoon of olive oil, apply to hair, leave for 20 minutes, then rinse with cool water.",
     category: "hair loss",
-    image: null,
+    image: require('../assets/images/egg mask.jpg'),
+  },
+  {
+    name: "Vitamins",
+    description:
+      "Essential vitamins like Biotin (B7), Vitamin D, Iron, and Zinc are crucial for healthy hair growth. Take supplements as directed or consume foods rich in these nutrients to support hair strength and prevent hair loss.",
+    category: "hair loss",
+    image: require('../assets/images/vitamins.jpg'),
   },
 ];
 
@@ -61,11 +68,12 @@ const NaturalRemedies = () => {
             className="flex-row bg-[#3F2305] rounded-lg mx-4 mt-2 mb-6 p-4 shadow-xl"
             style={{ alignItems: 'flex-start' }}>
 
-            <View className="w-24 h-24 bg-gray-300 rounded-md mt-2 mr-4" />
-            {/* Replace above View with <Image source={remedy.image} className="w-16 h-16 rounded-md mr-4" /> if you have images */}
+            {remedy.image && (
+              <Image source={remedy.image} className="w-28 h-28 rounded-md mr-4 flex-center justify-center items-center" />
+            )}
             <View style={{ flex: 1 }}>
               <Text className="text-white text-2xl font-bold mb-1">{remedy.name}</Text>
-              <Text className="text-white text-md text-wrap-pretty w-72">{remedy.description}</Text>
+              <Text className="text-white text-md leading-5 text-justify">{remedy.description}</Text>
             </View>
           </View>
         ))}
@@ -92,9 +100,21 @@ const NaturalRemedies = () => {
                         </View>
                     {/* Journal Icon */}
                         <View className="flex-col items-center">
+                            <Pressable className="2 justify-center"
+                            onPress={() => router.push('/journal')}>
                             <Image
                                 source={require('../assets/images/agenda 1.png')}
                                 className="w-9 h-9"/>
+                            </Pressable>
+                        </View>
+                    {/* Heart Icon */}
+                        <View className="flex-col items-center">
+                            <Pressable className="2 justify-center"
+                            onPress={() => router.push('/favorites')}>
+                            <Image
+                                source={require('../assets/images/heart (1).png')}
+                                className="w-9 h-9"/>
+                            </Pressable>
                         </View>
             </View>
       </View>

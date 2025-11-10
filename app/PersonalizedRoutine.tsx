@@ -1,10 +1,228 @@
 import React from 'react';
-import { View, Text, ScrollView, Pressable, Dimensions, Image, Modal } from 'react-native';
+import { View, Text, ScrollView, Pressable, Dimensions, Image, Modal, Animated, Linking, TouchableOpacity } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { getHairRoutine, mapDamageLevelToRoutine, mapHairTypeToRoutine, ScalpCondition } from '../lib/hairRoutines';
-import { recommendProducts, getProductImage } from '../lib/productRecommendations';
+import { recommendProducts, getProductImage, getPriceCategory, Product } from '../lib/productRecommendations';
+import { addFavorite, removeFavorite, isFavorite } from '../lib/favorites';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
+
+// Flip Card Component
+const FlipCard = ({ product }: { product: Product }) => {
+  const [flipped, setFlipped] = React.useState(false);
+  const [isFav, setIsFav] = React.useState(false);
+  const flipAnimation = React.useRef(new Animated.Value(0)).current;
+
+  React.useEffect(() => {
+    const checkFavorite = async () => {
+      const favStatus = await isFavorite(product.id);
+      setIsFav(favStatus);
+    };
+    checkFavorite();
+  }, [product.id]);
+
+  const flipCard = () => {
+    Animated.timing(flipAnimation, {
+      toValue: flipped ? 0 : 180,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
+    setFlipped(!flipped);
+  };
+
+  const toggleFavorite = async () => {
+    if (isFav) {
+      await removeFavorite(product.id);
+      setIsFav(false);
+    } else {
+      await addFavorite(product);
+      setIsFav(true);
+    }
+  };
+
+  const openProductLink = () => {
+    if (product.link) {
+      Linking.openURL(product.link);
+    }
+  };
+
+  const frontInterpolate = flipAnimation.interpolate({
+    inputRange: [0, 180],
+    outputRange: ['0deg', '180deg'],
+  });
+
+  const backInterpolate = flipAnimation.interpolate({
+    inputRange: [0, 180],
+    outputRange: ['180deg', '360deg'],
+  });
+
+  const frontAnimatedStyle = {
+    transform: [{ rotateY: frontInterpolate }],
+  };
+
+  const backAnimatedStyle = {
+    transform: [{ rotateY: backInterpolate }],
+  };
+
+  return (
+    <View style={{ width: 256, height: 500 }}>
+      {/* Front of Card */}
+      <Animated.View
+        style={[
+          {
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            backfaceVisibility: 'hidden',
+          },
+          frontAnimatedStyle,
+        ]}
+        pointerEvents={flipped ? 'none' : 'auto'}
+      >
+        <View className="w-64 bg-[#3F2305] rounded-xl shadow-lg p-4 items-center" style={{ height: 500 }}>
+          {/* Product Image */}
+          <View className="w-full bg-[#f3ddc5] rounded-lg mb-3 flex justify-center items-center" style={{ height: 180 }}>
+            <Image
+              source={getProductImage(product.imageKey)}
+              style={{ width: '80%', height: '80%', resizeMode: 'contain' }}
+            />
+          </View>
+          
+          <Text className="text-white text-lg font-bold text-center mb-2" numberOfLines={2}>
+            {product.name}
+          </Text>
+          <ScrollView 
+            style={{ maxHeight: 120, marginBottom: 8 }} 
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 4 }}
+          >
+            <Text className="text-white text-xs text-center">
+              {product.description}
+            </Text>
+          </ScrollView>
+          <View className="items-center mt-auto pb-2">
+            <Text className="text-[#F2D8A7] text-3xl font-bold mb-2">
+              {getPriceCategory(product.price)}
+            </Text>
+          </View>
+          <View className="flex-row items-center justify-center flex-wrap gap-2 mt-1 px-2" style={{ zIndex: 1000 }}>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('Ingredients button pressed');
+                flipCard();
+              }}
+              activeOpacity={0.6}
+              style={{
+                backgroundColor: '#8B6B47',
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 20,
+                elevation: 10,
+                zIndex: 1001,
+              }}
+            >
+              <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' }}>Ingredients</Text>
+            </TouchableOpacity>
+            {product.link && (
+              <TouchableOpacity
+                onPress={() => {
+                  console.log('View Product button pressed');
+                  openProductLink();
+                }}
+                activeOpacity={0.6}
+                style={{
+                  backgroundColor: '#F2D8A7',
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 20,
+                  elevation: 10,
+                  zIndex: 1001,
+                }}
+              >
+                <Text style={{ color: '#3F2305', fontSize: 12, fontWeight: 'bold' }}>View Product</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              onPress={() => {
+                console.log('Heart button pressed');
+                toggleFavorite();
+              }}
+              activeOpacity={0.6}
+              style={{
+                padding: 6,
+                backgroundColor: '#F2D8A7',
+                borderRadius: 20,
+                elevation: 10,
+                zIndex: 1001,
+              }}
+            >
+              <Ionicons
+                name={isFav ? 'heart' : 'heart-outline'}
+                size={20}
+                color={isFav ? '#FF0000' : '#3F2305'}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Animated.View>
+
+      {/* Back of Card */}
+      <Animated.View
+        style={[
+          {
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            backfaceVisibility: 'hidden',
+          },
+          backAnimatedStyle,
+        ]}
+        pointerEvents={flipped ? 'auto' : 'none'}
+      >
+        <View className="w-64 bg-[#5B3E20] rounded-xl shadow-lg p-4" style={{ height: 500 }}>
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-white text-xl font-bold flex-1 text-center">
+              Ingredients
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('Back button pressed');
+                flipCard();
+              }}
+              activeOpacity={0.6}
+              style={{
+                position: 'absolute',
+                right: 0,
+                backgroundColor: '#8B6B47',
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 20,
+                elevation: 10,
+                zIndex: 1001,
+              }}
+            >
+              <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' }}>Back</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+            {product.ingredients && product.ingredients.length > 0 ? (
+              product.ingredients.map((ingredient, index) => (
+                <Text key={index} className="text-white text-sm mb-2">
+                  • {ingredient}
+                </Text>
+              ))
+            ) : (
+              <Text className="text-white text-sm text-center">
+                No ingredient information available
+              </Text>
+            )}
+          </ScrollView>
+        </View>
+      </Animated.View>
+    </View>
+  );
+};
 
 export default function PersonalizedRoutine() {
   const params = useLocalSearchParams();
@@ -17,6 +235,7 @@ export default function PersonalizedRoutine() {
   const routine = getHairRoutine(scalpCondition, hairType, damageLevel);
 
   const [showDisclaimer, setShowDisclaimer] = React.useState(true);
+  const [selectedProductType, setSelectedProductType] = React.useState<string>('All');
 
   const NumberBadge = ({ num }: { num: string }) => (
     <View className="w-7 h-7 rounded-md bg-[#CDB08B] items-center justify-center mr-2" style={{ flexShrink: 0 }}>
@@ -236,26 +455,35 @@ export default function PersonalizedRoutine() {
         {/* Product Recommendations Section */}
         <View className="mx-4 mt-6">
           <Text className="text-2xl font-bold text-[#3F2305] text-center mb-4">Product Suggestions</Text>
+          
+          {/* Filter Pills */}
+          <View className="flex-row mb-4">
+            {['All', 'Shampoo', 'Conditioner', 'Hair Oil'].map((type) => (
+              <Pressable
+                key={type}
+                onPress={() => setSelectedProductType(type)}
+                className={`px-4 py-2 rounded-full mr-2 ${
+                  selectedProductType === type ? 'bg-[#3F2305]' : 'bg-[#E8DCC8]'
+                }`}
+              >
+                <Text className={`text-sm font-semibold ${
+                  selectedProductType === type ? 'text-white' : 'text-[#5B3E20]'
+                }`}>
+                  {type}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {recommendProducts({ 
               hairType: params.hair_type as string, 
               scalpCondition: scalpCondition, 
               hairDamage: params.damage_level as string, 
-              limit: 10 
-            }).map((product) => (
-              <View key={product.id} className="w-64 bg-[#3F2305] rounded-xl shadow-lg mx-2 p-4 items-center">
-                <View className="w-full aspect-square bg-[#f3ddc5] rounded-lg mb-4 flex justify-center items-center">
-                  <Image
-                    source={getProductImage(product.imageKey)}
-                    style={{ width: '80%', height: '80%', resizeMode: 'contain' }}
-                  />
-                </View>
-                <Text className="text-white text-xl font-bold text-center mb-2">
-                  {product.name}
-                </Text>
-                <Text className="text-white text-sm text-center">
-                  {product.description}
-                </Text>
+              limit: 20 
+            }).filter(product => selectedProductType === 'All' || product.productType === selectedProductType).map((product) => (
+              <View key={product.id} className="mx-2">
+                <FlipCard product={product} />
               </View>
             ))}
           </ScrollView>
@@ -264,26 +492,35 @@ export default function PersonalizedRoutine() {
         {/* Natural Remedies Section */}
         <View className="mx-4 mt-10 mb-6">
           <Text className="text-2xl font-bold text-[#3F2305] text-center mb-4">Natural Remedies</Text>
+          
+          {/* Filter Pills */}
+          <View className="flex-row mb-4">
+            {['All', 'Shampoo', 'Conditioner', 'Hair Oil'].map((type) => (
+              <Pressable
+                key={`remedy-${type}`}
+                onPress={() => setSelectedProductType(type)}
+                className={`px-4 py-2 rounded-full mr-2 ${
+                  selectedProductType === type ? 'bg-[#3F2305]' : 'bg-[#E8DCC8]'
+                }`}
+              >
+                <Text className={`text-sm font-semibold ${
+                  selectedProductType === type ? 'text-white' : 'text-[#5B3E20]'
+                }`}>
+                  {type}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {recommendProducts({ 
               hairType: params.hair_type as string, 
               scalpCondition: scalpCondition, 
               hairDamage: params.damage_level as string, 
-              limit: 10 
-            }).map((product) => (
-              <View key={`remedy-${product.id}`} className="w-64 bg-[#3F2305] rounded-xl shadow-lg mx-2 p-4 items-center">
-                <View className="w-full aspect-square bg-[#f3ddc5] rounded-lg mb-4 flex justify-center items-center">
-                  <Image
-                    source={getProductImage(product.imageKey)}
-                    style={{ width: '80%', height: '80%', resizeMode: 'contain' }}
-                  />
-                </View>
-                <Text className="text-white text-xl font-bold text-center mb-2">
-                  {product.name}
-                </Text>
-                <Text className="text-white text-sm text-center">
-                  {product.description}
-                </Text>
+              limit: 20 
+            }).filter(product => selectedProductType === 'All' || product.productType === selectedProductType).map((product) => (
+              <View key={`remedy-${product.id}`} className="mx-2">
+                <FlipCard product={product} />
               </View>
             ))}
           </ScrollView>
@@ -317,6 +554,14 @@ export default function PersonalizedRoutine() {
                     onPress={() => router.push('/journal')}>
                     <Image
                         source={require('../assets/images/agenda 1.png')}
+                        className="w-9 h-9"/>
+                    </Pressable>
+                </View>
+                <View className="flex-col items-center">
+                    <Pressable className="2 justify-center"
+                    onPress={() => router.push('/favorites')}>
+                    <Image
+                        source={require('../assets/images/heart (1).png')}
                         className="w-9 h-9"/>
                     </Pressable>
                 </View>
