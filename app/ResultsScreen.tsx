@@ -81,14 +81,14 @@ const FlipCard = ({ product }: { product: Product }) => {
       >
         <View className="w-64 bg-[#3F2305] rounded-xl shadow-lg p-4 items-center" style={{ height: 500 }}>
           {/* Product Image */}
-          <View className="w-full bg-[#f3ddc5] rounded-lg mb-3 flex justify-center items-center" style={{ height: 180 }}>
+          <View className="w-full bg-[#cfaf8d] rounded-lg mb-3 flex justify-center items-center" style={{ height: 180 }}>
             <Image
               source={getProductImage(product.imageKey)}
               style={{ width: '80%', height: '80%', resizeMode: 'contain' }}
             />
           </View>
           
-          <Text className="text-white text-lg font-bold text-center mb-2" numberOfLines={2}>
+          <Text className="text-white text-xl font-bold text-center mb-2" numberOfLines={2}>
             {product.name}
           </Text>
           <ScrollView 
@@ -113,7 +113,7 @@ const FlipCard = ({ product }: { product: Product }) => {
               }}
               activeOpacity={0.6}
               style={{
-                backgroundColor: '#8B6B47',
+                backgroundColor: '#F2D8A7',
                 paddingHorizontal: 12,
                 paddingVertical: 6,
                 borderRadius: 20,
@@ -121,8 +121,10 @@ const FlipCard = ({ product }: { product: Product }) => {
                 zIndex: 1001,
               }}
             >
-              <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' }}>Ingredients</Text>
+              <Text style={{ color: '#3F2305', fontSize: 12, fontWeight: 'bold' }}>Ingredients</Text>
+
             </TouchableOpacity>
+
             {product.link && (
               <TouchableOpacity
                 onPress={() => {
@@ -138,10 +140,12 @@ const FlipCard = ({ product }: { product: Product }) => {
                   elevation: 10,
                   zIndex: 1001,
                 }}
-              >
+                className='self-center ml-10'>
+                  
                 <Text style={{ color: '#3F2305', fontSize: 12, fontWeight: 'bold' }}>View Product</Text>
               </TouchableOpacity>
             )}
+          <View className="position left-5">
             <TouchableOpacity
               onPress={() => {
                 console.log('Heart button pressed');
@@ -155,6 +159,7 @@ const FlipCard = ({ product }: { product: Product }) => {
                 elevation: 10,
                 zIndex: 1001,
               }}
+              className=''
             >
               <Ionicons
                 name={isFav ? 'heart' : 'heart-outline'}
@@ -162,6 +167,7 @@ const FlipCard = ({ product }: { product: Product }) => {
                 color={isFav ? '#FF0000' : '#3F2305'}
               />
             </TouchableOpacity>
+          </View>
           </View>
         </View>
       </Animated.View>
@@ -177,14 +183,9 @@ const FlipCard = ({ product }: { product: Product }) => {
           },
           backAnimatedStyle,
         ]}
-        pointerEvents={flipped ? 'auto' : 'none'}
-      >
-        <View className="w-64 bg-[#5B3E20] rounded-xl shadow-lg p-4" style={{ height: 500 }}>
-          <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-white text-xl font-bold flex-1 text-center">
-              Ingredients
-            </Text>
-            <TouchableOpacity
+        pointerEvents={flipped ? 'auto' : 'none'}>
+
+        <TouchableOpacity
               onPress={() => {
                 console.log('Back button pressed');
                 flipCard();
@@ -193,16 +194,20 @@ const FlipCard = ({ product }: { product: Product }) => {
               style={{
                 position: 'absolute',
                 right: 0,
-                backgroundColor: '#8B6B47',
+                backgroundColor: '#3F2305',
                 paddingHorizontal: 12,
                 paddingVertical: 6,
                 borderRadius: 20,
                 elevation: 10,
                 zIndex: 1001,
-              }}
-            >
-              <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' }}>Back</Text>
-            </TouchableOpacity>
+              }}>
+        <View className="w-64 bg-[#3F2305] rounded-xl shadow-lg p-4" style={{height: 500}}>
+              
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-white text-xl font-bold flex-1 text-center">
+              Ingredients
+            </Text>
+              
           </View>
           <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
             {product.ingredients && product.ingredients.length > 0 ? (
@@ -218,6 +223,7 @@ const FlipCard = ({ product }: { product: Product }) => {
             )}
           </ScrollView>
         </View>
+        </TouchableOpacity>
       </Animated.View>
     </View>
   );
@@ -389,10 +395,10 @@ const ResultsScreen = () => {
              
                 {/* Product Recommendations Row */}
                 <View className="mx-8 my-16">
-                    <Text className="text-[27px] font-bold mb-4 text-[#3F2305] text-center">Product Suggestions</Text>
+                    <Text className="text-[29px] font-extrabold mb-6 text-[#3F2305] text-center">Product Suggestions</Text>
                     
                     {/* Filter Pills */}
-                    <View className="flex-row mb-4">
+                    <View className="flex-row mb-8 self-center mx-8 px-2">
                       {['All', 'Shampoo', 'Conditioner', 'Hair Oil'].map((type) => (
                         <Pressable
                           key={type}
@@ -401,7 +407,7 @@ const ResultsScreen = () => {
                             selectedProductType === type ? 'bg-[#3F2305]' : 'bg-[#E8DCC8]'
                           }`}
                         >
-                          <Text className={`text-sm font-semibold ${
+                          <Text className={`text-md font-semibold ${
                             selectedProductType === type ? 'text-white' : 'text-[#5B3E20]'
                           }`}>
                             {type}
@@ -454,7 +460,7 @@ const ResultsScreen = () => {
                             selectedProductType === type ? 'bg-[#3F2305]' : 'bg-[#E8DCC8]'
                           }`}
                         >
-                          <Text className={`text-sm font-semibold ${
+                          <Text className={`text- font-semibold ${
                             selectedProductType === type ? 'text-white' : 'text-[#5B3E20]'
                           }`}>
                             {type}

@@ -308,17 +308,34 @@ export default function HairDetectionPage() {
         </Modal>
 
         
-        {/* Image Frame */}
-        <View style={{ width: frameSize, height: frameSize, zIndex: 1, marginTop: -frameSize / 5}} className="relative rounded-xl overflow-hidden 
-        items-center justify-center bg-[#DFD7BF] top-16 shadow-lg">
-          {image ? (
-            <Image source={{ uri: image }} style={{ width: frameSize, height: frameSize }} resizeMode="cover" />
-          ) : (
-            <View className="flex-1 w-full h-full items-center justify-center align-middle">
-              <Text className="text-400 text-xl color-black">No Image</Text>
-            </View>
-          )}
-        </View>
+{/* Image Frame */}
+<Pressable
+  onPress={() => {
+    setImage(null); 
+    setShowImageSourceModal(true); 
+  }}
+  style={{
+    width: frameSize,
+    height: frameSize,
+    zIndex: 1,
+    marginTop: -frameSize / 5,
+  }}
+  className="relative rounded-xl overflow-hidden items-center justify-center bg-[#DFD7BF] top-16 shadow-lg">
+
+  {image ? (
+    <Image
+      source={{ uri: image }}
+      style={{ width: frameSize, height: frameSize }}
+      resizeMode="cover"
+    />
+  ) : (
+    
+    <View className="flex-1 w-full h-full items-center justify-center">
+      <Text className="text-xl text-black">No Image</Text>
+    </View>
+  )}
+</Pressable>
+
 
         {/* Upload and Capture Buttons */}
          <View style={{ width: frameSize, minHeight: 100, zIndex: 10 }} className="mt-28 mb-6">
@@ -327,7 +344,7 @@ export default function HairDetectionPage() {
             {image && (
               <Pressable
                 onPress={analyzeImage}
-                className="bg-[#6C4E31] rounded-lg w-48 h-14 items-center justify-center"
+                className="bg-[#3F2305] rounded-lg w-48 h-14 items-center justify-center"
                 disabled={loading}>
                 <Text className="text-[#FFEEDB] text-lg font-bold text-center">{loading ? 'Analyzing...' : 'Analyze'}</Text>
               </Pressable>)}

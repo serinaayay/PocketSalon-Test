@@ -22,7 +22,8 @@
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to take photos for hair analysis.",
         "NSPhotoLibraryUsageDescription": "This app accesses your photos to let you select images for hair analysis."
-      }
+      },
+      "bundleIdentifier": "com.pocketsalon.app"
     },
     "android": {
       "userInterfaceStyle": "automatic",
@@ -32,7 +33,7 @@
       },
       "package": "com.pocketsalon.app",
       "permissions": [
-        "INTERNET",
+        "android.permission.INTERNET",
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.READ_MEDIA_IMAGES",
@@ -66,7 +67,9 @@
         {
           "photosPermission": "Allow PocketSalon to access your photos for hair type analysis."
         }
-      ]
+      ],
+      "expo-sqlite",
+      "expo-web-browser"
     ],
     "experiments": {
       "tsconfigPaths": true,

@@ -237,12 +237,12 @@ export default function FavoritesPage() {
     <View className="flex-1 bg-[#FFF2E4]">
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 120 }}>
         {/* Header */}
-        <Text className="text-3xl font-bold text-[#3F2305] mt-16 mx-6 text-center">
+        <Text className="text-[30px] font-extrabold text-[#3F2305] mt-16 mx-6 self-center">
           My Favorite Products
         </Text>
 
         {/* Filter Pills */}
-        <View className="flex-row mb-4 mt-6 mx-4">
+        <View className="flex-row mb-6 mt-6 mx-4 self-center">
           {['All', 'Shampoo', 'Conditioner', 'Hair Oil'].map((type) => (
             <Pressable
               key={type}
@@ -251,7 +251,7 @@ export default function FavoritesPage() {
                 selectedProductType === type ? 'bg-[#3F2305]' : 'bg-[#E8DCC8]'
               }`}
             >
-              <Text className={`text-sm font-semibold ${
+              <Text className={`text-md font-semibold ${
                 selectedProductType === type ? 'text-white' : 'text-[#5B3E20]'
               }`}>
                 {type}
@@ -262,7 +262,7 @@ export default function FavoritesPage() {
 
         {/* Favorites List */}
         {filteredFavorites.length === 0 ? (
-          <View className="items-center justify-center mt-20">
+          <View className="self-center mt-20 justify-center items-center">
             <Ionicons name="heart-outline" size={64} color="#3F2305" />
             <Text className="text-xl text-[#3F2305] mt-4 mx-6 text-center">
               No favorite products yet!
@@ -272,7 +272,7 @@ export default function FavoritesPage() {
             </Text>
           </View>
         ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className='self-center'>
             {filteredFavorites.map((product) => (
               <View key={product.id} className="mx-2">
                 <FlipCard product={product} onFavoriteChange={loadFavorites} />
