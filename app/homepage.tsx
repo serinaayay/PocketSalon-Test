@@ -1,13 +1,54 @@
-import { View, Text, Pressable, ScrollView, TextInput, Dimensions } from "react-native";
+import { View, Text, Pressable, ScrollView, TextInput, Dimensions, ActivityIndicator, Alert } from "react-native";
 import { Image } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { router } from "expo-router";
 import Accordion from "@/components/Accordion";
 import data from "./data";
+import { runHairTypeEfficiencyAndUpload } from "@/lib/efficiencyRunner";
 
 const { width, height } = Dimensions.get('window');
 
 const HomePage = () => {
+  const [runningEffTest, setRunningEffTest] = useState(false);
+
+  const handleRunEfficiency = async () => {
+    if (runningEffTest) return;
+    setRunningEffTest(true);
+    try {
+      const { results, uploadedUrl } = await runHairTypeEfficiencyAndUpload();
+      if (!results || results.length === 0) {
+        Alert.alert(
+          "Efficiency Test",
+          "No sample images configured. Please populate assets/manifests/hairtypeImages.ts."
+        );
+      } else {
+        const messageLines = results.map(r => `${r.model}: mean=${r.mean_inference_ms.toFixed(6)}ms, std=${r.std_inference_ms.toFixed(6)}ms`);
+        const urlLine = uploadedUrl ? `\nUploaded JSON:\n${uploadedUrl}` : "";
+        Alert.alert("Efficiency Test Complete", messageLines.join("\n") + urlLine);
+      }
+    } catch (err: any) {
+      const errorMsg = err?.message ?? String(err);
+      console.error("Efficiency test error:", errorMsg);
+      
+      // Provide helpful guidance for common errors
+      if (errorMsg.includes('downloadAsync') || errorMsg.includes('Unable to download') || errorMsg.includes('asset')) {
+        Alert.alert(
+          "Development Limitation",
+          "Large ONNX models (90MB+) cannot be loaded in Expo dev mode.\n\n" +
+          "Solutions:\n" +
+          "1. Use Python script: python scripts/efficiency_test.py\n" +
+          "2. Build production APK with: eas build --platform android\n" +
+          "3. Or upload models to Firebase and download at runtime",
+          [{ text: "OK" }]
+        );
+      } else {
+        Alert.alert("Efficiency Test Failed", errorMsg);
+      }
+    } finally {
+      setRunningEffTest(false);
+    }
+  };
+
   return (
     <View className="flex-1 h-full bg-[#FFF2E4]">
       <ScrollView contentContainerStyle={{paddingBottom: 100}} showsVerticalScrollIndicator={true}>
@@ -21,6 +62,23 @@ const HomePage = () => {
             className="w-48 h-40 -mt-24 -mb-10"
             resizeMode="contain"/>
           
+          {/* Efficiency Test Button */}
+          <Pressable
+            onPress={handleRunEfficiency}
+            className="bg-[#6C4E31] rounded-xl py-3 px-4 mb-4 self-start"
+            style={{ opacity: runningEffTest ? 0.7 : 1 }}
+            disabled={runningEffTest}
+          >
+            <View className="flex-row items-center">
+              {runningEffTest ? (
+                <ActivityIndicator color="#FFF" />
+              ) : null}
+              <Text className="text-white font-semibold text-base ml-2">
+                {runningEffTest ? "Running Efficiency Test..." : "Run Model Efficiency Test"}
+              </Text>
+            </View>
+          </Pressable>
+
           <View className="mb-6">
             <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-4" contentContainerStyle={{ paddingLeft: 8 }}>
               <View className="flex-row space-x-20">
