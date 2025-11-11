@@ -4,6 +4,7 @@ import React from 'react';
 import { recommendProducts, getProductImage, getPriceCategory, Product } from '../lib/productRecommendations';
 import { addFavorite, removeFavorite, isFavorite } from '../lib/favorites';
 import { Ionicons } from '@expo/vector-icons';
+import { mapDamageTypeToRoutine } from '../lib/hairRoutines';
 
 const { width, height } = Dimensions.get('window');
 
@@ -278,8 +279,59 @@ const ResultsScreen = () => {
     const hairConfidence = params.hair_confidence as string | number | undefined;
     const damageLevel = params.damage_level as string | undefined;
     const damageConfidence = params.damage_confidence as string | number | undefined;
+    const damageTypeParam = params.damage_type as string | undefined;
     const imageUri = params.image_uri as string | undefined;
     const hairHealthScore = params.hair_health_score ? parseFloat(params.hair_health_score as string) : null;
+
+    const inferDamageTypeFromLevel = (level?: string): string | undefined => {
+        if (!level) return undefined;
+        const lower = level.toLowerCase();
+        if (lower.includes('breakage')) return 'Breakage';
+        if (lower.includes('hair loss') || lower.includes('hair-loss') || lower.includes('hairloss')) return 'Hair Loss';
+        if (lower.includes('color')) return 'Color Damage';
+        if (lower.includes('healthy')) return 'Healthy';
+        return undefined;
+    };
+
+    const mappedDamageType = mapDamageTypeToRoutine(
+        (damageTypeParam as string | undefined) ||
+        inferDamageTypeFromLevel(damageLevel) ||
+        'Healthy'
+    );
+
+    const formatDamageDisplay = (level?: string, type?: string): string => {
+        const normalizedLevel = (level || '').trim();
+        const normalizedType = (type || '').trim();
+
+        if (!normalizedLevel && !normalizedType) return 'Healthy';
+        if (normalizedLevel.toLowerCase() === 'healthy' || normalizedType.toLowerCase() === 'healthy') {
+            return 'Healthy';
+        }
+
+        const lowerLevel = normalizedLevel.toLowerCase();
+        const lowerType = normalizedType.toLowerCase();
+
+        if (
+            lowerLevel.includes('chance') ||
+            lowerLevel.includes('likely') ||
+            (lowerType && lowerLevel.includes(lowerType))
+        ) {
+            return normalizedLevel;
+        }
+
+        const levelWithoutDamage = normalizedLevel.replace(/\s*damage\s*/gi, '').trim();
+        if (!levelWithoutDamage && normalizedType) {
+            return `Chance of ${normalizedType}`;
+        }
+
+        if (!normalizedType) {
+            return levelWithoutDamage || normalizedLevel || 'Healthy';
+        }
+
+        return `${levelWithoutDamage || normalizedLevel} chance of ${normalizedType}`;
+    };
+
+    const damageDisplayText = formatDamageDisplay(damageLevel, mappedDamageType);
 
     const [selectedProductType, setSelectedProductType] = React.useState<string>('All');
 
@@ -360,8 +412,11 @@ const ResultsScreen = () => {
                         />
                         )}
                     </View>
-                    <Text className="text-base font-semibold mt-2 text-[#2D2D2D] mr-4">
-                        {damageLevel || 'Damage'}
+                    <Text
+                      className="text-base font-semibold mt-2 text-[#2D2D2D] text-center"
+                      style={{ width: width * 0.30 }}
+                    >
+                        {damageDisplayText}
                     </Text>
                     </View>
                     <View 

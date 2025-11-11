@@ -38,6 +38,11 @@ export default function ChatbotScreen() {
   const [inputText, setInputText] = useState("");
   const [showWelcome, setShowWelcome] = useState(true);
   const scrollViewRef = useRef<ScrollView>(null);
+  const conversationContext = useRef<{
+    lastHairType?: string;
+    lastTopic?: string;
+    mentionedIssues?: string[];
+  }>({});
 
   useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -49,6 +54,20 @@ export default function ChatbotScreen() {
     if (lowerQuestion.length < 3) {
       return "I can't understand your question or your question is not related to the app.";
     }
+
+    // Update conversation context
+    const updateContext = (topic?: string, hairType?: string, issue?: string) => {
+      if (topic) conversationContext.current.lastTopic = topic;
+      if (hairType) conversationContext.current.lastHairType = hairType;
+      if (issue) {
+        if (!conversationContext.current.mentionedIssues) {
+          conversationContext.current.mentionedIssues = [];
+        }
+        if (!conversationContext.current.mentionedIssues.includes(issue)) {
+          conversationContext.current.mentionedIssues.push(issue);
+        }
+      }
+    };
 
     if (lowerQuestion === 'hello' || lowerQuestion === 'hi' || lowerQuestion === 'hey' || lowerQuestion.startsWith('hello ') || lowerQuestion.startsWith('hi ') || lowerQuestion.startsWith('hey ')) {
       return "Hello! I'm here to help you with hair care tips, hair types, and hair health questions. What would you like to know?";
@@ -73,8 +92,10 @@ export default function ChatbotScreen() {
         return "I can't understand your question or your question is not related to the app.";
       }
     }
-    if (lowerQuestion.includes('trim') && (lowerQuestion.includes('grow') || lowerQuestion.includes('faster') || lowerQuestion.includes('longer'))) {
-      return "MYTH: Trimming doesn't make hair grow faster.\n\nYour hair grows from the roots, not the ends! However, regular trims (every 6-8 weeks) prevent split ends from traveling up the hair shaft, making your hair appear healthier and helping you retain length.";
+    // Specific question: Does trimming help hair grow faster?
+    if (lowerQuestion.includes('trim') && (lowerQuestion.includes('grow') || lowerQuestion.includes('faster') || lowerQuestion.includes('longer') || lowerQuestion.includes('help'))) {
+      updateContext('trimming');
+      return "MYTH BUSTED: Trimming does NOT make hair grow faster.\n\nWhy this is a myth:\n• Hair grows from the ROOTS (scalp), not the ends\n• Cutting ends doesn't affect growth rate\n• Growth happens at ~0.5 inches per month regardless\n\nBUT trimming IS important because:\n• Prevents split ends from traveling UP the hair shaft\n• Makes hair APPEAR longer and healthier\n• Helps you RETAIN length (less breakage)\n• Removes damaged, weak ends\n\nBest practice:\n• Trim every 6-8 weeks (or every 3-4 months minimum)\n• Remove only 1/4 to 1/2 inch\n• Use sharp scissors (dull ones cause more damage)\n• Trim when hair is dry for accuracy\n\nThink of it as maintenance, not growth stimulation!";
     }
 
     if (lowerQuestion.includes('brush') && (lowerQuestion.includes('grow') || lowerQuestion.includes('longer') || lowerQuestion.includes('times') || lowerQuestion.includes('day'))) {
@@ -109,7 +130,24 @@ export default function ChatbotScreen() {
       return "Natural remedies can be beneficial!\n\nCommon natural treatments:\n• Coconut oil: Deep moisture\n• Aloe vera: Soothing, strengthening\n• Avocado: Rich in vitamins\n• Egg mask: Protein boost\n• Honey: Moisture retention\n\nAlways do a patch test first! Natural doesn't always mean safe for everyone. Check our Natural Remedies section in the app for detailed recipes!";
     }
 
+    // Specific question: How often should I wash curly hair?
+    if ((lowerQuestion.includes('how often') || lowerQuestion.includes('how many times') || lowerQuestion.includes('frequency')) && 
+        (lowerQuestion.includes('wash') || lowerQuestion.includes('shampoo')) && 
+        (lowerQuestion.includes('curly') || lowerQuestion.includes('type 3') || conversationContext.current.lastHairType === 'curly')) {
+      updateContext('washing', 'curly');
+      return "For CURLY hair (Type 3), wash 1-2 times per week.\n\nWhy less frequent?\n• Curly hair is naturally drier\n• Natural oils take longer to travel down curls\n• Over-washing strips essential moisture\n• Can cause frizz and breakage\n\nBest practices:\n• Use sulfate-free shampoo\n• Focus shampoo on scalp only\n• Condition mid-lengths to ends\n• Co-wash (conditioner-only) between shampoos\n• Deep condition weekly\n\nAdjust if:\n• You exercise frequently (may need 2-3x)\n• You have oily scalp (focus on scalp only)\n• You use heavy products (clarify monthly)";
+    }
+
+    // General washing frequency question
     if ((lowerQuestion.includes('how often') || lowerQuestion.includes('how many') || lowerQuestion.includes('wash')) && !lowerQuestion.includes('oily')) {
+      const hairType = lowerQuestion.includes('straight') ? 'straight' : 
+                      lowerQuestion.includes('wavy') ? 'wavy' : 
+                      lowerQuestion.includes('curly') ? 'curly' : 
+                      lowerQuestion.includes('kinky') || lowerQuestion.includes('coily') ? 'kinky' : 
+                      conversationContext.current.lastHairType;
+      
+      if (hairType) updateContext('washing', hairType);
+      
       return "Washing frequency by hair type:\n\n• Type 1 (Straight): Every 2-3 days (gets oily faster)\n• Type 2 (Wavy): 2-3 times per week\n• Type 3 (Curly): 1-2 times per week\n• Type 4 (Kinky/Coily): Once a week or less\n\nAdjust based on:\n• Lifestyle (exercise, environment)\n• Scalp oiliness\n• Hair thickness\n• Product buildup";
     }
 
@@ -133,8 +171,16 @@ export default function ChatbotScreen() {
       return "Simple hair health tests:\n\n1. ELASTICITY TEST:\nStretch a strand when wet. Healthy hair stretches 50% then returns.\n\n2. POROSITY TEST:\nDrop hair in water. Floats = low, sinks slowly = normal, sinks fast = high.\n\n3. BREAKAGE TEST:\nGently pull a strand. Breaks easily = damaged.\n\nFor accurate analysis, use our app's AI detection feature!";
     }
 
+    // Specific question: How to prevent sun damage?
+    if (lowerQuestion.includes('sun') && (lowerQuestion.includes('prevent') || lowerQuestion.includes('protect') || lowerQuestion.includes('avoid') || lowerQuestion.includes('how'))) {
+      updateContext('sun protection');
+      return "How to PREVENT sun damage to your hair:\n\n1. PHYSICAL PROTECTION:\n• Wear wide-brimmed hats or scarves\n• Use umbrellas in direct sunlight\n• Cover hair when swimming\n\n2. PRODUCT PROTECTION:\n• Use UV-protectant hair sprays/serums\n• Apply leave-in conditioner with UV filters\n• Use hair oils with natural SPF (coconut, jojoba)\n• Look for products with UV filters (octinoxate, avobenzone)\n\n3. TIMING:\n• Avoid peak sun hours (10am-4pm)\n• Seek shade when possible\n• Plan outdoor activities for early morning/evening\n\n4. AFTER-SUN CARE:\n• Rinse hair after sun exposure\n• Deep condition weekly\n• Use protein treatments if hair feels weak\n• Avoid heat styling on sun-exposed days\n\n5. FOR COLORED HAIR:\n• Extra protection needed (color fades faster)\n• Use color-safe UV products\n• Consider color-depositing conditioners\n\nRemember: Prevention is easier than repair!";
+    }
+
+    // General sun damage question
     if (lowerQuestion.includes('sun') && (lowerQuestion.includes('damage') || lowerQuestion.includes('affect') || lowerQuestion.includes('harm'))) {
-      return "YES, sun DOES damage hair!\n\nUV rays cause:\n• Color fading\n• Protein loss\n• Dryness and brittleness\n• Weakened strands\n\nProtection:\n• Wear hats or scarves\n• UV-protectant hair products\n• Avoid peak sun (10am-4pm)\n• Deep condition weekly";
+      updateContext('sun damage');
+      return "YES, sun DOES damage hair!\n\nUV rays cause:\n• Color fading\n• Protein loss\n• Dryness and brittleness\n• Weakened strands\n• Split ends\n• Loss of elasticity\n\nProtection:\n• Wear hats or scarves\n• UV-protectant hair products\n• Avoid peak sun (10am-4pm)\n• Deep condition weekly\n• Rinse after sun exposure";
     }
 
     if (lowerQuestion.includes('pollution') || lowerQuestion.includes('pollutants')) {
@@ -154,22 +200,27 @@ export default function ChatbotScreen() {
     }
 
     if (lowerQuestion.includes('straight') || lowerQuestion.includes('type 1') || lowerQuestion.includes('1a') || lowerQuestion.includes('1b') || lowerQuestion.includes('1c')) {
+      updateContext('hair type', 'straight');
       return "Straight hair (Type 1):\n\nNo curl pattern, lies flat.\n\n• 1A: Fine, soft, very straight\n• 1B: Medium texture, slight body\n• 1C: Coarse, may have slight bends\n\nCare tips:\n• Wash every 2-3 days\n• Lightweight products\n• Avoid heavy oils\n• Regular trims to prevent oiliness from traveling down";
     }
 
     if (lowerQuestion.includes('wavy') || lowerQuestion.includes('type 2') || lowerQuestion.includes('2a') || lowerQuestion.includes('2b') || lowerQuestion.includes('2c')) {
+      updateContext('hair type', 'wavy');
       return "Wavy hair (Type 2):\n\nS-shaped pattern.\n\n• 2A: Fine, thin waves\n• 2B: Medium waves, more defined\n• 2C: Thick, coarse, prone to frizz\n\nCare tips:\n• Wash 2-3x per week\n• Lightweight moisture\n• Scrunch while wet\n• Air dry or diffuse on low";
     }
 
     if (lowerQuestion.includes('curly') || lowerQuestion.includes('type 3') || lowerQuestion.includes('3a') || lowerQuestion.includes('3b') || lowerQuestion.includes('3c')) {
+      updateContext('hair type', 'curly');
       return "Curly hair (Type 3):\n\nWell-defined spiral curls.\n\n• 3A: Loose, big curls\n• 3B: Springy ringlets\n• 3C: Tight corkscrew curls\n\nCare tips:\n• Wash 1-2x per week\n• Deep condition weekly\n• Never brush dry\n• Use curl creams\n• Silk/satin pillowcase";
     }
 
     if (lowerQuestion.includes('kinky') || lowerQuestion.includes('coily') || lowerQuestion.includes('type 4') || lowerQuestion.includes('4a') || lowerQuestion.includes('4b') || lowerQuestion.includes('4c')) {
+      updateContext('hair type', 'kinky');
       return "Kinky/Coily hair (Type 4):\n\nTight coils, zigzag patterns.\n\n• 4A: Soft, tight coils\n• 4B: Z-pattern, sharp angles\n• 4C: Very tight, fragile, high shrinkage\n\nCare tips:\n• Wash once a week or less\n• Maximum moisture\n• Protective styles\n• Gentle detangling\n• Rich oils and butters";
     }
 
     if (lowerQuestion.includes('damage') || lowerQuestion.includes('breakage') || lowerQuestion.includes('heat') || lowerQuestion.includes('chemical')) {
+      updateContext('damage', undefined, 'damage');
       return "Hair damage:\n\nCommon causes:\n• Heat styling without protection\n• Chemical treatments\n• Rough handling\n• Environmental factors\n• Lack of moisture\n\nRecovery:\n• Deep conditioning weekly\n• Trim damaged ends\n• Gentle handling\n• Minimize heat/chemicals\n• Use our app to track progress!";
     }
 
@@ -177,7 +228,16 @@ export default function ChatbotScreen() {
       return "There are 4 main hair types:\n\n• Type 1: Straight\n• Type 2: Wavy\n• Type 3: Curly\n• Type 4: Kinky/Coily\n\nEach has sub-categories (A, B, C).\n\nUse our app's detection feature to identify YOUR hair type!";
     }
 
-    return "I can help you with hair types, damage, care routines, natural remedies, and hair health tips! Could you rephrase your question?\n\nTry asking:\n• 'How often should I wash wavy hair?'\n• 'Is trimming good for growth?'\n• 'How to protect hair from sun?'\n• 'Are natural remedies better?'";
+    // Use context to provide more relevant fallback
+    const contextHint = conversationContext.current.lastHairType 
+      ? `\n\nSince you mentioned ${conversationContext.current.lastHairType} hair, you might want to ask about ${conversationContext.current.lastHairType} hair care routines!`
+      : '';
+    
+    const issueHint = conversationContext.current.mentionedIssues && conversationContext.current.mentionedIssues.length > 0
+      ? `\n\nYou've asked about: ${conversationContext.current.mentionedIssues.join(', ')}. Feel free to ask follow-up questions!`
+      : '';
+
+    return "I can help you with hair types, damage, care routines, natural remedies, and hair health tips! Could you rephrase your question?" + contextHint + issueHint + "\n\nTry asking:\n• 'How often should I wash curly hair?'\n• 'Does trimming help hair grow faster?'\n• 'How to prevent sun damage?'\n• 'Are natural remedies better?'";
   };
 
   const handleExampleQuestion = (question: string) => {

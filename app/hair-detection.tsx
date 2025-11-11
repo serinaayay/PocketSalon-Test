@@ -75,6 +75,11 @@ export default function HairDetectionPage() {
       // Run local on-device inference using ONNX models
       const result = await analyzeHair(targetImagePath);
       
+      // Log the complete analysis result
+      console.log('🎯 COMPLETE ANALYSIS RESULT OBJECT:');
+      console.log(JSON.stringify(result, null, 2));
+      console.log('');
+      
       // Navigate to results with both hair type and damage analysis
       router.push({
         pathname: '/ResultsScreen',
@@ -82,6 +87,7 @@ export default function HairDetectionPage() {
           hair_type: result.hairType.type,
           hair_confidence: result.hairType.confidence.toString(),
           damage_level: result.hairDamage.level,
+          damage_type: result.hairDamage.type,
           damage_confidence: result.hairDamage.confidence.toString(),
           scalp_condition: scalpCondition,
         },
@@ -135,6 +141,7 @@ export default function HairDetectionPage() {
         hairType: result.hairType.type,
         scalpCondition: scalpCondition,
         damageLevel: result.hairDamage.level,
+        damageType: result.hairDamage.type,
       });
 
       // Upload to Firebase (image + metadata + device info + results)

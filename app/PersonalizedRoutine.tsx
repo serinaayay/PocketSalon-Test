@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, Pressable, Dimensions, Image, Modal, Animated, Linking, TouchableOpacity } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { getHairRoutine, mapDamageLevelToRoutine, mapHairTypeToRoutine, ScalpCondition } from '../lib/hairRoutines';
+import { getHairRoutine, mapDamageLevelToRoutine, mapHairTypeToRoutine, mapDamageTypeToRoutine, ScalpCondition } from '../lib/hairRoutines';
 import { recommendProducts, getProductImage, getPriceCategory, Product } from '../lib/productRecommendations';
 import { addFavorite, removeFavorite, isFavorite } from '../lib/favorites';
 import { Ionicons } from '@expo/vector-icons';
@@ -231,8 +231,68 @@ export default function PersonalizedRoutine() {
   const scalpCondition = (params.scalp_condition as ScalpCondition) || 'Normal Scalp';
   const hairType = mapHairTypeToRoutine(params.hair_type as string || 'Straight');
   const damageLevel = mapDamageLevelToRoutine(params.damage_level as string || 'Healthy');
+  
+  // Try to get damage type from params, or extract from damage_level if not available
+  let damageType: string | undefined = params.damage_type as string;
+  if (!damageType || damageType === 'null' || damageType === 'undefined') {
+    // Try to extract damage type from damage_level string (for backward compatibility)
+    const damageLevelStr = (params.damage_level as string || '').toLowerCase();
+    if (damageLevelStr.includes('breakage')) {
+      damageType = 'Breakage';
+    } else if (damageLevelStr.includes('hair loss') || damageLevelStr.includes('hairloss')) {
+      damageType = 'Hair Loss';
+    } else if (damageLevelStr.includes('color') || damageLevelStr.includes('colordamage')) {
+      damageType = 'Color Damage';
+    } else {
+      damageType = 'Healthy';
+    }
+  }
+  
+  const mappedDamageType = mapDamageTypeToRoutine(damageType);
+  const routine = getHairRoutine(scalpCondition, hairType, damageLevel, mappedDamageType);
+  
+  // Format damage display text (e.g., "Moderate Hair Loss" or "Light Breakage")
+  const formatDamageDisplay = (level: string, type: string): string => {
+    const normalizedLevel = (level || '').trim();
+    const normalizedType = (type || '').trim();
 
-  const routine = getHairRoutine(scalpCondition, hairType, damageLevel);
+    if (!normalizedLevel && !normalizedType) return 'Healthy';
+    if (normalizedLevel.toLowerCase() === 'healthy' || normalizedType.toLowerCase() === 'healthy') {
+      return 'Healthy';
+    }
+
+    const lowerLevel = normalizedLevel.toLowerCase();
+    const lowerType = normalizedType.toLowerCase();
+
+    // If the level string already contains the type or mentions chance/likelihood, keep it as-is
+    if (
+      lowerLevel.includes('chance') ||
+      lowerLevel.includes('likely') ||
+      (lowerType && lowerLevel.includes(lowerType))
+    ) {
+      return normalizedLevel;
+    }
+
+    // Remove generic "damage" wording and append "chance of"
+    const levelWithoutDamage = normalizedLevel.replace(/\s*damage\s*/gi, '').trim();
+    if (!levelWithoutDamage) {
+      return `Chance of ${normalizedType}`;
+    }
+    return `${levelWithoutDamage} chance of ${normalizedType}`;
+  };
+  
+  const damageDisplayText = formatDamageDisplay(damageLevel, mappedDamageType);
+  
+  // Debug logging
+  console.log('PersonalizedRoutine params:', {
+    scalp_condition: params.scalp_condition,
+    hair_type: params.hair_type,
+    damage_level: params.damage_level,
+    damage_type: params.damage_type,
+    mappedDamageType,
+    damageLevel,
+    damageDisplayText,
+  });
 
   const [showDisclaimer, setShowDisclaimer] = React.useState(true);
   const [selectedProductType, setSelectedProductType] = React.useState<string>('All');
@@ -293,7 +353,7 @@ export default function PersonalizedRoutine() {
         </Text>
 
         <Text className="text-base text-[#5B3E20] mx-6 mt-4 text-center">
-          Based on: {scalpCondition} • {hairType} Hair • {damageLevel}
+          Based on: {scalpCondition} • {hairType} Hair • {damageDisplayText}
         </Text>
 
         {/* (Summary removed per request) */}
@@ -402,7 +462,7 @@ export default function PersonalizedRoutine() {
         <View className="mx-4 mt-6">
           <View className="flex-row items-center mb-3">
             <View className="flex-1">
-              <Text className="text-2xl font-bold text-[#3F2305]">Damage Treatment ({damageLevel})</Text>
+              <Text className="text-2xl font-bold text-[#3F2305]">Damage Treatment ({damageDisplayText})</Text>
             </View>
           </View>
           

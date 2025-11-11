@@ -171,24 +171,70 @@ export async function analyzeHair(imageUri: string): Promise<{
     ]);
     const inferenceTimeMs = Date.now() - t0Infer;
     
+    console.log('='.repeat(60));
+    console.log('🧬 HAIR ANALYSIS MODEL RESULTS');
+    console.log('='.repeat(60));
+    console.log(`⏱️  Model Loading Time: ${modelLoadingTimeMs}ms`);
+    console.log(`⚡ Inference Time: ${inferenceTimeMs}ms`);
+    console.log('');
+    
     // Process Hair Type results
     const hairTypeOutputName = hairTypeSession.outputNames[0];
     const hairTypeData = hairTypeOutputs[hairTypeOutputName].data as Float32Array;
     
+    // Map to hair type labels from README
+    const hairTypeLabels = ['Straight', 'Wavy', 'Curly', 'Coily'];
+    
+    console.log('📊 HAIR TYPE MODEL PREDICTIONS (Raw Logits):');
+    console.log('─'.repeat(60));
+    const rawLogits = Array.from(hairTypeData);
+    rawLogits.forEach((logit, idx) => {
+      console.log(`  ${hairTypeLabels[idx].padEnd(10)}: ${logit.toFixed(6)} (raw logit)`);
+    });
+    
+    // Apply softmax to convert logits to probabilities
+    // Softmax formula: exp(x_i) / sum(exp(x_j)) for all j
+    const maxLogit = Math.max(...rawLogits);
+    const expLogits = rawLogits.map(logit => Math.exp(logit - maxLogit)); // Subtract max for numerical stability
+    const sumExp = expLogits.reduce((sum, val) => sum + val, 0);
+    const probabilities = expLogits.map(exp => exp / sumExp);
+    
+    console.log('');
+    console.log('📊 HAIR TYPE MODEL PREDICTIONS (After Softmax):');
+    console.log('─'.repeat(60));
+    const hairTypeProbabilities = probabilities.map((prob, idx) => ({
+      type: hairTypeLabels[idx],
+      probability: prob,
+      percentage: (prob * 100).toFixed(2) + '%'
+    }));
+    
+    // Log all probabilities
+    hairTypeProbabilities.forEach(({ type, probability, percentage }) => {
+      console.log(`  ${type.padEnd(10)}: ${probability.toFixed(6)} (${percentage})`);
+    });
+    
+    // Verify probabilities sum to ~1.0
+    const probSum = probabilities.reduce((sum, p) => sum + p, 0);
+    console.log(`  Sum of probabilities: ${probSum.toFixed(6)} (should be ~1.0)`);
+    console.log('');
+    
     // Find the class with highest probability
     let maxIndex = 0;
-    let maxValue = hairTypeData[0];
-    for (let i = 1; i < hairTypeData.length; i++) {
-      if (hairTypeData[i] > maxValue) {
-        maxValue = hairTypeData[i];
+    let maxValue = probabilities[0];
+    for (let i = 1; i < probabilities.length; i++) {
+      if (probabilities[i] > maxValue) {
+        maxValue = probabilities[i];
         maxIndex = i;
       }
     }
     
-    // Map to hair type labels from README
-    const hairTypeLabels = ['Straight', 'Wavy', 'Curly', 'Coily'];
     const hairType = hairTypeLabels[maxIndex] || `Type ${maxIndex + 1}`;
     const hairTypeConfidence = maxValue;
+    
+    console.log('');
+    console.log(`✅ Predicted Hair Type: ${hairType}`);
+    console.log(`   Confidence: ${(hairTypeConfidence * 100).toFixed(2)}%`);
+    console.log('');
     
     // Process Hair Damage results
     // The model has separate outputs for each damage type
@@ -201,6 +247,11 @@ export async function analyzeHair(imageUri: string): Promise<{
       'color_damage': 'Color Damage',
       'colordamage': 'Color Damage',
     };
+    
+    console.log('🔍 HAIR DAMAGE MODEL PREDICTIONS:');
+    console.log('─'.repeat(60));
+    console.log(`   Output Names: [${hairDamageSession.outputNames.join(', ')}]`);
+    console.log('');
     
     // Process all outputs and find the one with highest value
     let maxDamageValue = 0;
@@ -217,12 +268,23 @@ export async function analyzeHair(imageUri: string): Promise<{
       
       allDamageValues[damageType] = outputValue;
       
+      // Log each damage type prediction
+      const percentage = outputValue > 1.0 
+        ? outputValue.toFixed(2) + '%' 
+        : (outputValue * 100).toFixed(2) + '%';
+      console.log(`  ${damageType.padEnd(15)}: ${outputValue.toFixed(6)} (${percentage})`);
+      
       // Track the highest value
       if (outputValue > maxDamageValue) {
         maxDamageValue = outputValue;
         maxDamageType = damageType;
       }
     }
+    
+    console.log('');
+    console.log(`✅ Predicted Damage Type: ${maxDamageType}`);
+    console.log(`   Raw Value: ${maxDamageValue.toFixed(6)}`);
+    console.log('');
     
     const baseDamageType = maxDamageType;
     
@@ -268,6 +330,28 @@ export async function analyzeHair(imageUri: string): Promise<{
     
     // Create predictions array from all damage values (for compatibility)
     const predictionsArray = Object.values(allDamageValues);
+    
+    console.log('📋 FINAL ANALYSIS RESULTS:');
+    console.log('─'.repeat(60));
+    console.log(`Hair Type: ${hairType} (${(hairTypeConfidence * 100).toFixed(2)}% confidence)`);
+    console.log(`Damage Type: ${baseDamageType}`);
+    console.log(`Damage Level: ${damageLevel}`);
+    console.log(`Damage Confidence: ${(damageConfidence * 100).toFixed(2)}%`);
+    console.log(`Hair Health Score: ${healthScore.toFixed(2)}/100`);
+    console.log(`Damage Percentage: ${damagePercentage.toFixed(2)}%`);
+    console.log('');
+    console.log('📈 All Damage Probabilities:');
+    Object.entries(allDamageValues).forEach(([type, value]) => {
+      const pct = value > 1.0 ? value.toFixed(2) + '%' : (value * 100).toFixed(2) + '%';
+      console.log(`  ${type.padEnd(15)}: ${pct}`);
+    });
+    console.log('');
+    console.log('📊 All Hair Type Probabilities (After Softmax):');
+    hairTypeProbabilities.forEach(({ type, percentage }) => {
+      console.log(`  ${type.padEnd(10)}: ${percentage}`);
+    });
+    console.log('='.repeat(60));
+    console.log('');
     
     return {
       hairType: { type: hairType, confidence: hairTypeConfidence },

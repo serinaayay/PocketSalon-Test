@@ -44,6 +44,7 @@ export async function openDatabase(): Promise<SQLite.SQLiteDatabase> {
   try { await database.runAsync(`ALTER TABLE hair_analyses ADD COLUMN hair_type TEXT;`); } catch {}
   try { await database.runAsync(`ALTER TABLE hair_analyses ADD COLUMN scalp_condition TEXT;`); } catch {}
   try { await database.runAsync(`ALTER TABLE hair_analyses ADD COLUMN damage_level TEXT;`); } catch {}
+  try { await database.runAsync(`ALTER TABLE hair_analyses ADD COLUMN damage_type TEXT;`); } catch {}
   return database;
 }
 
@@ -59,6 +60,7 @@ export type HairAnalysis = {
   hairType?: string | null;
   scalpCondition?: string | null;
   damageLevel?: string | null;
+  damageType?: string | null;
 };
 
 export async function saveHairAnalysis(score: number, date: string): Promise<number> {
@@ -78,7 +80,7 @@ export async function getHairAnalysisHistory(): Promise<HairAnalysis[]> {
   const rows = await db.getAllAsync<any>(
     `SELECT id, hair_health_score as hairHealthScore, analysis_date as analysisDate,
             user_id as userId, image_link as imageLink, result_link as resultLink, local_image_path as localImagePath,
-            recommendations, hair_type as hairType, scalp_condition as scalpCondition, damage_level as damageLevel
+            recommendations, hair_type as hairType, scalp_condition as scalpCondition, damage_level as damageLevel, damage_type as damageType
      FROM hair_analyses
      ORDER BY datetime(analysis_date) DESC;`
   );
@@ -96,12 +98,13 @@ export async function saveAnalysisToLocalDB(entry: {
   hairType?: string;
   scalpCondition?: string;
   damageLevel?: string;
+  damageType?: string;
 }): Promise<number> {
   const db = await openDatabase();
   const clamped = Math.max(0, Math.min(100, Math.round(entry.hairHealthScore)));
   const res = await db.runAsync(
-    `INSERT INTO hair_analyses (hair_health_score, analysis_date, user_id, image_link, result_link, local_image_path, recommendations, hair_type, scalp_condition, damage_level)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+    `INSERT INTO hair_analyses (hair_health_score, analysis_date, user_id, image_link, result_link, local_image_path, recommendations, hair_type, scalp_condition, damage_level, damage_type)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
     clamped,
     entry.analysisDate,
     entry.userId ?? null,
@@ -111,7 +114,8 @@ export async function saveAnalysisToLocalDB(entry: {
     entry.recommendations ?? null,
     entry.hairType ?? null,
     entry.scalpCondition ?? null,
-    entry.damageLevel ?? null
+    entry.damageLevel ?? null,
+    entry.damageType ?? null
   );
   return res.lastInsertRowId ?? 0;
 }

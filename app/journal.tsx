@@ -155,9 +155,10 @@ const journal = () => {
                         onPress={() => router.push({
                           pathname: '/PersonalizedRoutine',
                           params: {
-                            hair_type: item.hairType,
-                            scalp_condition: item.scalpCondition,
-                            damage_level: item.damageLevel,
+                            hair_type: item.hairType || '',
+                            scalp_condition: item.scalpCondition || '',
+                            damage_level: item.damageLevel || '',
+                            damage_type: item.damageType || '',
                           }
                         })}
                         className="bg-[#3F2305] px-3 py-1.5 rounded-lg ml-3"

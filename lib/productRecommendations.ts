@@ -26,6 +26,13 @@ export const productImages: { [key: string]: any } = {
   'LUXE Organix - Curl Define Intensive Hydration Shampoo': require('../assets/products/shampoo/Luxe Organix - Curl Define.jpg'),
   'Goldwell - Dual Senses Curls & Waves Hydrating Shampoo': require('../assets/products/shampoo/curls and waves shampoo.jpg'),
   'Zenutrients - Curl Avocado & Tea Tree Sulfate-Free Shampoo': require('../assets/products/shampoo/Zenutrients - Curls avocado.jpg'),
+  'LUXE Organix - Bye Brass Purple Shampoo': require('../assets/products/shampoo/bye brass purple shampoo.jpg'),
+  'Ichikami - Damage and Color Care Shampoo': require('../assets/products/shampoo/ichikami damage and color shampoo.jpg'),
+  'Joico - Colorful Anti-Fade Shampoo': require('../assets/products/shampoo/joico colorful.jpg'),
+  'Not Your Mother\'s - Kinky Moves Curl Defining Hair Cream': require('../assets/products/shampoo/not your mother\'s  - kinky moves.jpg'),
+  'The Body Shop - Jamaican Black Castor Oil Curl Activator': require('../assets/products/shampoo/Jamaican_Black_Castor_Oil_Curl_Activator_1_540x.jpg'),
+  'It\'s a 10 - Coily Miracle Hydrating Shampoo': require('../assets/products/shampoo/it\'s a 10 - coily miracle.jpg'),
+  'Yves Rocher - Anti Hair Loss Fortifying Shampoo': require('../assets/products/shampoo/yves-rocher-1585-7203033-1.jpg'),
 
 };
 
@@ -720,7 +727,7 @@ export const sampleProducts: Product[] = [
       name: 'Kracie "Ichikami" - Japanase Shampoo',
       description:
         'Discover the highly-rated (5/5 stars) Kracie "Ichikami" Shampoo, brought to you directly from Japan. This authentic Japanese hair care system is specially formulated for women, offering a premium solution for beautiful, healthy hair. ',
-      imageKey: 'Watsons - Smooth and Sleek Shampoo Ylang Ylang & Coconut',
+      imageKey: 'Kracie "Ichikami" - Japanase Shampoo',
       productType: 'Shampoo',
       hairTypes: ['Wavy'],
       price: 358,
@@ -731,7 +738,7 @@ export const sampleProducts: Product[] = [
       name: 'Bremod - Cocoa Butter Hair Shampoo',
       description:
         'With its superior ability to be easily absorbed deep into the hair shaft, coconut oil coats and moisturizes the hair, reducing breakage and protecting it from protein loss and environmental damage like wind, sun, and smoke to help you grow longer, sleeker, and healthier-looking hair.',
-      imageKey: 'Watsons - Smooth and Sleek Shampoo Ylang Ylang & Coconut',
+      imageKey: 'Bremod - Cocoa Butter Hair Shampoo',
       productType: 'Shampoo',
       hairTypes: ['Wavy'],
       hairDamage: ['Breakage'],
@@ -744,7 +751,7 @@ export const sampleProducts: Product[] = [
       name: 'Bremod - Cocoa Butter Hair Conditioner',
       description:
         'With its superior ability to be easily absorbed deep into the hair shaft, coconut oil coats and moisturizes the hair, reducing breakage and protecting it from protein loss and environmental damage like wind, sun, and smoke to help you grow longer, sleeker, and healthier-looking hair.',
-      imageKey: 'Watsons - Smooth and Sleek Shampoo Ylang Ylang & Coconut',
+      imageKey: 'Bremod - Cocoa Butter Hair Conditioner',
       productType: 'Conditioner',
       hairTypes: ['Wavy'],
       hairDamage: ['Breakage'],
@@ -757,7 +764,7 @@ export const sampleProducts: Product[] = [
       name: 'LUXE Organix - Curl Define Intensive Hydration Shampoo',
       description:
         'Say goodbye to frizzy and tangled curls! The Luxe Organix Premium Curl and Define Shampoo gently cleanses the hair while effectively locking in moisture to prevent dryness. It is formulated with a blend of Jojoba, Avocado, and Moroccan Oil to keep curls strong, healthy, and bouncy. Embrace and revive your natural curls with this CGM-approved shampoo that is perfect for everyday use.',
-      imageKey: 'Watsons - Smooth and Sleek Shampoo Ylang Ylang & Coconut',
+      imageKey: 'LUXE Organix - Curl Define Intensive Hydration Shampoo',
       productType: 'Shampoo',
       scalpCondition: ['Dry'],
       hairTypes: ['Wavy','Curly'],
@@ -792,7 +799,7 @@ export const sampleProducts: Product[] = [
       name: 'Goldwell - Dual Senses Curls & Waves Hydrating Shampoo',
       description:
         'Goldwell\'s Dual Senses Curls & Waves Hydrating Shampoo is specifically formulated to restore elasticity and provide essential moisture for naturally curly and wavy hair.',
-      imageKey: 'Watsons - Smooth and Sleek Shampoo Ylang Ylang & Coconut',
+      imageKey: 'Goldwell - Dual Senses Curls & Waves Hydrating Shampoo',
       productType: 'Shampoo',
       scalpCondition: ['Dry'],
       hairTypes: ['Wavy','Curly'],
@@ -804,7 +811,7 @@ export const sampleProducts: Product[] = [
       name: 'Zenutrients - Curl Avocado & Tea Tree Sulfate-Free Shampoo',
       description:
        'Maximize your curl potential with Zenutrients\' Curls Avocado & Tea Tree Sulfate-Free Shampoo, a gentle cleansing formula designed to keep curls healthy, strong, and protected from damage, all while being free of sulfates, parabens, protein, and silicones.',
-      imageKey: 'Watsons - Smooth and Sleek Shampoo Ylang Ylang & Coconut',
+      imageKey: 'Zenutrients - Curl Avocado & Tea Tree Sulfate-Free Shampoo',
       productType: 'Shampoo',
       hairTypes: ['Wavy','Curly'],
       price: 372,
@@ -827,7 +834,7 @@ export const sampleProducts: Product[] = [
       name: 'LUXE Organix - Bye Brass Purple Shampoo',
       description:
        'Luxe Organix Bye Brass Purple Shampoo removes brassiness and yellow undertones. This product is perfect for maintaining color-treated blonde, platinum, or highlighted hair for a natural salon look!',
-      imageKey: 'Watsons - Smooth and Sleek Shampoo Ylang Ylang & Coconut',
+      imageKey: 'LUXE Organix - Bye Brass Purple Shampoo',
       productType: 'Shampoo',
       hairDamage: ['Color Damage'],
       price: 179,
@@ -857,33 +864,177 @@ export const sampleProducts: Product[] = [
       id: '30',
       name: 'Ichikami - Damage and Color Care Shampoo',
       description:
-       'The Ichikami Damage and Color Care Shampoo A features a premium blend of Pure Japanese Botanical Extracts that repair and protect colored hair from root to tip. This nourishing formula strengthens each strand, leaving your hair soft, shiny, and vibrant while preserving color richness. Experience ultimate care for your color-treated hair!',
-      imageKey: 'Watsons - Smooth and Sleek Shampoo Ylang Ylang & Coconut',
+       'The Ichikami Damage and Color Care Shampoo A features a premium blend of Pure Japanese Botanical Extracts that repair and protect colored hair from root to tip. This nourishing formula strengthens each strand, leaving your hair soft, shiny, and vibrant while preserving color richness. Experience ultimate care for your color-treated hair!',
+      imageKey: 'Ichikami - Damage and Color Care Shampoo',
       productType: 'Shampoo',
       hairDamage: ['Color Damage'],
-      price: 179,
-      link: 'https://www.watsons.com.ph/luxe-organix-luxe-organix-bye-brass-purple-shampoo-270ml/p/BP_50036502?',
+      price: 645,
+      link: 'https://rustans.com/products/ichikami-damage-and-color-care-shampoo-a?variant=43510277046411&country=PH&currency=PHP&',
       ingredients: [
-        "Aqua",
-        "Ammonium Laureth Sulfate",
-        "Cocamidopropyl Betaine",
-        "Cocamide Mea",
+        "Water",
+        "Tea-Lauroyl Sarcosinate",
+        "Palm Kernelamidopropyl Betaine",
+        "Cocamide Methyl MEA",
+        "Cocamide MEA",
         "Glycol Distearate",
-        "Cocamidopropylamine Oxide",
-        "Dime- Thicone",
-        "Polyquaternium-10",
-        "Sodium Chloride",
-        "Glycerin",
-        "Parfum",
+        "Tea-Cocoyl Glutamate",
+        "Fragrance",
+        "PEG-7 Glyceryl Cocoate",
+        "Lauric Acid",
+        "Sodium Benzoate",
         "Citric Acid",
-        "CI 60730",
-        "Argania Spinosa Kernel Oil",
-        "Tocopherol",
-        "Jojoba Oil",
-        "Methylchloroisothiazolinone",
-        "Methylisothiazolinone"
+        "Sodium Chloride",
+        "PPG-9 Diglyceryl Ether",
+        "Polyquaternium-10",
+        "Guar Hydroxypropyltrimonium Chloride",
+        "Disodium EDTA",
+        "Polyquaternium-7",
+        "Oryza Sativa (Rice) Bran Oil",
+        "Butylene Glycol",
+        "Oryza Sativa (Rice) Germ Oil",
+        "Alcohol",
+        "Perilla Frutescens Seed Oil",
+        "Caramel",
+        "Propanediol",
+        "Diisostearyl Malate",
+        "Camellia Japonica Seed Extract",
+        "Balamcanda Chinensis Root Extract",
+        "Oryza Sativa (Rice) Bran Extract",
+        "Angelica Keiskei Leaf/Stem Extract",
+        "Polyquaternium-64",
+        "Sapindus Mukorossi Peel Extract",
+        "BHT",
+        "Dianthus Longicalyx Seed Extract",
+        "Phenoxyethanol",
+        "Tocopherol"
       ]
     },
+    {
+      id: '31',
+      name: 'Joico - Colorful Anti-Fade Shampoo',
+      description:
+       'This gentle, SLS/SLES sulfate-free anti-fade cleanser preserves up to 8 weeks of hair color vibrancy by using Camelia Oil to restore shine, Pomegranate Extract to protect color longevity, and SmartRelease Technology to repair and fortify hair, providing 3X greater resistance to breakage and leaving it smooth and rejuvenated.',
+      imageKey: 'Joico - Colorful Anti-Fade Shampoo',
+      productType: 'Shampoo',
+      hairDamage: ['Color Damage'],
+      price: 1063.50,
+      link: 'https://www.strawberrynet.com/en-PH/joico-colorful-anti-fade-shampoo-for-long-lasting-color-vibrancy-300ml-10-1oz/278762?campaign=Google+-+PF',
+      ingredients:[
+        "Water/Aqua/Eau",
+        "Sodium C14-16 Olefin Sulfonate",
+        "Cocamidopropyl Betaine",
+        "Sodium Methyl Cocoyl Taurate",
+        "Sodium Lauroamphoacetate",
+        "Lauryl Glucoside",
+        "Disodium Laureth Sulfosuccinate",
+        "Betaine",
+        "Laurdimonium Hydroxypropyl Hydrolyzed Keratin",
+        "Rosa Canina Fruit Oil",
+        "Phosphatidylcholine",
+        "Camellia Sinensis Seed Oil",
+        "Arginine HCl",
+        "Punica Granatum Extract",
+        "Sodium Lauryl Sulfoacetate",
+        "Dimethicone Propyl PG-Betaine",
+        "Glycol Distearate",
+        "Guar Hydroxypropyltrimonium Chloride",
+        "Isostearamide MIPA",
+        "Polyquaternium-47",
+        "Citric Acid",
+        "Polyquaternium-7",
+        "Laureth-4",
+        "PEG-120 Methyl Glucose Dioleate",
+        "Dimethicone PEG-8 Meadowfoamate",
+        "PEG-4 Laurate",
+        "Quaternium-80",
+        "Methyl Gluceth-10",
+        "Methoxy PEG/PPG-7/3 Aminopropyl Dimethicone",
+        "Propylene Glycol",
+        "Glyceryl Laurate",
+        "Tetrasodium EDTA",
+        "Iodopropynyl Butylcarbamate",
+        "Phenoxyethanol",
+        "Benzoic Acid",
+        "Dehydroacetic Acid",
+        "Methylchloroisothiazolinone",
+        "Methylisothiazolinone",
+        "Sodium Benzoate",
+        "Sodium Hydroxide",
+        "Hydroxycitronellal",
+        "Linalool",
+        "Fragrance/Parfum"
+      ]
+    },
+      {
+        id: '32',
+        name: 'Not Your Mother\'s - Kinky Moves Curl Defining Hair Cream',
+        description:
+        'Don\'t let your sad waves and curls get you all in a knot. Kinky Moves helps encourage natural curls by giving them that extra oomph they so desperately need. It eliminates frizz and flyaways to show your true locks. Infused with natural grape seed and jasmine, this salon formula will add the extra bounce to your step and your hair.',
+        imageKey: 'Not Your Mother\'s - Kinky Moves Curl Defining Hair Cream',
+        productType: 'Hair Cream',
+        hairTypes: ['Coily'],
+        price: 325,
+        link: 'https://beautybar.com.ph/products/not-your-mothers-kinky-moves-curl-defining-hair-cream-travel-size-4351329-01?',
+        ingredients: [
+          "Water",
+          "polyquaternium-37",
+          "propylene glycol dicaprylate/caprate",
+          "fragrance",
+          "polyquaternium-72",
+          "phenyl trimethicone",
+          "PPG-1 trideceth-6",
+          "poplyquaternium-11",
+          "amodimethicone",
+          "cetrimonium chloride",
+          "trideceth-12",
+          "propylene glycol",
+          "tetrasodium EDTA",
+          "diazolidinyl urea",
+          "methylparaben",
+          "propylparaben",
+          "vitis vinifera (grape) seed extract",
+          "jasminum officinale (jasmine) flower extract"
+        ]
+      },
+      {
+        id: '33',
+        name: 'The Body Shop - Jamaican Black Castor Oil Curl Activator',
+        description:
+        'Say hello to defined, strong and bouncy curls and coils everyday with our weightless, easy-to-use Curl Activator. It helps to reduce frizz while shaping your hair with a light and natural hold. Smooth the silky cream through your damp or dry locks for healthy, nourished and stronger looking curls and coils. ',
+        imageKey: 'The Body Shop - Jamaican Black Castor Oil Curl Activator',
+        productType: 'Hair Oil',
+        hairTypes: ['Coily'],
+        price: 795,
+        link: 'https://thebodyshop.com.ph/products/jamaican-black-castor-oil-curl-activator?variant=46841336856851&country=PH&currency=PHP',
+      },
+      {
+        id: '34',
+        name: 'It\'s a 10 - Coily Miracle Hydrating Shampoo',
+        description:
+        'This color-safe, no-added-sulfate hydrating shampoo, designed for curly and textured hair, delivers a rich lather to remove build-up while its deep moisturizing formula strengthens, seals, and defends against humidity and UV rays, resulting in well-defined, bouncy, and lustrous curls with fewer split ends and tamed fly-aways.',
+        imageKey: 'It\'s a 10 - Coily Miracle Hydrating Shampoo',
+        productType: 'Shampoo',
+        hairTypes: ['Coily'],
+        price: 1782.50,
+        link: 'https://www.strawberrynet.com/en-PH/it-s-a-10-coily-miracle-hydrating-shampoo-295-7ml-10oz/285169?campaign=Google+-+PF&',
+        ingredients: [
+          "Avocado Oil",
+          "Coconut Oil",
+          "Shea Butter",
+          "Monoi Extract"
+        ]
+      },
+      {
+        id: '35',
+        name: 'Yves Rocher - Anti Hair Loss Fortifying Shampoo',
+        description:
+        'This gentle shampoo strengthens hair and steadily decreases hair loss, using White Lupin to restore density and Agave Fructans to activate scalp microcirculation for stronger, more beautiful growth.',
+        imageKey: 'Yves Rocher - Anti Hair Loss Fortifying Shampoo',
+        productType: 'Shampoo',
+        hairDamage: ['Hair Loss'],
+        price: 547.25,
+        link: 'https://www.zalora.com.ph/p/yves-rocher-anti-hair-loss-fortifying-shampoo-with-white-lupin-300ml-for-stronger-thicker-hair-green-3303027?productQuery=yves-rocher-anti-hair-loss-fortifying-shampoo-with-white-lupin-300ml-for-stronger-thicker-hair-green-3303027&',
+      },
       
 
 ];
@@ -897,44 +1048,74 @@ export function recommendProducts(preferences: {
 }): Product[] {
   if (!preferences) return sampleProducts.slice(0, 6);
   const { requiredCategories = [], hairType, scalpCondition, hairDamage, limit = 6 } = preferences;
+  
+  // Normalize empty strings to undefined
+  const normalizedHairType = hairType?.trim() || undefined;
+  const normalizedScalpCondition = scalpCondition?.trim() || undefined;
+  const normalizedHairDamage = hairDamage?.trim() || undefined;
 
-  // Strict filtering: products must match the specified criteria OR not have that property defined
+  // Lenient filtering: products must match AT LEAST ONE specified criteria
+  // If a product matches hair type, include it even if it doesn't match other criteria
   const filtered = sampleProducts.filter((product) => {
-    // Hair Type Filter: If hairType is specified, product must match it or have no hairTypes defined
-    if (hairType) {
+    let matchesAnyCriteria = false;
+    
+    // Check if product matches hair type
+    if (normalizedHairType) {
       const hasHairTypes = product.hairTypes && product.hairTypes.length > 0;
-      if (hasHairTypes && !product.hairTypes?.some((t) => t.toLowerCase() === hairType.toLowerCase())) {
-        return false; // Product has hair types but doesn't match the required one
+      if (hasHairTypes && product.hairTypes?.some((t) => t.toLowerCase() === normalizedHairType.toLowerCase())) {
+        matchesAnyCriteria = true; // Matches hair type - include it!
       }
     }
 
-    // Scalp Condition Filter: If scalpCondition is specified, product must match it or have no scalpCondition defined
-    if (scalpCondition) {
+    // Check if product matches scalp condition
+    if (normalizedScalpCondition) {
       const hasScalpCondition = product.scalpCondition && product.scalpCondition.length > 0;
-      if (hasScalpCondition && !product.scalpCondition?.some((s) => s.toLowerCase() === scalpCondition.toLowerCase())) {
-        return false; // Product has scalp conditions but doesn't match the required one
+      if (hasScalpCondition && product.scalpCondition?.some((s) => s.toLowerCase() === normalizedScalpCondition.toLowerCase())) {
+        matchesAnyCriteria = true; // Matches scalp condition - include it!
       }
     }
 
-    // Hair Damage Filter: If hairDamage is specified, product must match it or have no hairDamage defined
-    if (hairDamage) {
+    // Check if product matches hair damage
+    if (normalizedHairDamage) {
       const hasHairDamage = product.hairDamage && product.hairDamage.length > 0;
-      if (hasHairDamage && !product.hairDamage?.some((d) => d.toLowerCase() === hairDamage.toLowerCase())) {
-        return false; // Product has hair damage types but doesn't match the required one
+      if (hasHairDamage) {
+        // Extract base damage type from strings like "Moderate Hair Loss" -> "Hair Loss"
+        const normalizedDamage = normalizedHairDamage.toLowerCase();
+        const baseDamageTypes = ['breakage', 'color damage', 'hair loss', 'healthy'];
+        const extractedDamage = baseDamageTypes.find(damage => normalizedDamage.includes(damage)) || normalizedDamage;
+        
+        const matches = product.hairDamage?.some((d) => {
+          const productDamage = d.toLowerCase();
+          // Check if product damage matches the extracted damage or vice versa
+          return productDamage === extractedDamage || 
+                 productDamage.includes(extractedDamage) || 
+                 extractedDamage.includes(productDamage);
+        });
+        
+        if (matches) {
+          matchesAnyCriteria = true; // Matches hair damage - include it!
+        }
       }
     }
 
     // Category Filter: If requiredCategories specified, product must have at least one matching category
+    // This is still strict because it's a required filter
     if (requiredCategories.length > 0) {
       const hasMatchingCategory = requiredCategories.some((reqCat) =>
         product.categories?.some((prodCat) => prodCat.toLowerCase() === reqCat.toLowerCase())
       );
       if (!hasMatchingCategory) {
-        return false;
+        return false; // Required category not matched - exclude
       }
     }
 
-    return true;
+    // If no criteria specified, include all products
+    if (!normalizedHairType && !normalizedScalpCondition && !normalizedHairDamage) {
+      return true;
+    }
+
+    // Include product if it matches at least one criteria
+    return matchesAnyCriteria;
   });
 
   // Score the filtered products to prioritize better matches
@@ -943,18 +1124,31 @@ export function recommendProducts(preferences: {
       let score = 0;
       
       // Bonus for matching hair type
-      if (hairType && product.hairTypes?.some((t) => t.toLowerCase() === hairType.toLowerCase())) {
+      if (normalizedHairType && product.hairTypes?.some((t) => t.toLowerCase() === normalizedHairType.toLowerCase())) {
         score += 3;
       }
       
       // Bonus for matching scalp condition
-      if (scalpCondition && product.scalpCondition?.some((s) => s.toLowerCase() === scalpCondition.toLowerCase())) {
+      if (normalizedScalpCondition && product.scalpCondition?.some((s) => s.toLowerCase() === normalizedScalpCondition.toLowerCase())) {
         score += 3;
       }
       
-      // Bonus for matching hair damage
-      if (hairDamage && product.hairDamage?.some((d) => d.toLowerCase() === hairDamage.toLowerCase())) {
-        score += 3;
+      // Bonus for matching hair damage (with partial matching like the filter)
+      if (normalizedHairDamage && product.hairDamage) {
+        const normalizedDamage = normalizedHairDamage.toLowerCase();
+        const baseDamageTypes = ['breakage', 'color damage', 'hair loss', 'healthy'];
+        const extractedDamage = baseDamageTypes.find(damage => normalizedDamage.includes(damage)) || normalizedDamage;
+        
+        const matches = product.hairDamage.some((d) => {
+          const productDamage = d.toLowerCase();
+          return productDamage === extractedDamage || 
+                 productDamage.includes(extractedDamage) || 
+                 extractedDamage.includes(productDamage);
+        });
+        
+        if (matches) {
+          score += 3;
+        }
       }
       
       // Bonus for matching categories
