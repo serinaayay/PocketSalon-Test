@@ -139,10 +139,12 @@ const FlipCard = ({ product }: { product: Product }) => {
                   elevation: 10,
                   zIndex: 1001,
                 }}
-              >
+                className='self-center ml-10'>
+
                 <Text style={{ color: '#3F2305', fontSize: 12, fontWeight: 'bold' }}>View Product</Text>
               </TouchableOpacity>
             )}
+          <View className="position left-5">
             <TouchableOpacity
               onPress={() => {
                 console.log('Heart button pressed');
@@ -163,6 +165,7 @@ const FlipCard = ({ product }: { product: Product }) => {
                 color={isFav ? '#FF0000' : '#3F2305'}
               />
             </TouchableOpacity>
+          </View>
           </View>
         </View>
       </Animated.View>
@@ -288,11 +291,11 @@ export default function PersonalizedRoutine() {
     <View className="flex-1 bg-[#FFF2E4]">
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 120 }}>
         {/* Header */}
-        <Text className="text-3xl font-bold text-[#3F2305] mt-16 mx-6 text-center">
+        <Text className="text-[30px] font-extrabold text-[#3F2305] mt-16 mx-6 text-center">
           Your Personalized {'\n'}Hair Care Routine
         </Text>
 
-        <Text className="text-base text-[#5B3E20] mx-6 mt-4 text-center">
+        <Text className="text-md text-[#5B3E20] text-extrabold mx-6 mt-4 text-center">
           Based on: {scalpCondition} • {hairType} Hair • {damageLevel}
         </Text>
 
@@ -300,9 +303,9 @@ export default function PersonalizedRoutine() {
 
         {/* Section 1: Scalp Routine */}
         <View className="mx-4 mt-6">
-          <View className="flex-row items-center mb-3">
+          <View className="flex-row items-center mb-3 bg-[#3F2305] px-3 py-2 rounded-lg mb-6">
             <View className="flex-1">
-              <Text className="text-2xl font-bold text-[#3F2305]">Scalp Care (Only Scalp)</Text>
+              <Text className="text-2xl font-bold text-white">Scalp Care (Only Scalp)</Text>
             </View>
           </View>
           
@@ -311,8 +314,8 @@ export default function PersonalizedRoutine() {
               <CenteredImage src={require('../assets/recommendation page/calendar.png')} />
             </IconSquare>
             <View className="flex-1">
-              <Text className="text-[#3F2305] font-semibold text-xl mb-1">Wash Frequency</Text>
-              <Text className="text-[#5B3E20] text-base">{formatBody(routine.scalpRoutine.washFrequency)}</Text>
+              <Text className="text-[#3F2305] font-bold text-xl mb-1">Wash Frequency</Text>
+              <Text className="text-[#3F2305] text-lg text-justify">{formatBody(routine.scalpRoutine.washFrequency)}</Text>
             </View>
           </View>
 
@@ -321,8 +324,8 @@ export default function PersonalizedRoutine() {
               <CenteredImage src={require('../assets/recommendation page/shampoo.png')} />
             </IconSquare>
             <View className="flex-1">
-              <Text className="text-[#3F2305] font-semibold text-xl mb-1">Shampoo Type</Text>
-              <Text className="text-[#5B3E20] text-base">{formatBody(routine.scalpRoutine.shampooType)}</Text>
+              <Text className="text-[#3F2305] font-bold text-xl mb-1">Shampoo Type</Text>
+              <Text className="text-[#3F2305] text-lg text-justify">{(routine.scalpRoutine.shampooType)}</Text>
             </View>
           </View>
 
@@ -331,8 +334,8 @@ export default function PersonalizedRoutine() {
               <CenteredImage src={require('../assets/recommendation page/waterdrop.png')} />
             </IconSquare>
             <View className="flex-1">
-              <Text className="text-[#3F2305] font-semibold text-xl mb-1">How To Wash</Text>
-              <Text className="text-[#5B3E20] text-base">{formatBody(routine.scalpRoutine.howTo)}</Text>
+              <Text className="text-[#3F2305] font-bold text-xl mb-1">How To Wash</Text>
+              <Text className="text-[#3F2305] text-lg text-justify">{(routine.scalpRoutine.howTo)}</Text>
             </View>
           </View>
 
@@ -341,8 +344,8 @@ export default function PersonalizedRoutine() {
               <CenteredImage src={require('../assets/recommendation page/hair-treatment.png')} offsetX={2} />
             </IconSquare>
             <View className="flex-1">
-              <Text className="text-[#3F2305] font-semibold text-xl mb-1">Treatment</Text>
-              <Text className="text-[#5B3E20] text-base">{formatBody(routine.scalpRoutine.treatment)}</Text>
+              <Text className="text-[#3F2305] font-bold text-xl mb-1">Treatment</Text>
+              <Text className="text-[#5B3E20] text-lg text-justify">{(routine.scalpRoutine.treatment)}</Text>
             </View>
           </View>
         </View>
@@ -351,7 +354,9 @@ export default function PersonalizedRoutine() {
         <View className="mx-4 mt-6">
           <View className="flex-row items-center mb-3">
             <View className="flex-1">
-              <Text className="text-2xl font-bold text-[#3F2305]">Hair Styling ({hairType} Hair)</Text>
+              <Text className="text-2xl font-bold text-white bg-[#3F2305] px-3 py-2 rounded-lg mb-4">
+                Hair Styling ({hairType} Hair)
+              </Text>
             </View>
           </View>
           
@@ -360,8 +365,8 @@ export default function PersonalizedRoutine() {
               <CenteredImage src={require('../assets/recommendation page/hair-conditioner.png')} />
             </IconSquare>
             <View className="flex-1">
-              <Text className="text-[#3F2305] font-semibold text-xl mb-1">Conditioner Tips</Text>
-              <Text className="text-[#5B3E20] text-base">{formatBody(routine.hairTypeRoutine.conditionerTips)}</Text>
+              <Text className="text-[#3F2305] font-bold text-xl mb-1">Conditioner Tips</Text>
+              <Text className="text-[#5B3E20] text-lg text-justify">{formatBody(routine.hairTypeRoutine.conditionerTips)}</Text>
             </View>
           </View>
 
@@ -370,8 +375,8 @@ export default function PersonalizedRoutine() {
               <CenteredImage src={require('../assets/recommendation page/comb.png')} />
             </IconSquare>
             <View className="flex-1">
-              <Text className="text-[#3F2305] font-semibold text-xl mb-1">Styling</Text>
-              <Text className="text-[#5B3E20] text-base">{formatBody(routine.hairTypeRoutine.styling)}</Text>
+              <Text className="text-[#3F2305] font-bold text-xl mb-1">Styling</Text>
+              <Text className="text-[#5B3E20] text-lg text-justify">{formatBody(routine.hairTypeRoutine.styling)}</Text>
             </View>
           </View>
 
@@ -380,8 +385,8 @@ export default function PersonalizedRoutine() {
               <CenteredImage src={require('../assets/recommendation page/hair-dryer.png')} />
             </IconSquare>
             <View className="flex-1">
-              <Text className="text-[#3F2305] font-semibold text-xl mb-1">Drying Tips</Text>
-              <Text className="text-[#5B3E20] text-base">{formatBody(routine.hairTypeRoutine.dryingTips)}</Text>
+              <Text className="text-[#3F2305] font-bold text-xl mb-1">Drying Tips</Text>
+              <Text className="text-[#5B3E20] text-lg text-justify">{formatBody(routine.hairTypeRoutine.dryingTips)}</Text>
             </View>
           </View>
 
@@ -391,8 +396,8 @@ export default function PersonalizedRoutine() {
                 <CenteredImage src={require('../assets/recommendation page/healthy (1).png')} />
               </IconSquare>
               <View className="flex-1">
-                <Text className="text-[#3F2305] font-semibold text-xl mb-1">Extra Tip</Text>
-                <Text className="text-[#5B3E20] text-base">{formatBody(routine.hairTypeRoutine.extraTip)}</Text>
+                <Text className="text-[#3F2305] font-bold text-xl mb-1">Extra Tip</Text>
+                <Text className="text-[#5B3E20] text-lg text-justify">{formatBody(routine.hairTypeRoutine.extraTip)}</Text>
               </View>
             </View>
           )}
@@ -402,17 +407,18 @@ export default function PersonalizedRoutine() {
         <View className="mx-4 mt-6">
           <View className="flex-row items-center mb-3">
             <View className="flex-1">
-              <Text className="text-2xl font-bold text-[#3F2305]">Damage Treatment ({damageLevel})</Text>
+              <Text className="text-2xl font-bold text-white bg-[#3F2305] px-3 py-2 rounded-lg mb-6">Damage Treatment ({damageLevel})</Text>
             </View>
           </View>
-          
+
           <View className="flex-row items-center mb-5">
             <IconSquare>
               <CenteredImage src={require('../assets/recommendation page/goal.png')} offsetX={5} />
             </IconSquare>
+
             <View className="flex-1">
-              <Text className="text-[#3F2305] font-semibold text-xl mb-1">Goal</Text>
-              <Text className="text-[#5B3E20] text-base">{formatBody(routine.damageRoutine.goal)}</Text>
+              <Text className="text-[#3F2305] font-bold text-xl mb-1">Goal</Text>
+              <Text className="text-[#5B3E20] text-lg text-justify">{formatBody(routine.damageRoutine.goal)}</Text>
             </View>
           </View>
 
@@ -421,8 +427,8 @@ export default function PersonalizedRoutine() {
               <CenteredImage src={require('../assets/recommendation page/hair-conditioner.png')} />
             </IconSquare>
             <View className="flex-1">
-              <Text className="text-[#3F2305] font-semibold text-xl mb-1">Conditioner</Text>
-              <Text className="text-[#5B3E20] text-base">{formatBody(routine.damageRoutine.conditioner)}</Text>
+              <Text className="text-[#3F2305] font-bold text-xl mb-1">Conditioner</Text>
+              <Text className="text-[#5B3E20] text-lg text-justify">{(routine.damageRoutine.conditioner)}</Text>
             </View>
           </View>
 
@@ -431,8 +437,8 @@ export default function PersonalizedRoutine() {
               <CenteredImage src={require('../assets/recommendation page/hair-treatment.png')} offsetX={2} />
             </IconSquare>
             <View className="flex-1">
-              <Text className="text-[#3F2305] font-semibold text-xl mb-1">Treatment</Text>
-              <Text className="text-[#5B3E20] text-base">{formatBody(routine.damageRoutine.treatment)}</Text>
+              <Text className="text-[#3F2305] font-bold text-xl mb-1">Treatment</Text>
+              <Text className="text-[#5B3E20] text-lg text-justify">{(routine.damageRoutine.treatment)}</Text>
             </View>
           </View>
 
@@ -441,23 +447,23 @@ export default function PersonalizedRoutine() {
               <CenteredImage src={require('../assets/recommendation page/healthy (1).png')} />
             </IconSquare>
             <View className="flex-1">
-              <Text className="text-[#3F2305] font-semibold text-xl mb-1">Lifestyle</Text>
-              <Text className="text-[#5B3E20] text-base">{formatBody(routine.damageRoutine.lifestyle)}</Text>
+              <Text className="text-[#3F2305] font-bold text-xl mb-1">Lifestyle</Text>
+              <Text className="text-[#5B3E20] text-lg text-justify">{(routine.damageRoutine.lifestyle)}</Text>
             </View>
           </View>
         </View>
 
         {/* Disclaimer */}
-        <Text className="text-base font-semibold mx-6 mt-10 mb-6 text-[#5B3E20] text-center">
+        <Text className="text-lg font-bold mx-6 mt-10 mb-6 text-[#3F2305] text-center">
           Disclaimer: This study is experimental. The recommended products below are for guidance and suggestions only. Consult a professional.
         </Text>
 
         {/* Product Recommendations Section */}
         <View className="mx-4 mt-6">
-          <Text className="text-2xl font-bold text-[#3F2305] text-center mb-4">Product Suggestions</Text>
+          <Text className="text-[27px] font-extrabold mb-6 text-[#3F2305] text-center">Product Suggestions</Text>
           
           {/* Filter Pills */}
-          <View className="flex-row mb-4">
+          <View className="flex-row mb-4 self-center mx-8 px-2">
             {['All', 'Shampoo', 'Conditioner', 'Hair Oil'].map((type) => (
               <Pressable
                 key={type}
@@ -466,13 +472,25 @@ export default function PersonalizedRoutine() {
                   selectedProductType === type ? 'bg-[#3F2305]' : 'bg-[#E8DCC8]'
                 }`}
               >
-                <Text className={`text-sm font-semibold ${
+                <Text className={`text-md font-semibold ${
                   selectedProductType === type ? 'text-white' : 'text-[#5B3E20]'
                 }`}>
                   {type}
                 </Text>
               </Pressable>
             ))}
+          </View>
+
+          {/* price legend */}
+          <View className="mx-5 my-5 bg-[#3F2305] py-4 px-6 rounded-2xl shadow-lg mb-8">
+            <Text className="text-white text-xl font-bold text-center">
+                Price legend
+            </Text>
+            <Text className="text-white text-md text-center">
+                  ₱ - Price is less than 300 Pesos {'\n'}
+                  ₱₱ - Price ranges from 300 to 500 Pesos {'\n'}
+                  ₱₱₱ - Price is higher than 500 Pesos 
+            </Text>
           </View>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -491,10 +509,10 @@ export default function PersonalizedRoutine() {
 
         {/* Natural Remedies Section */}
         <View className="mx-4 mt-10 mb-6">
-          <Text className="text-2xl font-bold text-[#3F2305] text-center mb-4">Natural Remedies</Text>
+          <Text className="text-[27px] font-extrabold mb-6 text-[#3F2305] text-center">Natural Remedies</Text>
           
           {/* Filter Pills */}
-          <View className="flex-row mb-4">
+          <View className="flex-row mb-8 self-center mx-8 px-2">
             {['All', 'Shampoo', 'Conditioner', 'Hair Oil'].map((type) => (
               <Pressable
                 key={`remedy-${type}`}
@@ -503,7 +521,7 @@ export default function PersonalizedRoutine() {
                   selectedProductType === type ? 'bg-[#3F2305]' : 'bg-[#E8DCC8]'
                 }`}
               >
-                <Text className={`text-sm font-semibold ${
+                <Text className={`text-md font-semibold ${
                   selectedProductType === type ? 'text-white' : 'text-[#5B3E20]'
                 }`}>
                   {type}
@@ -573,7 +591,7 @@ export default function PersonalizedRoutine() {
         <View className="flex-1 items-center justify-center bg-black/50">
           <View className="w-11/12 items-center">
             <View className="w-full bg-[#3F2305] rounded-2xl px-5 py-4 mb-4">
-              <Text className="text-[#FAF7F0] italic text-base text-center">
+              <Text className="text-lg font-bold mb-10 mt-10 text-[#3F2305] text-center">
                 Disclaimer: This application is experimental. Consult an expert.
               </Text>
             </View>
