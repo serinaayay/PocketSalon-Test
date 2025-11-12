@@ -3,14 +3,16 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { recommendProducts, getProductImage, getPriceCategory, Product } from '../lib/productRecommendations';
 import { addFavorite, removeFavorite, isFavorite } from '../lib/favorites';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome} from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
 // Flip Card Component
-const FlipCard = ({ product }: { product: Product }) => {
+const FlipCard = ({ product, reorderProducts }: { product: Product, reorderProducts: (product: Product, liked: boolean) => void }) => {
   const [flipped, setFlipped] = React.useState(false);
   const [isFav, setIsFav] = React.useState(false);
+  const [isLike, setIsLike] = React.useState(false);
+
   const flipAnimation = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
@@ -40,6 +42,20 @@ const FlipCard = ({ product }: { product: Product }) => {
     }
   };
 
+  //like/dislike + reordder
+const toggleLike = async (liked: boolean) => {
+  setIsLike(liked);
+  await reorderProducts(product, liked);
+
+};
+
+const toggleDislike = async (liked: boolean) => {
+  setIsLike(liked);
+  await reorderProducts(product, liked);
+
+};
+
+
   const openProductLink = () => {
     if (product.link) {
       Linking.openURL(product.link);
@@ -65,7 +81,9 @@ const FlipCard = ({ product }: { product: Product }) => {
   };
 
   return (
+    <View className='items-center'>
     <View style={{ width: 256, height: 500 }}>
+      
       {/* Front of Card */}
       <Animated.View
         style={[
@@ -79,7 +97,7 @@ const FlipCard = ({ product }: { product: Product }) => {
         ]}
         pointerEvents={flipped ? 'none' : 'auto'}
       >
-        <View className="w-64 bg-[#3F2305] rounded-xl shadow-lg p-4 items-center" style={{ height: 500 }}>
+        <View className="w-64 bg-[#3F2305] rounded-xl shadow-lg p-4 items-center self-center" style={{ height: 500 }}>
           {/* Product Image */}
           <View className="w-full bg-[#cfaf8d] rounded-lg mb-3 flex justify-center items-center" style={{ height: 180 }}>
             <Image
@@ -106,6 +124,7 @@ const FlipCard = ({ product }: { product: Product }) => {
             </Text>
           </View>
           <View className="flex-row items-center justify-center flex-wrap gap-2 mt-1 px-2" style={{ zIndex: 1000 }}>
+
             <TouchableOpacity
               onPress={() => {
                 console.log('Ingredients button pressed');
@@ -226,6 +245,43 @@ const FlipCard = ({ product }: { product: Product }) => {
         </TouchableOpacity>
       </Animated.View>
     </View>
+
+    <View className='flex-row'>
+      <TouchableOpacity
+        onPress={() => {
+          console.log('Like button pressed');
+          toggleLike(true)
+        }}
+        activeOpacity={0.8}
+        style={{
+          padding: 10,
+          marginTop: 10,
+        }}
+      >
+        <FontAwesome
+          name="thumbs-up"
+          size={28}
+          color={isLike === true ? '#29ac31ff' : '#3F2305'}/>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => {
+          console.log('Dislike button pressed');
+          toggleDislike(false)
+        }}
+        activeOpacity={0.8}
+        style={{
+          padding: 10,
+          marginTop: 10,
+        }}
+      >
+        <FontAwesome
+          name={'thumbs-down'}
+          size={28}
+          color={isLike === false ? '#ac3629ff' : '#3F2305'}/>
+      </TouchableOpacity>
+    </View>
+  </View>
   );
 };
 
@@ -291,6 +347,24 @@ const ResultsScreen = () => {
 
     // Note: Hair analysis is now saved in hair-detection.tsx to avoid duplicates
     // This useEffect has been removed to prevent duplicate journal entries
+
+    const [products, setProducts] = React.useState(
+      recommendProducts({ hairType, scalpCondition, hairDamage: damageLevel, limit: 20})
+    )
+    
+    const reorderProducts = (product: Product, liked: boolean) => {
+      setProducts((prevProducts) => {
+        const filtered = prevProducts.filter(p => p.id !== product.id);
+
+        if (liked) {
+          // Move similar ones to the front
+          return [product, ...filtered]
+        } else {
+          // Move similar ones to the back
+          return [...filtered, product]
+        }
+      });
+  };
 
     return (
         <View className="flex-1 bg-[#FFF2E4]">
@@ -398,7 +472,7 @@ const ResultsScreen = () => {
                     <Text className="text-[29px] font-extrabold mb-6 text-[#3F2305] text-center">Product Suggestions</Text>
                     
                     {/* Filter Pills */}
-                    <View className="flex-row mb-8 self-center mx-8 px-2">
+                    <View className="flex-row mb-3 self-center mx-8 px-2">
                       {['All', 'Shampoo', 'Conditioner', 'Hair Oil'].map((type) => (
                         <Pressable
                           key={type}
@@ -416,12 +490,27 @@ const ResultsScreen = () => {
                       ))}
                     </View>
 
-                    <View className="w-full flex items-center">
+                    {/* price legend */}
+
+                    <View className="mx-5 my-5 bg-[#3F2305] py-4 px-6 rounded-2xl shadow-lg mb-8">
+                        <Text className="text-white text-xl font-bold text-center">
+                            Price legend
+                        </Text>
+                        <Text className="text-white text-md text-center">
+                            ₱ - Price is less than 300 Pesos {'\n'}
+                            ₱₱ - Price ranges from 300 to 500 Pesos {'\n'}
+                            ₱₱₱ - Price is higher than 500 Pesos 
+                        </Text>
+                    </View>
+
+                    <View className="w-full flex items-center self-center">
                       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                        {recommendProducts({ hairType, scalpCondition, hairDamage: damageLevel, limit: 20 }).filter(product => selectedProductType === 'All' || product.productType === selectedProductType).map((product) => (
-                          <View key={product.id} className="mx-4">
-                            <FlipCard product={product} />
-                          </View>
+                        {products
+                          .filter(product => selectedProductType === 'All' || product.productType === selectedProductType)
+                          .map((product) => (
+                            <View key={product.id} className="mx-4">
+                              <FlipCard product={product} reorderProducts={reorderProducts} />
+                            </View>
                         ))}
                       </ScrollView>
                     </View>
@@ -458,8 +547,8 @@ const ResultsScreen = () => {
                           onPress={() => setSelectedProductType(type)}
                           className={`px-4 py-2 rounded-full mr-2 ${
                             selectedProductType === type ? 'bg-[#3F2305]' : 'bg-[#E8DCC8]'
-                          }`}
-                        >
+                          }`}>
+
                           <Text className={`text- font-semibold ${
                             selectedProductType === type ? 'text-white' : 'text-[#5B3E20]'
                           }`}>
@@ -469,12 +558,14 @@ const ResultsScreen = () => {
                       ))}
                     </View>
 
-                    <View className="w-full flex items-center">
+                    <View className="w-full flex items-center align-center">
                       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                        {recommendProducts({ hairType, scalpCondition, hairDamage: damageLevel, limit: 20 }).filter(product => selectedProductType === 'All' || product.productType === selectedProductType).map((product) => (
-                          <View key={product.id} className="mx-4">
-                            <FlipCard product={product} />
-                          </View>
+                        {products
+                          .filter(product => selectedProductType === 'All' || product.productType === selectedProductType)
+                          .map((product) => (
+                            <View key={product.id} className="mx-4">
+                              <FlipCard product={product} reorderProducts={reorderProducts} />
+                            </View>
                         ))}
                       </ScrollView>
                     </View>

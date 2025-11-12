@@ -15,35 +15,35 @@ const productList = [
   {
     name: "L'Oréal Paris EverPure Moisture Shampoo",
     description:
-      "",
+      "Keep your straight hair soft and hydrated with this sulfate-free formula infused with rosemary. It gently cleanses while preserving color and shine, leaving your hair smooth and frizz-free.",
     category: "straight",
     image: require('../assets/images/loreal everpure.png'),
   },
   {
     name: "Kérastase Discipline Bain Fluidealiste Gentle Shampoo",
     description:
-      "",
+      "A luxurious, gentle shampoo designed to tame frizz and smooth unruly hair. Perfect for straight and curly types, it leaves hair feeling silky, manageable, and full of movement without weighing it down.",
     category: ["straight", "curly"],
     image: require('../assets/images/kerastase.jpg'),
   },
   {
     name: "Human Nature Revitalizing Shampoo",
     description:
-      "",
+      "Made with 96.4% natural ingredients, this refreshing shampoo helps bring life back to dull, straight hair. It cleans deeply while keeping strands healthy and bouncy — all without harsh chemicals.",
     category: "straight",
     image: require('../assets/images/hhn revitalizing shampoo.jpg'),
   },
   {
     name: "Zenutrients Coco Honey Nourishing Shampoo",
     description:
-      "",
+      "Combining the moisture of coconut oil and the soothing properties of honey, this nourishing shampoo softens and strengthens straight hair. It helps reduce dryness while keeping your scalp healthy and hydrated.",
     category: "straight",
     image: require('../assets/images/coco honey zenutrients.png'),
   },
   {
     name: "HairReve Sulfate-Free Shampoo",
     description:
-      "",
+      "A gentle yet effective sulfate-free formula made for sensitive scalps and straight hair. It cleanses without stripping natural oils, promoting smoother, shinier strands with every wash.",
     category: "straight",
     image: require('../assets/images/hairreve.jpg'),
   }
@@ -92,6 +92,7 @@ export default function HealthyHairGuide() {
             className="flex-row bg-[#3F2305] rounded-lg mx-4 mt-2 mb-6 p-4 shadow-xl"
             style={{ alignItems: 'flex-start' }}>
             
+          <View className="flex-row items-center">
             {item.image && (
             <Image source={item.image} className="w-28 h-28 rounded-md mr-4 flex-center justify-center items-center" />
             )}
@@ -99,6 +100,7 @@ export default function HealthyHairGuide() {
               <Text className="text-white text-2xl font-bold mb-1">{item.name}</Text>
               <Text className="text-white text-md leading-5 text-justify">{item.description}</Text>
             </View>
+          </View>
           </View>
         ))}
 

@@ -1,7 +1,7 @@
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from 'expo-file-system';
 import { router, useLocalSearchParams } from "expo-router";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Alert, Dimensions, Image, Pressable, ScrollView, Text, View, Modal } from "react-native";
 import { analyzeHair } from "../lib/onnx-helpers-native";
 import { getOrCreateRespondentCode } from "../lib/respondent";
@@ -19,10 +19,11 @@ export default function HairDetectionPage() {
   const [image, setImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showImageSourceModal, setShowImageSourceModal] = useState(true); // First modal: Choose Capture or Upload
+  const [showImageSourceModal, setShowImageSourceModal] = useState(false); // First modal: Choose Capture or Upload
   const [modalVisible, setModalVisible] = useState(false); // Second modal: Scalp condition
   const [scalpCondition, setScalpCondition] = useState<ScalpCondition>('Normal Scalp');
   const [showScalpModal, setShowScalpModal] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = React.useState(true)
 
   // Check if an image was selected from the test-image-picker page
   useEffect(() => {
@@ -206,6 +207,7 @@ export default function HairDetectionPage() {
               resizeMode="contain"/>
           </Pressable>
           <Text className="text-[#FAF7F0] text-4xl font-bold text-center -mt-28">Hair Type and {'\n'} Damage Detector</Text>
+
           {/* to center text */}
           <View className="absolute items-center justify-center mt-16 px-10">
           <Text className="text-[#FAF7F0] text-lg text-wrap-pretty w-96 mt-20 text-center mb-5 ">Take a picture or upload an image of your hair and we’ll identify your hair type!</Text>
@@ -213,6 +215,43 @@ export default function HairDetectionPage() {
           </View>
         </View>
 
+        <Modal
+        visible={showDisclaimer}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowDisclaimer(false)}>
+
+          <View style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.5)" 
+            }}>
+          <View className="w-96 bg-[#3F2305] rounded-2xl px-5 py-4 mb-4">
+            <Text className="text-[#FAF7F0] font-extrabold text-xl text-center">
+              Cropping Guidelines:
+            </Text>
+
+            <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+               1. Please make sure to crop the image to focus on your hair only.{'\n'}
+               2. Keep the frame free of unnecessary background elements. {'\n'}
+               3. Ensure good lighting for better analysis results.
+            </Text>
+          </View>
+        
+          <Pressable
+            onPress={() => {
+              setShowDisclaimer(false);
+              setShowImageSourceModal(true); 
+            }}
+            className="bg-[#F2EAD3] px-5 py-2 rounded-xl">
+            
+            <Text className="text-[#3F2305] font-semibold">OK</Text>
+          </Pressable>
+
+          </View>
+        </Modal>
+                
         {/* First Modal: Choose Capture or Upload */}
         <Modal 
           visible={showImageSourceModal} 
@@ -225,9 +264,12 @@ export default function HairDetectionPage() {
               alignItems: "center",
               backgroundColor: "rgba(0, 0, 0, 0.5)" 
             }}>
+          
+
           <View style={{backgroundColor: '#FFF2E4', width: 340, height: 300, alignSelf: "center", borderRadius: 10, paddingTop: 40}}>
             <Text className="text-2xl text-center font-bold mb-8">How would you like to add your image?</Text>
             
+
             <Pressable 
               className="bg-[#3F2305] py-4 px-6 rounded-xl w-60 self-center items-center mb-4"
               onPress={handleCaptureOption}>
@@ -243,7 +285,8 @@ export default function HairDetectionPage() {
           </View>
         </Modal>
 
-        {/* Second Modal: Scalp Condition */}
+
+        {/* Third Modal: Scalp Condition */}
         <Modal 
           visible={modalVisible} 
           animationType="slide" 
