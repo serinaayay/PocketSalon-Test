@@ -26,7 +26,9 @@ export const productImages: { [key: string]: any } = {
   'LUXE Organix - Curl Define Intensive Hydration Shampoo': require('../assets/products/shampoo/Luxe Organix - Curl Define.jpg'),
   'Goldwell - Dual Senses Curls & Waves Hydrating Shampoo': require('../assets/products/shampoo/curls and waves shampoo.jpg'),
   'Zenutrients - Curl Avocado & Tea Tree Sulfate-Free Shampoo': require('../assets/products/shampoo/Zenutrients - Curls avocado.jpg'),
-
+  'Khaokho Talaypu Advanced Repair Treatment' : require('../assets/products/shampoo/Zenutrients - Curls avocado.jpg'),
+  'Nanny Rose Gugo & Lawat Anti Hair Fall' : require('../assets/products/shampoo/Nanny Rose Gugo Lawat.png'),
+  'HASK Curl Care Moisturizing Shampoo' : require('../assets/products/shampoo/HASK Curl Care Moisturizing.jpeg'),
 };
 
 export type Product = {
@@ -884,6 +886,118 @@ export const sampleProducts: Product[] = [
         "Methylisothiazolinone"
       ]
     },
+    {
+      id: '31',
+      name: 'Khaokho Talaypu Advanced Repair Treatment Coconut & Avocado Shampoo',
+      description:
+       'Khaokho Talaypu Advanced Repair Treatment Coconut & Avocado Shampoo is enriched with natural ingredients like coconut oil and avocado extract, known for their nourishing properties. This shampoo deeply conditions and repairs damaged hair, restoring its natural shine and softness. It is free from harmful chemicals, making it suitable for all hair types, especially those in need of extra care and hydration.',
+      imageKey: 'Khaokho Talaypu Advanced Repair Treatment',
+      productType: 'Shampoo',
+      hairDamage: ['Hair Breakage'],
+      price: 272,
+      link: 'https://www.watsons.com.ph/khaokho-talaypu-khaokho-talaypu-advanced-repair-treatment-coconut-avocado-200-ml/p/BP_50048187',
+      ingredients: [
+        "Water",
+        "Cetearyl Alcohol",
+        "Behentrimonium Chloride",
+        "Cocos Nucifera (Coconut) Oil",
+        "Propylene Glycol",
+        "Cetrimonium Chloride",
+        "Cetearyl Olivate",
+        "Phenoxyethanol Sorbitan Olivate",
+        "2-Propanol",
+        "Hydroxypropyl Guar Hydroxypropyltrimonium Chloride",
+        "Panthenol",
+        "Flavor",
+        "Persea Gratissima (Avocado) Oil",
+        "Disodium Edta",
+        "Iodopropynyl Butylcarbamate",
+        "Hydrolyzed Keratin",
+        "Citric Acid",
+        "Cystine",
+        "Sodium Hyaluronate",
+        "Sodium Citrate",
+        "Platinum Powder"
+      ]
+    },
+    {
+      id: '32',
+      name: 'Nanny Rose Gugo & Lawat Anti Hair Fall Shampoo',
+      description:
+       'Nanny Rose Gugo & Lawat Anti Hair Fall Shampoo is specially formulated to help reduce hair fall and promote healthier hair growth. Enriched with natural ingredients like Gugo and Lawat, this shampoo strengthens hair from the roots, leaving it feeling revitalized and nourished.',
+      imageKey: 'Nanny Rose Gugo & Lawat Anti Hair Fall',
+      productType: 'Shampoo',
+      hairDamage: ['Hair Loss'],
+      price: 245,
+      link: 'https://www.watsons.com.ph/nanny-rose-gugo-lawat-antihairfall-shampoo-200ml/p/BP_10091326',
+      ingredients: [
+        "Entada Phaseoloides Extract",
+        "Litsea Glutinosae Extract",
+        "Sodium lauroyl sarcosinate",
+        "Cocamide DEA",
+        "Vitex Nigundo Extract",
+        "PEG-120 Methyl Glucose Dioleate",
+        "Moringa Oleifera Lam Extract",
+        "Cocoamidopropyl betaine",
+        "Cetrimonium Chloride",
+        "Glycerin",
+        "Phenoxyethanol",
+        "Citric Acid",
+        "Tetrasodium EDTA",
+        "Citrofortunella Microcarpa Extract",
+        "Dimethicone",
+        "Soya Bean Oil",
+        "Helianthus Annuus Oil",
+        "Lemongrass (cymbopogon flexuosus) Essential Oil",
+        "Grapefruit (citrus grandis) Essential Oil",
+        "Menthol"
+      ]
+    },
+    {
+      id: '33',
+      name: 'HASK Curl Care Moisturizing Shampoo',
+      description:
+       'HASK Curl Care Moisturizing Shampoo is specially formulated to help reduce hair fall and promote healthier hair growth. Enriched with natural ingredients like Gugo and Lawat, this shampoo strengthens hair from the roots, leaving it feeling revitalized and nourished.',
+      imageKey: 'HASK Curl Care Moisturizing Shampoo',
+      productType: 'Shampoo',
+      hairDamage: ['Hair Breakage'],
+      price: 720,
+      link: 'https://www.watsons.com.ph/hask-hask-curl-care-moisturizing-shampoo-355ml/p/BP_50052302',
+      ingredients: [
+        "Water",
+        "Sodium C14-16 Olefin Sulfonate",
+        "Cocamide MIPA",
+        "Cocamidopropyl Betaine",
+        "Glycerin",
+        "Sodium Chloride",
+        "Cocos Nucifera (coconut) Oil,",
+        "Argania Spinosa (argan) Kernel Oil",
+        "Tocopheryl Acetate (vitamin E)",
+        "Panthenol",
+        "Coco Glucoside",
+        "Polyimide-1",
+        "Polyquaternium-10",
+        "Hydrogenated Palm Glycerides Citrate",
+        "Polyquaternium-7",
+        "Glyceryl Oleate",
+        "Tocopherol",
+        "Guar Hydroxypropyltrimonium Chloride",
+        "Sodium Hydroxide",
+        "Citric Acid",
+        "Glycol Distearate",
+        "Sodium Benzoate",
+        "Sodium Salicylate",
+        "Trisodium Ethylenediamine Disuccinate",
+        "Isopropanolamine",
+        "Parfum/Fragrance",
+        "Alpha Isomethyl Ionone",
+        "Hexyl Cinnamal",
+        "Juniperus Virginiana Oil",
+        "Tetramethyl Acetyloctahydronaphthalenes",
+        "Vanillin",
+      ]
+    },
+
       
 
 ];

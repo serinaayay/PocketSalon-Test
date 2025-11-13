@@ -98,6 +98,7 @@ const toggleDislike = async (liked: boolean) => {
         pointerEvents={flipped ? 'none' : 'auto'}
       >
         <View className="w-64 bg-[#3F2305] rounded-xl shadow-lg p-4 items-center self-center" style={{ height: 500 }}>
+          
           {/* Product Image */}
           <View className="w-full bg-[#cfaf8d] rounded-lg mb-3 flex justify-center items-center" style={{ height: 180 }}>
             <Image
