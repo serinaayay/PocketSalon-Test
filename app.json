@@ -4,11 +4,11 @@
     "slug": "pocket-salon",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/Startup-Page.png",
     "scheme": "nativewind-expo-router",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/Startup-Page.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },

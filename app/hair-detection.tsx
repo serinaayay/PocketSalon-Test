@@ -284,7 +284,53 @@ export default function HairDetectionPage() {
           </View>
           </View>
         </Modal>
+      
+      <Modal
+        visible={showDisclaimer}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowDisclaimer(false)}>
 
+          <View style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.5)" 
+            }}>
+          <View className="w-96 bg-[#3F2305] rounded-2xl px-5 py-4 mb-4">
+            <Text className="text-[#FAF7F0] font-extrabold text-2xl text-center">
+              How to identify your scalp condition:
+            </Text>
+
+            <Text className="text-[#FAF7F0] font-extrabold text-xl text-center">
+                {'\n'} Oily Scalp: <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+                 Hair appears greasy or shiny shortly after washing. {'\n'}</Text>
+
+                {'\n'} Dry Scalp: <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+                 Hair feels itchy and tight; Small white flakes on the scalp and/or shoulders is present.{'\n'} </Text>
+
+                {'\n'} Dandruff: <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+                 Visible white or yellow big flakes on the scalp and in the hair, accompanied by an itchy scalp.{'\n'}</Text>
+
+                {'\n'} Normal Scalp: <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+                 Hair looks healthy and shiny, not too oily nor too dry; No significant flaking or itching.{'\n'}</Text>
+            </Text>
+
+
+          </View>
+        
+          <Pressable
+            onPress={() => {
+              setShowDisclaimer(false);
+              setShowImageSourceModal(true); 
+            }}
+            className="bg-[#F2EAD3] px-5 py-2 rounded-xl">
+            
+            <Text className="text-[#3F2305] font-semibold">I understand</Text>
+          </Pressable>
+
+          </View>
+        </Modal>
 
         {/* Third Modal: Scalp Condition */}
         <Modal 
@@ -334,7 +380,7 @@ export default function HairDetectionPage() {
                 setScalpCondition('Normal Scalp');
                 setModalVisible(false);
               }}>
-              <Text className="text-[#FAF7F0] text-xl font-bold">I don't know</Text>
+              <Text className="text-[#FAF7F0] text-xl font-bold">Normal/I don't know</Text>
             </Pressable>
             
           {/* Cancel button */}
