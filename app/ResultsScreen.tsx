@@ -1,9 +1,9 @@
-import {View, Text, Image, Pressable, ScrollView, Dimensions, Animated, Linking, TouchableOpacity} from 'react-native';
+import {View, Text, Image, Pressable, ScrollView, Dimensions, Animated, Linking, TouchableOpacity, Modal} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
 import { recommendProducts, getProductImage, getPriceCategory, Product } from '../lib/productRecommendations';
 import { addFavorite, removeFavorite, isFavorite } from '../lib/favorites';
 import { Ionicons, FontAwesome} from '@expo/vector-icons';
+import React, { useState } from "react";
 
 const { width, height } = Dimensions.get('window');
 
@@ -12,6 +12,8 @@ const FlipCard = ({ product, reorderProducts }: { product: Product, reorderProdu
   const [flipped, setFlipped] = React.useState(false);
   const [isFav, setIsFav] = React.useState(false);
   const [isLike, setIsLike] = React.useState(false);
+  const [showDisclaimer, setShowDisclaimer] = React.useState(true)
+
 
   const flipAnimation = React.useRef(new Animated.Value(0)).current;
 
@@ -83,6 +85,35 @@ const toggleDislike = async (liked: boolean) => {
   return (
     <View className='items-center'>
     <View style={{ width: 256, height: 500 }}>
+
+      <Modal
+          visible={showDisclaimer}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setShowDisclaimer(false)}>
+
+          <View style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.11)" 
+            }}>
+            <View className="w-96 bg-[#3F2305] rounded-2xl px-5 py-4 mb-4">
+              <Text className="text-[#FAF7F0] italic font-normal text-lg text-center">
+                Disclaimer: This application is experimental. Consult a trusted hair expert.
+              </Text>
+          </View>
+        
+          <Pressable
+            onPress={() => {
+              setShowDisclaimer(false);
+            }}
+            className="bg-[#F2EAD3] px-5 py-2 rounded-xl">
+            
+            <Text className="text-[#3F2305] font-semibold">OK</Text>
+          </Pressable>
+          </View>
+        </Modal>
       
       {/* Front of Card */}
       <Animated.View

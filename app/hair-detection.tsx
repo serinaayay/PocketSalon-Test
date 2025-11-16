@@ -23,7 +23,9 @@ export default function HairDetectionPage() {
   const [modalVisible, setModalVisible] = useState(false); // Second modal: Scalp condition
   const [scalpCondition, setScalpCondition] = useState<ScalpCondition>('Normal Scalp');
   const [showScalpModal, setShowScalpModal] = useState(false);
-  const [showDisclaimer, setShowDisclaimer] = React.useState(true)
+  const [showCropDisclaimer, setShowCropDisclaimer] = React.useState(true)
+  const [showScalpGuide, setShowScalpGuide] = React.useState(false);
+  
 
   // Check if an image was selected from the test-image-picker page
   useEffect(() => {
@@ -31,7 +33,8 @@ export default function HairDetectionPage() {
       setImage(params.selectedImage as string);
       setError(null);
       setShowImageSourceModal(false); // Hide image source modal
-      setModalVisible(true); // Show scalp condition modal after image is selected
+      setShowCropDisclaimer(false);
+      setShowScalpGuide(true);
       console.log('Received image from picker:', params.selectedImage);
     }
   }, [params.selectedImage]);
@@ -45,7 +48,7 @@ export default function HairDetectionPage() {
     });
     if (!result.canceled && result.assets.length > 0) {
       setImage(result.assets[0].uri);
-      setModalVisible(true); // Show scalp condition modal
+      setShowScalpGuide(true)
     }
   };
 
@@ -216,10 +219,10 @@ export default function HairDetectionPage() {
         </View>
 
         <Modal
-        visible={showDisclaimer}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setShowDisclaimer(false)}>
+          visible={showCropDisclaimer}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setShowCropDisclaimer(false)}>
 
           <View style={{
               flex: 1,
@@ -241,7 +244,7 @@ export default function HairDetectionPage() {
         
           <Pressable
             onPress={() => {
-              setShowDisclaimer(false);
+              setShowCropDisclaimer(false);
               setShowImageSourceModal(true); 
             }}
             className="bg-[#F2EAD3] px-5 py-2 rounded-xl">
@@ -286,10 +289,10 @@ export default function HairDetectionPage() {
         </Modal>
       
       <Modal
-        visible={showDisclaimer}
+        visible={showScalpGuide}
         animationType="fade"
         transparent={true}
-        onRequestClose={() => setShowDisclaimer(false)}>
+        onRequestClose={() => setShowScalpGuide(false)}>
 
           <View style={{
               flex: 1,
@@ -298,6 +301,7 @@ export default function HairDetectionPage() {
               backgroundColor: "rgba(0, 0, 0, 0.5)" 
             }}>
           <View className="w-96 bg-[#3F2305] rounded-2xl px-5 py-4 mb-4">
+
             <Text className="text-[#FAF7F0] font-extrabold text-2xl text-center">
               How to identify your scalp condition:
             </Text>
@@ -321,8 +325,8 @@ export default function HairDetectionPage() {
         
           <Pressable
             onPress={() => {
-              setShowDisclaimer(false);
-              setShowImageSourceModal(true); 
+              setShowScalpGuide(false);
+              setModalVisible(true); 
             }}
             className="bg-[#F2EAD3] px-5 py-2 rounded-xl">
             
