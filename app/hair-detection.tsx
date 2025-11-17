@@ -2,7 +2,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from 'expo-file-system';
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState, useEffect } from "react";
-import { Alert, Dimensions, Image, Pressable, ScrollView, Text, View, Modal } from "react-native";
+import { Alert, Dimensions, Image, Pressable, ScrollView, Text, View, Modal,} from "react-native";
 import { analyzeHair } from "../lib/onnx-helpers-native";
 import { getOrCreateRespondentCode } from "../lib/respondent";
 import { saveAnalysisRecord, saveAnalysisToLocalDB } from "../lib/db";
@@ -10,6 +10,7 @@ import { trySyncPendingAnalyses } from "../lib/sync";
 import { ScalpCondition } from "../lib/hairRoutines";
 import { uploadHairScan } from "../lib/firebaseService";
 import { getDeviceInfo } from "../lib/deviceInfo";
+import { Octicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 const frameSize = Math.min(width * 0.9, 350); 
@@ -34,7 +35,7 @@ export default function HairDetectionPage() {
       setError(null);
       setShowImageSourceModal(false); // Hide image source modal
       setShowCropDisclaimer(false);
-      setShowScalpGuide(true);
+      setModalVisible(true); // Show scalp condition modal
       console.log('Received image from picker:', params.selectedImage);
     }
   }, [params.selectedImage]);
@@ -48,7 +49,8 @@ export default function HairDetectionPage() {
     });
     if (!result.canceled && result.assets.length > 0) {
       setImage(result.assets[0].uri);
-      setShowScalpGuide(true)
+      setShowCropDisclaimer(false);
+      setModalVisible(true);
     }
   };
 
@@ -349,41 +351,76 @@ export default function HairDetectionPage() {
               backgroundColor: "rgba(0, 0, 0, 0.3)" 
             }}>
 
-          <View style={{backgroundColor: '#FFF2E4', width: 340, height: 390, alignSelf: "center", borderRadius: 10, paddingTop: 40}}>
-            <Text className="text-2xl text-center font-bold"> What is your Scalp Condition?</Text>
-            <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mt-5 mb-3"
-              onPress={() => {
-                setScalpCondition('Oily Scalp');
-                setModalVisible(false);
-              }}>
-              <Text className="text-[#FAF7F0] text-xl font-bold">Oily</Text>
+          <View style={{backgroundColor: '#FFF2E4', width: 340, height: 420, alignSelf: "center", borderRadius: 10, paddingTop: 40, position: 'relative'}}>
+
+            <Pressable
+              onPress={() => setShowScalpGuide(true)}
+              style={{ position: 'absolute', top: 10, right: 10, flexDirection: 'row', alignItems: 'center' }}>
+            
+              <Text className="text-[#3F2305] font-normal italic text-sm mr-2">Scalp Condition Guide</Text>
+
+              <Octicons
+                name="question"
+                size={22}
+                color="#3F2305" />
+              
+
             </Pressable>
+            <Text className="text-2xl text-center font-bold mt-1"> What is your Scalp Condition?</Text>
+            <Pressable 
+                className="bg-[#3F2305] py-2 px-4 rounded-xl w-64 self-center items-center justify-center mt-5 mb-3 flex-row"
+                onPress={() => {
+                  setScalpCondition('Oily Scalp');
+                  setModalVisible(false); }}>
+
+                <Image
+                  source={require('../assets/images/oily scalp.png')}
+                  style={{ width: 30, height: 30, marginRight: 8 }}
+                  resizeMode="contain"/>
+
+                <Text className="text-[#FAF7F0] text-xl font-bold">Oily</Text>
+              </Pressable>
 
             <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mb-3"
+              className="bg-[#3F2305] py-2 px-4 rounded-xl w-64 self-center items-center justify-center mb-3 flex-row"
               onPress={() => {
                 setScalpCondition('Dry Scalp');
                 setModalVisible(false);
               }}>
+
+                <Image
+                  source={require('../assets/images/dry scalp.png')}
+                  style={{ width: 30, height: 30, marginRight: 8 }}
+                  resizeMode="contain"/>
+
               <Text className="text-[#FAF7F0] text-xl font-bold">Dry</Text>
             </Pressable>
 
             <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mb-3"
+              className="bg-[#3F2305] py-2 px-4 rounded-xl w-64 self-center items-center justify-center mb-3 flex-row"
               onPress={() => {
                 setScalpCondition('Dandruff');
                 setModalVisible(false);
               }}>
+                <Image
+                  source={require('../assets/images/dandruff.png')}
+                  style={{ width: 30, height: 30, marginRight: 8 }}
+                  resizeMode="contain"/>
+
               <Text className="text-[#FAF7F0] text-xl font-bold">Dandruff</Text>
             </Pressable>
 
             <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mb-12"
+              className="bg-[#3F2305] py-2 px-4 rounded-xl w-65 self-center items-center justify-center mb-12 flex-row"
               onPress={() => {
                 setScalpCondition('Normal Scalp');
                 setModalVisible(false);
               }}>
+                <Image
+                  source={require('../assets/images/normal scalp.png')}
+                  style={{ width: 30, height: 30, marginRight: 8 }}
+                  resizeMode="contain"/>
+
               <Text className="text-[#FAF7F0] text-xl font-bold">Normal/I don't know</Text>
             </Pressable>
             
