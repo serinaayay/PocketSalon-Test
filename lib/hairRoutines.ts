@@ -28,7 +28,7 @@ export type HairRoutine = {
 };
 
 // Section 1: Scalp Condition Routines
-const scalpRoutines = {
+export const scalpRoutines = {
   'Dry Scalp': {
     washFrequency: '1-3 times per week (low frequency)',
     shampooType: 'Sulfate-free, hydrating, or soothing shampoo with aloe vera, hyaluronic acid, or tea tree oil',
@@ -56,35 +56,35 @@ const scalpRoutines = {
 };
 
 // Section 2: Hair Type Management
-const hairTypeRoutines = {
+export const hairTypeRoutines = {
   'Straight': {
-    conditionerTips: 'Use lightweight conditioners. Apply only from ears down. Recommended: TRESemmé Keratin Smooth, Pantene 3 Minute Miracle Intensive Conditioner Keratin, or Creamsilk Triple Keratin Ultimate Straight',
+    conditionerTips: 'Use lightweight conditioners. Apply only from ears down. When using conditioner, focus the conditioner on applying from mid-length to ends and not on the roots to avoid oiliness. Recommended: TRESemmé Keratin Smooth, Pantene 3 Minute Miracle Intensive Conditioner Keratin, or Creamsilk Triple Keratin Ultimate Straight',
     styling: 'Apply volumizing mousse or root-lift spray to damp hair before blow-drying. Use smoothing shampoos like Palmolive Silky Straight with Keratin or LUXE Organix Premium Keratin Castor Oil Shampoo',
-    dryingTips: 'Use texturizing spray or dry shampoo on non-wash days for grip and lift. Try Watsons Smooth and Sleek Shampoo Ylang Ylang & Coconut for daily maintenance',
+    dryingTips: 'Use texturizing spray or dry shampoo on non-wash days for grip and lift. Try Watsons Smooth and Sleek Shampoo Ylang Ylang & Coconut for daily maintenance. It\'s much better if the hair is towel dried to remove any dripping water from hair, so that the products would not be wasted. Then gently massage after.',
     extraTip: 'Avoid heavy oils, butters, or creams—they make hair look greasy instantly. For dry scalp, try Human Heart Nature Moisturizing Shampoo',
   },
   'Wavy': {
-    conditionerTips: 'Detangle in shower with fingers or wide-tooth comb while conditioner is in. Use moisturizing products like Bremod Cocoa Butter Conditioner or Human Heart Nature Moisturizing Shampoo',
+    conditionerTips: 'Detangle in shower with fingers or wide-tooth comb while conditioner is in. When using conditioner, focus the conditioner on applying from mid-length to ends and not on the roots to avoid oiliness. Use moisturizing products like Bremod Cocoa Butter Conditioner or Human Heart Nature Moisturizing Shampoo',
     styling: 'On soaking wet hair, apply curl cream then scrunch in lightweight gel or mousse. Try LUXE Organix Curl Define Intensive Hydration Shampoo or Zenutrients Curl Avocado & Tea Tree Sulfate-Free Shampoo',
-    dryingTips: 'Plop hair in t-shirt or microfiber towel for 15 min, then air-dry or diffuse. Never brush when dry. For hydration, use Goldwell Dual Senses Curls & Waves Hydrating Shampoo',
+    dryingTips: 'Plop hair in t-shirt or microfiber towel for 15 min, then air-dry or diffuse. Never brush when dry. For hydration, use Goldwell Dual Senses Curls & Waves Hydrating Shampoo. It\'s much better if the hair is towel dried to remove any dripping water from hair, so that the products would not be wasted. Then gently massage after.',
     extraTip: 'Use a microfiber towel or t-shirt to reduce frizz when drying. Kracie Ichikami Japanese Shampoo works great for wavy hair maintenance',
   },
   'Curly': {
-    conditionerTips: 'Be generous with conditioner—this is your main detangling tool. Use curl-specific products like LUXE Organix Curl Define Intensive Hydration Shampoo or Zenutrients Curl Avocado & Tea Tree Sulfate-Free Shampoo',
+    conditionerTips: 'Be generous with conditioner—this is your main detangling tool. When using conditioner, focus the conditioner on applying from mid-length to ends and not on the roots to avoid oiliness. Use curl-specific products like LUXE Organix Curl Define Intensive Hydration Shampoo or Zenutrients Curl Avocado & Tea Tree Sulfate-Free Shampoo',
     styling: 'On soaking wet hair, apply leave-in conditioner followed by curl-defining cream or strong-hold gel (praying hands or raking method). Goldwell Dual Senses Curls & Waves Hydrating Shampoo helps maintain elasticity',
-    dryingTips: 'Plop, diffuse, or air-dry. Scrunch out the crunch with oil only when 100% dry. Use sulfate-free products to preserve curl definition',
+    dryingTips: 'Plop, diffuse, or air-dry. Scrunch out the crunch with oil only when 100% dry. Use sulfate-free products to preserve curl definition. It\'s much better if the hair is towel dried to remove any dripping water from hair, so that the products would not be wasted. Then gently massage after.',
     extraTip: 'The Curly Girl Method (CGM) can help maintain natural curl patterns. Zenutrients Curl Avocado & Tea Tree is CGM-approved and perfect for curly hair',
   },
   'Kinky': {
-    conditionerTips: 'Use thick, buttery deep conditioner every wash day. Let it sit 15-30 minutes with shower cap. Try It\'s a 10 Coily Miracle Hydrating Shampoo for intensive moisture',
+    conditionerTips: 'Use thick, buttery deep conditioner every wash day. When using conditioner, focus the conditioner on applying from mid-length to ends and not on the roots to avoid oiliness. Let it sit 15-30 minutes with shower cap. Try It\'s a 10 Coily Miracle Hydrating Shampoo for intensive moisture',
     styling: 'Use LOC Method: (L) water-based leave-in, (O) sealing oil like castor or jojoba, (C) thick curl cream or shea butter. Recommended: Not Your Mother\'s Kinky Moves Curl Defining Hair Cream or The Body Shop Jamaican Black Castor Oil Curl Activator',
-    dryingTips: 'Focus on low-manipulation and protective styles (twists, braids) to prevent breakage. Use products specifically designed for coily hair texture',
+    dryingTips: 'Focus on low-manipulation and protective styles (twists, braids) to prevent breakage. Use products specifically designed for coily hair texture. It\'s much better if the hair is towel dried to remove any dripping water from hair, so that the products would not be wasted. Then gently massage after.',
     extraTip: 'Protective styles help retain length and minimize breakage. The Body Shop Jamaican Black Castor Oil Curl Activator provides weightless definition without buildup',
   },
 };
 
 // Section 3: Damage Treatment (Organized by Damage Type and Severity)
-const damageRoutines = {
+export const damageRoutines = {
   'Healthy': {
     goal: 'Prevent future damage',
     conditioner: 'Standard hydrating conditioner',
@@ -207,10 +207,28 @@ export function getHairRoutine(
 export function mapDamageLevelToRoutine(detectedLevel: string): DamageLevel {
   const normalized = detectedLevel.toLowerCase();
   if (normalized.includes('healthy')) return 'Healthy';
+  
+  // Handle "High chance of..." or "high" -> Severe Damage
+  if (normalized.includes('high chance') || normalized.includes('high')) return 'Severe Damage';
+  
+  // Handle "Moderate chance of..." or "moderate" -> Moderate Damage
+  if (normalized.includes('moderate chance') || normalized.includes('moderate')) return 'Moderate Damage';
+  
+  // Handle "Likely..." or "Possible chance of..." -> Light Damage
+  if (normalized.includes('likely') || normalized.includes('possible chance') || normalized.includes('possible')) return 'Light Damage';
+  
+  // Handle "light" -> Light Damage
   if (normalized.includes('light')) return 'Light Damage';
-  if (normalized.includes('moderate')) return 'Moderate Damage';
+  
+  // Handle "severe" -> Severe Damage
   if (normalized.includes('severe')) return 'Severe Damage';
-  return 'Healthy'; // default
+  
+  // If it contains any damage indicator but doesn't match above, default to Moderate Damage
+  if (normalized.includes('breakage') || normalized.includes('hair loss') || normalized.includes('color') || normalized.includes('damage')) {
+    return 'Moderate Damage';
+  }
+  
+  return 'Healthy'; // default only if truly no damage indicators
 }
 
 // Helper to normalize hair type from detection

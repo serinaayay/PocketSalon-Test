@@ -13,7 +13,7 @@ const data: Data = [
 
     {
         title: 'Will the recommended products surely work on my hair?',
-        content: ['Answer Question 2']
+        content: ['Every person’s hair is unique, so results may vary. The products we recommend are based on your hair condition and common effective ingredients, but they may not work the same for everyone. We encourage you to observe how your hair responds and adjust as needed. If concerns persist, consulting a haircare professional or dermatologist may provide more personalized guidance.']
     },
 
     {

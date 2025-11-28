@@ -1,5 +1,6 @@
 import { collection, addDoc, getDocs, query, orderBy, where, Timestamp } from "firebase/firestore";
 import * as FileSystem from 'expo-file-system';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { db } from './firebaseConfig';
 import { getOrCreateRespondentCode } from './respondent';
 
@@ -30,6 +31,95 @@ export type HairScanData = {
 };
 
 /**
+ * Compress and resize image to be under 1MB
+ * @param imageUri Local file URI of the image
+ * @returns Compressed image URI
+ */
+async function compressImageForUpload(imageUri: string): Promise<string> {
+  try {
+    const MAX_SIZE_MB = 1;
+    const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+    const MAX_DIMENSION = 1920; // Max width or height in pixels
+    
+    // Get file info to check current size
+    const fileInfo = await FileSystem.getInfoAsync(imageUri);
+    if (fileInfo.exists && fileInfo.size && fileInfo.size <= MAX_SIZE_BYTES) {
+      // Already under 1MB, return as-is
+      console.log(`✅ Image already under ${MAX_SIZE_MB}MB (${(fileInfo.size / 1024 / 1024).toFixed(2)}MB)`);
+      return imageUri;
+    }
+
+    console.log(`📦 Compressing image (current size: ${fileInfo.exists && fileInfo.size ? (fileInfo.size / 1024 / 1024).toFixed(2) + 'MB' : 'unknown'})...`);
+
+    // Start with quality 0.8 and max dimension 1920
+    let quality = 0.8;
+    let currentDimension = MAX_DIMENSION;
+    let compressedUri = imageUri;
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    while (attempts < maxAttempts) {
+      // Resize and compress
+      const manipResult = await ImageManipulator.manipulateAsync(
+        compressedUri,
+        [
+          { resize: { width: currentDimension } }, // Maintain aspect ratio
+        ],
+        {
+          compress: quality,
+          format: ImageManipulator.SaveFormat.JPEG,
+        }
+      );
+
+      // Check the new file size
+      const newFileInfo = await FileSystem.getInfoAsync(manipResult.uri);
+      if (newFileInfo.exists && newFileInfo.size) {
+        const sizeMB = newFileInfo.size / 1024 / 1024;
+        console.log(`  Attempt ${attempts + 1}: ${sizeMB.toFixed(2)}MB (quality: ${quality}, dimension: ${currentDimension})`);
+
+        if (newFileInfo.size <= MAX_SIZE_BYTES) {
+          console.log(`✅ Image compressed successfully to ${sizeMB.toFixed(2)}MB`);
+          // Clean up previous compressed file if it's different from original
+          if (compressedUri !== imageUri && compressedUri !== manipResult.uri) {
+            await FileSystem.deleteAsync(compressedUri, { idempotent: true });
+          }
+          return manipResult.uri;
+        }
+
+        // If still too large, reduce quality and/or dimension
+        if (attempts < 2) {
+          quality = Math.max(0.3, quality - 0.15); // Reduce quality more aggressively
+        } else {
+          quality = Math.max(0.2, quality - 0.1);
+          currentDimension = Math.max(1280, currentDimension - 160); // Reduce dimension
+        }
+      }
+
+      // Clean up previous attempt if it's not the original
+      if (compressedUri !== imageUri && compressedUri !== manipResult.uri) {
+        await FileSystem.deleteAsync(compressedUri, { idempotent: true });
+      }
+
+      compressedUri = manipResult.uri;
+      attempts++;
+    }
+
+    // If we still couldn't get it under 1MB after max attempts, use the last result
+    const finalFileInfo = await FileSystem.getInfoAsync(compressedUri);
+    if (finalFileInfo.exists && finalFileInfo.size) {
+      const sizeMB = finalFileInfo.size / 1024 / 1024;
+      console.log(`⚠️ Image compressed to ${sizeMB.toFixed(2)}MB (target: ${MAX_SIZE_MB}MB)`);
+    }
+
+    return compressedUri;
+  } catch (error) {
+    console.error('Error compressing image:', error);
+    // If compression fails, return original (upload will still work, just larger)
+    return imageUri;
+  }
+}
+
+/**
  * Upload a file to Firebase Storage
  * @param fileUri Local file URI or file content
  * @param storagePath Path in Firebase Storage
@@ -58,8 +148,12 @@ async function uploadFileToStorage(
       throw new Error(`Upload failed: ${uploadResponse.status} - ${uploadResponse.body}`);
     }
     
-    // Get the download URL
-    const downloadURL = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(storagePath)}?alt=media`;
+    // Parse response to get the download token
+    const responseData = JSON.parse(uploadResponse.body);
+    const downloadToken = responseData.downloadTokens;
+    
+    // Construct the download URL with the token
+    const downloadURL = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(storagePath)}?alt=media&token=${downloadToken}`;
     return downloadURL;
   } catch (error) {
     console.error(`Error uploading file to Firebase Storage (${storagePath}):`, error);
@@ -79,9 +173,20 @@ export async function uploadHairScanImage(
   userId: string,
   timestamp: Date
 ): Promise<string> {
+  // Compress image to under 1MB before uploading
+  const compressedImageUri = await compressImageForUpload(imageUri);
+  
   const timestampStr = timestamp.getTime().toString();
   const storagePath = `hair_scans/${userId}/${timestampStr}.jpg`;
-  return uploadFileToStorage(imageUri, storagePath, 'image/jpeg');
+  
+  const downloadUrl = await uploadFileToStorage(compressedImageUri, storagePath, 'image/jpeg');
+  
+  // Clean up compressed file if it's different from original
+  if (compressedImageUri !== imageUri) {
+    await FileSystem.deleteAsync(compressedImageUri, { idempotent: true });
+  }
+  
+  return downloadUrl;
 }
 
 /**

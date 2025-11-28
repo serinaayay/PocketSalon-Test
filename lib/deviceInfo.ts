@@ -78,18 +78,38 @@ async function getCpuArchitecture(DeviceModule: any): Promise<string> {
     }
     
     if (Platform.OS === 'android') {
-      // On Android, we can get some info from the device
+      // On Android, try to get supported CPU architectures
       try {
-        const supportedAbis = await DeviceModule.supportedCpuArchitecturesAsync();
-        if (supportedAbis && supportedAbis.length > 0) {
-          return supportedAbis.join(', ');
+        // Check if the method exists (expo-device API)
+        if (DeviceModule.supportedCpuArchitecturesAsync) {
+          const supportedAbis = await DeviceModule.supportedCpuArchitecturesAsync();
+          if (supportedAbis && supportedAbis.length > 0) {
+            // Return the primary architecture (first one, usually the most relevant)
+            const primaryArch = supportedAbis[0];
+            // Map common ABIs to readable names
+            const archMap: { [key: string]: string } = {
+              'armeabi-v7a': 'ARMv7',
+              'arm64-v8a': 'ARM64',
+              'x86': 'x86',
+              'x86_64': 'x86_64',
+            };
+            return archMap[primaryArch] || primaryArch;
+          }
+        }
+        // Fallback: try to get device architecture from other properties
+        if (DeviceModule.platformApiLevel) {
+          // Android API level can give hints, but not exact architecture
+          return 'ARM64 (estimated)'; // Most modern Android devices are ARM64
         }
       } catch (error) {
         console.warn('Could not get CPU architecture:', error);
       }
     }
-    // iOS or fallback
-    return Platform.OS === 'ios' ? 'ARM64' : 'Unknown';
+    // iOS devices are typically ARM64
+    if (Platform.OS === 'ios') {
+      return 'ARM64';
+    }
+    return 'Unknown';
   } catch (error) {
     console.error('Error getting CPU architecture:', error);
     return 'Unknown';

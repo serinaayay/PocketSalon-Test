@@ -14,7 +14,6 @@ export default function StackLayout() {
       <Stack.Screen name="chatbot" />
       <Stack.Screen name="PersonalizedRoutine" />
       <Stack.Screen name="favorites" />
-      <Stack.Screen name="test-image-picker" />
       <Stack.Screen name="layout" />
       <Stack.Screen name="modal" options={{ presentation: "modal" }} />
     </Stack>

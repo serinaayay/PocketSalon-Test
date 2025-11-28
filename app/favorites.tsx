@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, Dimensions, Image, Animated, Linking, TouchableOpacity } from 'react-native';
-import { router } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 import { getFavorites, addFavorite, removeFavorite, isFavorite } from '../lib/favorites';
 import { Product, getProductImage, getPriceCategory } from '../lib/productRecommendations';
 import { Ionicons } from '@expo/vector-icons';
@@ -74,14 +74,14 @@ const FlipCard = ({ product, onFavoriteChange }: { product: Product; onFavoriteC
       >
         <View className="w-64 bg-[#3F2305] rounded-xl shadow-lg p-4 items-center" style={{ height: 500 }}>
           {/* Product Image */}
-          <View className="w-full bg-[#f3ddc5] rounded-lg mb-3 flex justify-center items-center" style={{ height: 180 }}>
+          <View className="w-full bg-white rounded-lg mb-3 flex justify-center items-center" style={{ height: 180 }}>
             <Image
               source={getProductImage(product.imageKey)}
               style={{ width: '80%', height: '80%', resizeMode: 'contain' }}
             />
           </View>
           
-          <Text className="text-white text-lg font-bold text-center mb-2" numberOfLines={2}>
+          <Text className="text-white text-xl font-bold text-center mb-2" numberOfLines={2}>
             {product.name}
           </Text>
           <ScrollView 
@@ -106,7 +106,7 @@ const FlipCard = ({ product, onFavoriteChange }: { product: Product; onFavoriteC
               }}
               activeOpacity={0.6}
               style={{
-                backgroundColor: '#8B6B47',
+                backgroundColor: '#F2D8A7',
                 paddingHorizontal: 12,
                 paddingVertical: 6,
                 borderRadius: 20,
@@ -114,7 +114,7 @@ const FlipCard = ({ product, onFavoriteChange }: { product: Product; onFavoriteC
                 zIndex: 1001,
               }}
             >
-              <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' }}>Ingredients</Text>
+              <Text style={{ color: '#3F2305', fontSize: 12, fontWeight: 'bold' }}>Ingredients</Text>
             </TouchableOpacity>
             {product.link && (
               <TouchableOpacity
@@ -131,10 +131,12 @@ const FlipCard = ({ product, onFavoriteChange }: { product: Product; onFavoriteC
                   elevation: 10,
                   zIndex: 1001,
                 }}
-              >
+                className='self-center ml-10'>
+                  
                 <Text style={{ color: '#3F2305', fontSize: 12, fontWeight: 'bold' }}>View Product</Text>
               </TouchableOpacity>
             )}
+          <View className="position left-5">
             <TouchableOpacity
               onPress={() => {
                 console.log('Heart button pressed');
@@ -148,6 +150,7 @@ const FlipCard = ({ product, onFavoriteChange }: { product: Product; onFavoriteC
                 elevation: 10,
                 zIndex: 1001,
               }}
+              className=''
             >
               <Ionicons
                 name={isFav ? 'heart' : 'heart-outline'}
@@ -155,6 +158,7 @@ const FlipCard = ({ product, onFavoriteChange }: { product: Product; onFavoriteC
                 color={isFav ? '#FF0000' : '#3F2305'}
               />
             </TouchableOpacity>
+          </View>
           </View>
         </View>
       </Animated.View>
@@ -170,53 +174,39 @@ const FlipCard = ({ product, onFavoriteChange }: { product: Product; onFavoriteC
           },
           backAnimatedStyle,
         ]}
-        pointerEvents={flipped ? 'auto' : 'none'}
-      >
-        <View className="w-64 bg-[#5B3E20] rounded-xl shadow-lg p-4" style={{ height: 500 }}>
-          <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-white text-xl font-bold flex-1 text-center">
-              Ingredients
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                console.log('Back button pressed');
-                flipCard();
-              }}
-              activeOpacity={0.6}
-              style={{
-                position: 'absolute',
-                right: 0,
-                backgroundColor: '#8B6B47',
-                paddingHorizontal: 12,
-                paddingVertical: 6,
-                borderRadius: 20,
-                elevation: 10,
-                zIndex: 1001,
-              }}
-            >
-              <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: 'bold' }}>Back</Text>
-            </TouchableOpacity>
-          </View>
-          <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-            {product.ingredients && product.ingredients.length > 0 ? (
-              product.ingredients.map((ingredient, index) => (
-                <Text key={index} className="text-white text-sm mb-2">
-                  • {ingredient}
-                </Text>
-              ))
-            ) : (
-              <Text className="text-white text-sm text-center">
-                No ingredient information available
+        pointerEvents={flipped ? 'auto' : 'none'}>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={flipCard}
+        >
+          <View className="w-64 bg-[#3F2305] rounded-xl shadow-lg p-4" style={{height: 500}}>
+            <View className="flex-row justify-center items-center mb-4">
+              <Text className="text-white text-xl font-bold text-center">
+                Ingredients
               </Text>
-            )}
-          </ScrollView>
-        </View>
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+              {product.ingredients && product.ingredients.length > 0 ? (
+                product.ingredients.map((ingredient, index) => (
+                  <Text key={index} className="text-white text-sm mb-2">
+                    • {ingredient}
+                  </Text>
+                ))
+              ) : (
+                <Text className="text-white text-sm text-center">
+                  No ingredient information available
+                </Text>
+              )}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
       </Animated.View>
     </View>
   );
 };
 
 export default function FavoritesPage() {
+  const pathname = usePathname();
   const [favorites, setFavorites] = useState<Product[]>([]);
   const [selectedProductType, setSelectedProductType] = useState<string>('All');
 
@@ -231,6 +221,8 @@ export default function FavoritesPage() {
 
   const filteredFavorites = selectedProductType === 'All' 
     ? favorites 
+    : selectedProductType === 'Others'
+    ? favorites.filter(product => product.productType !== 'Shampoo' && product.productType !== 'Conditioner')
     : favorites.filter(product => product.productType === selectedProductType);
 
   return (
@@ -242,8 +234,8 @@ export default function FavoritesPage() {
         </Text>
 
         {/* Filter Pills */}
-        <View className="flex-row mb-4 mt-6 mx-4">
-          {['All', 'Shampoo', 'Conditioner', 'Hair Oil'].map((type) => (
+        <View className="flex-row mb-8 self-center mx-8 px-2 mt-6">
+          {['All', 'Shampoo', 'Conditioner', 'Others'].map((type) => (
             <Pressable
               key={type}
               onPress={() => setSelectedProductType(type)}
@@ -251,7 +243,7 @@ export default function FavoritesPage() {
                 selectedProductType === type ? 'bg-[#3F2305]' : 'bg-[#E8DCC8]'
               }`}
             >
-              <Text className={`text-sm font-semibold ${
+              <Text className={`text-md font-semibold ${
                 selectedProductType === type ? 'text-white' : 'text-[#5B3E20]'
               }`}>
                 {type}
@@ -283,29 +275,54 @@ export default function FavoritesPage() {
       </ScrollView>
 
       {/* Bottom Navigation */}
-      <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 shadow-lg">
-        <View className="flex-1 flex-row justify-around">
-          <View className="flex-col items-center">
-            <Pressable className="2 justify-center" onPress={() => router.push('/homepage')}>
-              <Image source={require('../assets/images/house 1.png')} className="w-8 h-8"/>
+      <View className="absolute bottom-5 self-center h-16 w-11/12 bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg border-2 border-[#FFF2E4]">
+                <Pressable 
+                    onPress={() => router.push('/homepage')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/homepage' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                        <Image
+                            source={require('../assets/images/house 1.png')}
+                            style={{ width: 24, height: 24, tintColor: pathname === '/homepage' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
             </Pressable>
+
+                <Pressable 
+                    onPress={() => router.push('/hair-detection')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/hair-detection' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                        <Image
+                            source={require('../assets/images/capture (1).png')}
+                            style={{ width: 24, height: 24, tintColor: pathname === '/hair-detection' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
           </View>
-          <View className="flex-col items-center">
-            <Pressable className="2 justify-center" onPress={() => router.push('/hair-detection')}>
-              <Image source={require('../assets/images/capture (1).png')} className="w-9 h-9"/>
             </Pressable>
+
+                <Pressable 
+                    onPress={() => router.push('/journal')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/journal' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                        <Image
+                            source={require('../assets/images/agenda 1.png')}
+                            style={{ width: 24, height: 24, tintColor: pathname === '/journal' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
           </View>
-          <View className="flex-col items-center">
-            <Pressable className="2 justify-center" onPress={() => router.push('/journal')}>
-              <Image source={require('../assets/images/agenda 1.png')} className="w-9 h-9"/>
             </Pressable>
+
+                <Pressable 
+                    onPress={() => router.push('/favorites')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/favorites' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                        <Image
+                            source={require('../assets/images/heart (1).png')}
+                            style={{ width: 24, height: 24, tintColor: pathname === '/favorites' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
           </View>
-          <View className="flex-col items-center">
-            <Pressable className="2 justify-center" onPress={() => router.push('/favorites')}>
-              <Image source={require('../assets/images/heart (1).png')} className="w-9 h-9"/>
             </Pressable>
-          </View>
-        </View>
       </View>
     </View>
   );

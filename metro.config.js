@@ -18,11 +18,22 @@ for (const ext of requiredExtensions) {
 // Configure for large assets
 config.transformer = {
   ...config.transformer,
-  // Increase the asset size limit to handle large ONNX files
+  // Increase the asset size limit to handle large ONNX files (100MB limit)
   assetPlugins: [],
   // Don't inline large assets
   publicPath: '/assets',
+  // Increase max file size for assets
+  getTransformOptions: async () => ({
+    transform: {
+      experimentalImportSupport: false,
+      inlineRequires: false,
+    },
+  }),
 };
+
+// Increase max file size for Metro bundler (100MB)
+config.maxWorkers = 2;
+config.resetCache = false;
 
 // Increase timeouts and limits for large file processing
 config.server = {

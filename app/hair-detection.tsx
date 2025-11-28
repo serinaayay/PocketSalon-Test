@@ -1,15 +1,16 @@
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from 'expo-file-system';
 import { router, useLocalSearchParams } from "expo-router";
-import { useState, useEffect } from "react";
-import { Alert, Dimensions, Image, Pressable, ScrollView, Text, View, Modal } from "react-native";
-import { analyzeHair } from "../lib/onnx-helpers-native";
+import React, { useState, useEffect } from "react";
+import { Dimensions, Image, Pressable, ScrollView, Text, View, Modal } from "react-native";
+import { analyzeHair, HAIR_DAMAGE_LABELS, HAIR_TYPE_LABELS } from "../lib/onnx-helpers-native";
 import { getOrCreateRespondentCode } from "../lib/respondent";
 import { saveAnalysisRecord, saveAnalysisToLocalDB } from "../lib/db";
 import { trySyncPendingAnalyses } from "../lib/sync";
 import { ScalpCondition } from "../lib/hairRoutines";
 import { uploadHairScan } from "../lib/firebaseService";
 import { getDeviceInfo } from "../lib/deviceInfo";
+import { Octicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 const frameSize = Math.min(width * 0.9, 350); 
@@ -19,19 +20,29 @@ export default function HairDetectionPage() {
   const [image, setImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showImageSourceModal, setShowImageSourceModal] = useState(true); // First modal: Choose Capture or Upload
+  const [showImageSourceModal, setShowImageSourceModal] = useState(false); // First modal: Choose Capture or Upload
+  const [showScalpInfoModal, setShowScalpInfoModal] = useState(false); // Modal: How to identify scalp condition
   const [modalVisible, setModalVisible] = useState(false); // Second modal: Scalp condition
   const [scalpCondition, setScalpCondition] = useState<ScalpCondition>('Normal Scalp');
-  const [showScalpModal, setShowScalpModal] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = React.useState(true);
+  const [showScalpGuide, setShowScalpGuide] = React.useState(false);
+  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
 
-  // Check if an image was selected from the test-image-picker page
+      // Check if an image was selected from the test-image-picker page
   useEffect(() => {
     if (params.selectedImage) {
-      setImage(params.selectedImage as string);
+      const imageUri = params.selectedImage as string;
+      setImage(imageUri);
       setError(null);
       setShowImageSourceModal(false); // Hide image source modal
-      setModalVisible(true); // Show scalp condition modal after image is selected
-      console.log('Received image from picker:', params.selectedImage);
+      setShowScalpInfoModal(true); // Show scalp condition info modal first
+      // Try to get image dimensions
+      Image.getSize(imageUri, (width, height) => {
+        setImageDimensions({ width, height });
+      }, () => {
+        setImageDimensions(null);
+      });
+      console.log('Received image from picker:', imageUri);
     }
   }, [params.selectedImage]);
 
@@ -43,15 +54,39 @@ export default function HairDetectionPage() {
       quality: 1,
     });
     if (!result.canceled && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
-      setModalVisible(true); // Show scalp condition modal
+      const asset = result.assets[0];
+      setImage(asset.uri);
+      if (asset.width && asset.height) {
+        setImageDimensions({ width: asset.width, height: asset.height });
+      }
+      setShowScalpInfoModal(true); // Show scalp condition info modal first
     }
   };
 
-  const handleUploadOption = () => {
+  const handleUploadOption = async () => {
     setShowImageSourceModal(false);
-    // Navigate to upload page
-    router.push('/test-image-picker');
+    // Use image picker directly
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.canceled && result.assets.length > 0) {
+      const asset = result.assets[0];
+      setImage(asset.uri);
+      if (asset.width && asset.height) {
+        setImageDimensions({ width: asset.width, height: asset.height });
+      } else {
+        // Try to get dimensions from image URI
+        Image.getSize(asset.uri, (width, height) => {
+          setImageDimensions({ width, height });
+        }, () => {
+          setImageDimensions(null);
+        });
+      }
+      setShowScalpInfoModal(true); // Show scalp condition info modal first
+    }
   };
 
   const analyzeImage = async () => {
@@ -80,19 +115,6 @@ export default function HairDetectionPage() {
       console.log(JSON.stringify(result, null, 2));
       console.log('');
       
-      // Navigate to results with both hair type and damage analysis
-      router.push({
-        pathname: '/ResultsScreen',
-        params: {
-          hair_type: result.hairType.type,
-          hair_confidence: result.hairType.confidence.toString(),
-          damage_level: result.hairDamage.level,
-          damage_type: result.hairDamage.type,
-          damage_confidence: result.hairDamage.confidence.toString(),
-          scalp_condition: scalpCondition,
-        },
-      });
-
       // Create recommendations text based on damage level (simple rules)
       const recommendations = result.hairDamage.level === 'Severe Damage'
         ? 'Seek deep conditioning treatments, reduce heat and chemical exposure.'
@@ -102,17 +124,51 @@ export default function HairDetectionPage() {
         ? 'Maintain hydration and gentle handling.'
         : 'Keep a balanced routine and regular trims.';
 
+      // Hair type and damage labels
+      const hairTypeLabels = HAIR_TYPE_LABELS;
+      const hairDamageLabels = HAIR_DAMAGE_LABELS;
+      
+      // Create labeled predictions
+      const hairDamagePredictions = result.predictions.map((value, index) => ({
+        label: hairDamageLabels[index] || `Damage ${index + 1}`,
+        value: value,
+        percentage: value > 1.0 ? value.toFixed(2) + '%' : (value * 100).toFixed(2) + '%'
+      }));
+      
+      const hairTypePredictions = (result.hairTypePredictions || []).map((value, index) => ({
+        label: hairTypeLabels[index] || `Type ${index + 1}`,
+        value: value,
+        percentage: (value * 100).toFixed(2) + '%'
+      }));
+      
+      // Navigate to results with both hair type and damage analysis
+      router.push({
+        pathname: '/ResultsScreen',
+        params: {
+          hair_type: result.hairType.type,
+          hair_confidence: result.hairType.confidence.toString(),
+          hair_type_predictions: JSON.stringify(hairTypePredictions),
+          damage_level: result.hairDamage.level,
+          damage_confidence: result.hairDamage.confidence.toString(),
+          scalp_condition: scalpCondition,
+          damage_predictions: JSON.stringify(hairDamagePredictions), // Pass all damage predictions with labels
+          image_uri: targetImagePath, // Pass the analyzed image path
+          hair_health_score: result.hairHealth.score.toString(),
+        },
+      });
+
       // Consolidated JSON content
       const consolidated = {
         respondentCode: code,
         timestamp: new Date().toISOString(),
-        modelPredictions: result.predictions,
+        hairDamagePredictions: hairDamagePredictions,
+        hairTypePredictions: hairTypePredictions,
         recommendations,
         deviceInfo: {
           model: 'unknown', cpu: 'unknown', gpu: 'unknown', ram: 'unknown', cameraMP: 'unknown'
         },
-        modelLoadingTime: result.modelLoadingTimeMs,
-        inferenceTime: result.inferenceTimeMs,
+        modelLoadingTime: `${result.modelLoadingTimeMs.toFixed(2)}ms`,
+        inferenceTime: `${result.inferenceTimeMs.toFixed(2)}ms`,
       };
 
       const resultPath = resultsDir + `result_${code}_${ts}.json`;
@@ -126,7 +182,10 @@ export default function HairDetectionPage() {
         timestamp: consolidated.timestamp,
         modelLoadingTimeMs: result.modelLoadingTimeMs,
         inferenceTimeMs: result.inferenceTimeMs,
-        predictionsJson: JSON.stringify(result.predictions),
+        predictionsJson: JSON.stringify({
+          hairDamagePredictions: hairDamagePredictions,
+          hairTypePredictions: hairTypePredictions,
+        }),
         recommendations,
         deviceInfoJson: JSON.stringify(consolidated.deviceInfo),
         synced: false,
@@ -149,19 +208,40 @@ export default function HairDetectionPage() {
         const timestamp = new Date();
         const damageScore = 100 - result.hairHealth.score; // Convert health score to damage score
         
-        // Get device information
+        // Get device information (including CPU architecture)
         const deviceInfo = await getDeviceInfo();
         
-        // Update consolidated data with actual device info
+        // Calculate camera MP from image dimensions (approximate)
+        let cameraMP = 'Unknown';
+        if (imageDimensions) {
+          const totalPixels = imageDimensions.width * imageDimensions.height;
+          const megapixels = totalPixels / 1000000; // Convert to megapixels
+          cameraMP = `${megapixels.toFixed(1)} MP (estimated from image)`;
+        }
+        
+        // Try to estimate GPU based on device model (basic estimation)
+        let gpuInfo = 'Unknown';
+        const modelLower = deviceInfo.model?.toLowerCase() || '';
+        if (modelLower.includes('iphone') || modelLower.includes('ipad')) {
+          gpuInfo = 'Apple GPU (estimated)';
+        } else if (modelLower.includes('samsung') || modelLower.includes('galaxy')) {
+          gpuInfo = 'Adreno/Mali GPU (estimated)';
+        } else if (modelLower.includes('pixel')) {
+          gpuInfo = 'Adreno GPU (estimated)';
+        } else if (modelLower.includes('xiaomi') || modelLower.includes('redmi')) {
+          gpuInfo = 'Adreno/Mali GPU (estimated)';
+        }
+        
+        // Update consolidated data with actual device info (including CPU architecture)
         consolidated.deviceInfo = {
-          model: deviceInfo.model,
-          cpu: deviceInfo.cpuArchitecture || 'Unknown',
-          gpu: 'Unknown', // GPU info not available via expo-device
+          model: deviceInfo.model || 'Unknown',
+          cpu: deviceInfo.cpuArchitecture || 'Unknown', // CPU architecture fetched from device
+          gpu: gpuInfo,
           ram: deviceInfo.totalMemory ? `${(deviceInfo.totalMemory / 1024).toFixed(1)} GB` : 'Unknown',
-          cameraMP: 'Unknown', // Camera MP not available via expo-device
+          cameraMP: cameraMP,
         };
         
-        // Prepare results JSON for upload
+        // Prepare results JSON for upload (includes CPU architecture in deviceInfo.cpu)
         const resultsJson = JSON.stringify(consolidated, null, 2);
         
         // Upload with all metadata, results, and device info
@@ -220,6 +300,44 @@ export default function HairDetectionPage() {
           </View>
         </View>
 
+        <Modal
+        visible={showDisclaimer}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowDisclaimer(false)}>
+
+          <View style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.5)" 
+            }}>
+          <View className="w-96 bg-[#3F2305] rounded-2xl px-5 py-4 mb-4">
+            <Text className="text-[#FAF7F0] font-extrabold text-xl text-center">
+              Cropping Guidelines:
+            </Text>
+
+            <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+               1. Please make sure to crop the image to focus on your hair only.{'\n'}
+               2. Keep the frame free of unnecessary background elements. {'\n'}
+               3. Ensure good lighting for better analysis results.
+            </Text>
+          </View>
+        
+          <Pressable
+            onPress={() => {
+              setShowDisclaimer(false);
+              setShowImageSourceModal(true); 
+            }}
+            className="bg-[#F2EAD3] px-5 py-2 rounded-xl">
+            
+            <Text className="text-[#3F2305] font-semibold">OK</Text>
+          </Pressable>
+
+          </View>
+
+        </Modal>
+                
         {/* First Modal: Choose Capture or Upload */}
         <Modal 
           visible={showImageSourceModal} 
@@ -250,7 +368,52 @@ export default function HairDetectionPage() {
           </View>
         </Modal>
 
-        {/* Second Modal: Scalp Condition */}
+        {/* Scalp Condition Info Modal */}
+        <Modal
+          visible={showScalpInfoModal}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setShowScalpInfoModal(false)}>
+          <View style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.5)" 
+            }}>
+          <View className="w-96 bg-[#3F2305] rounded-2xl px-5 py-4 mb-4 max-h-[80%]">
+            <Text className="text-[#FAF7F0] font-extrabold text-2xl text-center mb-4">
+              How to identify your scalp condition:
+            </Text>
+
+            <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 400 }}>
+              <Text className="text-[#FAF7F0] font-extrabold text-xl text-center">
+                {'\n'} Oily Scalp: <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+                 Hair appears greasy or shiny shortly after washing. {'\n'}</Text>
+
+                {'\n'} Dry Scalp: <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+                 Hair feels itchy and tight; Small white flakes on the scalp and/or shoulders is present.{'\n'} </Text>
+
+                {'\n'} Dandruff: <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+                 Visible white or yellow big flakes on the scalp and in the hair, accompanied by an itchy scalp.{'\n'}</Text>
+
+                {'\n'} Normal Scalp: <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+                 Hair looks healthy and shiny, not too oily nor too dry; No significant flaking or itching.{'\n'}</Text>
+              </Text>
+            </ScrollView>
+          </View>
+        
+          <Pressable
+            onPress={() => {
+              setShowScalpInfoModal(false);
+              setModalVisible(true); // Show scalp condition selection modal
+            }}
+            className="bg-[#F2EAD3] px-5 py-2 rounded-xl">
+            <Text className="text-[#3F2305] font-semibold">I understand</Text>
+          </Pressable>
+          </View>
+        </Modal>
+
+        {/* Third Modal: Scalp Condition */}
         <Modal 
           visible={modalVisible} 
           animationType="slide" 
@@ -263,42 +426,67 @@ export default function HairDetectionPage() {
               backgroundColor: "rgba(0, 0, 0, 0.3)" 
             }}>
 
-          <View style={{backgroundColor: '#FFF2E4', width: 340, height: 390, alignSelf: "center", borderRadius: 10, paddingTop: 40}}>
-            <Text className="text-2xl text-center font-bold"> What is your Scalp Condition?</Text>
+          <View style={{backgroundColor: '#FFF2E4', width: 340, height: 420, alignSelf: "center", borderRadius: 10, paddingTop: 40, position: 'relative'}}>
+            <Pressable
+              onPress={() => setShowScalpGuide(true)}
+              style={{ position: 'absolute', top: 10, right: 10, flexDirection: 'row', alignItems: 'center' }}>
+              <Text className="text-[#3F2305] font-normal italic text-sm mr-2">Scalp Condition Guide</Text>
+              <Octicons
+                name="question"
+                size={22}
+                color="#3F2305" />
+            </Pressable>
+            <Text className="text-2xl text-center font-bold mt-1"> What is your Scalp Condition?</Text>
             <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mt-5 mb-3"
+              className="bg-[#3F2305] py-2 px-4 rounded-xl w-64 self-center items-center justify-center mt-5 mb-3 flex-row"
               onPress={() => {
                 setScalpCondition('Oily Scalp');
                 setModalVisible(false);
               }}>
+              <Image
+                source={require('../assets/images/oily scalp.png')}
+                style={{ width: 30, height: 30, marginRight: 8 }}
+                resizeMode="contain"/>
               <Text className="text-[#FAF7F0] text-xl font-bold">Oily</Text>
             </Pressable>
 
             <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mb-3"
+              className="bg-[#3F2305] py-2 px-4 rounded-xl w-64 self-center items-center justify-center mb-3 flex-row"
               onPress={() => {
                 setScalpCondition('Dry Scalp');
                 setModalVisible(false);
               }}>
+              <Image
+                source={require('../assets/images/dry scalp.png')}
+                style={{ width: 30, height: 30, marginRight: 8 }}
+                resizeMode="contain"/>
               <Text className="text-[#FAF7F0] text-xl font-bold">Dry</Text>
             </Pressable>
 
             <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mb-3"
+              className="bg-[#3F2305] py-2 px-4 rounded-xl w-64 self-center items-center justify-center mb-3 flex-row"
               onPress={() => {
                 setScalpCondition('Dandruff');
                 setModalVisible(false);
               }}>
+              <Image
+                source={require('../assets/images/danfruff.png')}
+                style={{ width: 30, height: 30, marginRight: 8 }}
+                resizeMode="contain"/>
               <Text className="text-[#FAF7F0] text-xl font-bold">Dandruff</Text>
             </Pressable>
 
             <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-60 self-center items-center mb-12"
+              className="bg-[#3F2305] py-2 px-4 rounded-xl w-65 self-center items-center justify-center mb-12 flex-row"
               onPress={() => {
                 setScalpCondition('Normal Scalp');
                 setModalVisible(false);
               }}>
-              <Text className="text-[#FAF7F0] text-xl font-bold">I don't know</Text>
+              <Image
+                source={require('../assets/images/normal scalp.png')}
+                style={{ width: 30, height: 30, marginRight: 8 }}
+                resizeMode="contain"/>
+              <Text className="text-[#FAF7F0] text-xl font-bold">Normal/I don't know</Text>
             </Pressable>
             
           {/* Cancel button */}
@@ -314,18 +502,75 @@ export default function HairDetectionPage() {
           </View>
         </Modal>
 
+        <Modal
+          visible={showScalpGuide}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={() => setShowScalpGuide(false)}>
+            <View style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.5)" 
+            }}>
+          <View className="w-96 bg-[#3F2305] rounded-2xl px-5 py-4 mb-4 max-h-[80%]">
+            <Text className="text-[#FAF7F0] font-extrabold text-2xl text-center mb-4">
+              How to identify your scalp condition:
+            </Text>
+
+            <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 400 }}>
+              <Text className="text-[#FAF7F0] font-extrabold text-xl text-center">
+                {'\n'} Oily Scalp: <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+                 Hair appears greasy or shiny shortly after washing. {'\n'}</Text>
+
+                {'\n'} Dry Scalp: <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+                 Hair feels itchy and tight; Small white flakes on the scalp and/or shoulders is present.{'\n'} </Text>
+
+                {'\n'} Dandruff: <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+                 Visible white or yellow big flakes on the scalp and in the hair, accompanied by an itchy scalp.{'\n'}</Text>
+
+                {'\n'} Normal Scalp: <Text className="text-[#FAF7F0] font-normal text-lg text-center">
+                 Hair looks healthy and shiny, not too oily nor too dry; No significant flaking or itching.{'\n'}</Text>
+              </Text>
+            </ScrollView>
+          </View>
+        
+          <Pressable
+            onPress={() => setShowScalpGuide(false)}
+            className="bg-[#F2EAD3] px-5 py-2 rounded-xl">
+            <Text className="text-[#3F2305] font-semibold">I understand</Text>
+          </Pressable>
+          </View>
+        </Modal>
+
         
         {/* Image Frame */}
-        <View style={{ width: frameSize, height: frameSize, zIndex: 1, marginTop: -frameSize / 5}} className="relative rounded-xl overflow-hidden 
-        items-center justify-center bg-[#DFD7BF] top-16 shadow-lg">
+        <Pressable
+          onPress={() => {
+            setImage(null); 
+            setShowImageSourceModal(true); 
+          }}
+          style={{
+            width: frameSize,
+            height: frameSize,
+            zIndex: 1,
+            marginTop: -frameSize / 5,
+          }}
+          className="relative rounded-xl overflow-hidden items-center justify-center bg-[#DFD7BF] top-16 shadow-lg">
+
           {image ? (
-            <Image source={{ uri: image }} style={{ width: frameSize, height: frameSize }} resizeMode="cover" />
+            <Image
+              source={{ uri: image }}
+              style={{ width: frameSize, height: frameSize }}
+              resizeMode="cover"
+            />
           ) : (
-            <View className="flex-1 w-full h-full items-center justify-center align-middle">
-              <Text className="text-400 text-xl color-black">No Image</Text>
+            
+            <View className="flex-1 w-full h-full items-center justify-center">
+              <Text className="text-xl text-black">No Image</Text>
             </View>
           )}
-        </View>
+        </Pressable>
 
         {/* Upload and Capture Buttons */}
          <View style={{ width: frameSize, minHeight: 100, zIndex: 10 }} className="mt-28 mb-6">
@@ -334,7 +579,7 @@ export default function HairDetectionPage() {
             {image && (
               <Pressable
                 onPress={analyzeImage}
-                className="bg-[#6C4E31] rounded-lg w-48 h-14 items-center justify-center"
+                className="bg-[#3F2305] rounded-lg w-48 h-14 items-center justify-center"
                 disabled={loading}>
                 <Text className="text-[#FFEEDB] text-lg font-bold text-center">{loading ? 'Analyzing...' : 'Analyze'}</Text>
               </Pressable>)}

@@ -178,6 +178,26 @@ export async function markRecordSynced(id: number): Promise<void> {
   await db.runAsync(`UPDATE analysis_records SET synced = 1, last_error = NULL WHERE id = ?;`, id);
 }
 
+export async function getAnalysisRecordByImagePath(imagePath?: string | null): Promise<AnalysisRecord | null> {
+  if (!imagePath) return null;
+  const db = await openDatabase();
+  const rows = await db.getAllAsync<any>(
+    `SELECT id, respondent_code as respondentCode, image_path as imagePath, result_path as resultPath, timestamp,
+            model_loading_time_ms as modelLoadingTimeMs, inference_time_ms as inferenceTimeMs,
+            predictions_json as predictionsJson, recommendations, device_info_json as deviceInfoJson,
+            synced, sync_attempts as syncAttempts, last_error as lastError
+     FROM analysis_records
+     WHERE image_path = ?
+     ORDER BY datetime(timestamp) DESC
+     LIMIT 1;`,
+    imagePath
+  );
+  if (!rows || rows.length === 0) {
+    return null;
+  }
+  return rows[0] as AnalysisRecord;
+}
+
 export async function noteSyncFailure(id: number, errorMessage: string): Promise<void> {
   const db = await openDatabase();
   await db.runAsync(

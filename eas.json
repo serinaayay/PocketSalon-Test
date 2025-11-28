@@ -25,7 +25,7 @@
     },
     "production": {
       "android": {
-        "buildType": "apk"
+        "buildType": "app-bundle"
       },
       "env": {
         "EXPO_PUBLIC_SYNC_URL": "https://pocketsalon-upload-838334574163.us-central1.run.app",
