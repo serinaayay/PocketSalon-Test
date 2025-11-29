@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, Image, Pressable, Dimensions, Alert } from "react-native";
-import { router } from "expo-router";
+import { router, usePathname} from "expo-router";
 import { getHairAnalysisHistory, HairAnalysis, clearAllData } from "../lib/db";
 import { Svg as SvgNS, Circle as CircleNS, G as GNS, Text as SvgText } from "react-native-svg";
 const { width, height } = Dimensions.get('window');
@@ -9,6 +9,7 @@ const journal = () => {
   const [history, setHistory] = React.useState<HairAnalysis[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
+  const pathname = usePathname();
 
   const CircularProgress = ({ percentage, size = 120, strokeWidth = 12 }: { percentage: number; size?: number; strokeWidth?: number }) => {
     const radius = (size - strokeWidth) / 2;
@@ -141,14 +142,20 @@ const journal = () => {
           <View className="px-4">
             {history.map((item) => {
               const date = new Date(item.analysisDate);
-              const dateStr = isNaN(date.getTime()) ? item.analysisDate : date.toLocaleDateString();
+              const dateStr = isNaN(date.getTime())
+                ? item.analysisDate
+                : date.toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  });
               const score = item.hairHealthScore ?? 0;
               const damagePercentage = 100 - score;
               return (
                 <View key={item.id} className="mb-6">
                   {/* Date header with line and recommendations button */}
                   <View className="flex-row items-center mb-3">
-                    <Text className="text-[#3F2305] text-lg font-bold">Hair Health as of {dateStr}</Text>
+                    <Text className="text-[#3F2305] text-lg font-bold"> {dateStr} </Text>
                     <View className="flex-1 h-px bg-[#3F2305] ml-3" />
                     {item.recommendations && item.hairType && item.scalpCondition && item.damageLevel && (
                       <Pressable
@@ -183,41 +190,54 @@ const journal = () => {
           </View>
         )}
       </ScrollView>
-      <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 shadow-lg">
-            <View className="flex-1 flex-row justify-around">
-                <View className="flex-col items-center">
-                    <Pressable className="2 justify-center"
-                    onPress={() => router.push('/homepage')}>
+      <View className="absolute bottom-5 self-center h-16 w-11/12 bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg border-2 border-[#FFF2E4]">
+                <Pressable 
+                    onPress={() => router.push('/homepage')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/homepage' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
                         <Image
                         source={require('../assets/images/house 1.png')}
-                        className="w-8 h-8"/>
+                            style={{ width: 24, height: 24, tintColor: pathname === '/homepage' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
                     </Pressable>
-                </View>
-                <View className="flex-col items-center">
-                    <Pressable className="2 justify-center"
-                    onPress={() => router.push('/hair-detection')}>
+
+                <Pressable 
+                    onPress={() => router.push('/hair-detection')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/hair-detection' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
                     <Image
                         source={require('../assets/images/capture (1).png')}
-                        className="w-9 h-9"/>
+                            style={{ width: 24, height: 24, tintColor: pathname === '/hair-detection' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
                     </Pressable>
-                </View>
-                <View className="flex-col items-center">
-                    <Pressable className="2 justify-center"
-                    onPress={() => router.push('/journal')}>
+
+                <Pressable 
+                    onPress={() => router.push('/journal')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/journal' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
                     <Image
                         source={require('../assets/images/agenda 1.png')}
-                        className="w-9 h-9"/>
+                            style={{ width: 24, height: 24, tintColor: pathname === '/journal' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
                     </Pressable>
-                </View>
-                <View className="flex-col items-center">
-                    <Pressable className="2 justify-center"
-                    onPress={() => router.push('/favorites')}>
+
+                <Pressable 
+                    onPress={() => router.push('/favorites')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/favorites' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
                     <Image
                         source={require('../assets/images/heart (1).png')}
-                        className="w-9 h-9"/>
+                            style={{ width: 24, height: 24, tintColor: pathname === '/favorites' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
                     </Pressable>
-                </View>
-            </View>
       </View>
     </View>
   );

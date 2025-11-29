@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, Dimensions, Image, Animated, Linking, TouchableOpacity } from 'react-native';
-import { router } from 'expo-router';
+import { router, usePathname} from 'expo-router';
 import { getFavorites, addFavorite, removeFavorite, isFavorite } from '../lib/favorites';
 import { Product, getProductImage, getPriceCategory } from '../lib/productRecommendations';
 import { Ionicons } from '@expo/vector-icons';
@@ -217,6 +217,7 @@ const FlipCard = ({ product, onFavoriteChange }: { product: Product; onFavoriteC
 };
 
 export default function FavoritesPage() {
+  const pathname = usePathname();
   const [favorites, setFavorites] = useState<Product[]>([]);
   const [selectedProductType, setSelectedProductType] = useState<string>('All');
 
@@ -281,31 +282,54 @@ export default function FavoritesPage() {
           </ScrollView>
         )}
       </ScrollView>
+      <View className="absolute bottom-5 self-center h-16 w-11/12 bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg border-2 border-[#FFF2E4]">
+                <Pressable 
+                    onPress={() => router.push('/homepage')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/homepage' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                        <Image
+                        source={require('../assets/images/house 1.png')}
+                            style={{ width: 24, height: 24, tintColor: pathname === '/homepage' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
+                    </Pressable>
 
-      {/* Bottom Navigation */}
-      <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 shadow-lg">
-        <View className="flex-1 flex-row justify-around">
-          <View className="flex-col items-center">
-            <Pressable className="2 justify-center" onPress={() => router.push('/homepage')}>
-              <Image source={require('../assets/images/house 1.png')} className="w-8 h-8"/>
-            </Pressable>
-          </View>
-          <View className="flex-col items-center">
-            <Pressable className="2 justify-center" onPress={() => router.push('/hair-detection')}>
-              <Image source={require('../assets/images/capture (1).png')} className="w-9 h-9"/>
-            </Pressable>
-          </View>
-          <View className="flex-col items-center">
-            <Pressable className="2 justify-center" onPress={() => router.push('/journal')}>
-              <Image source={require('../assets/images/agenda 1.png')} className="w-9 h-9"/>
-            </Pressable>
-          </View>
-          <View className="flex-col items-center">
-            <Pressable className="2 justify-center" onPress={() => router.push('/favorites')}>
-              <Image source={require('../assets/images/heart (1).png')} className="w-9 h-9"/>
-            </Pressable>
-          </View>
-        </View>
+                <Pressable 
+                    onPress={() => router.push('/hair-detection')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/hair-detection' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                    <Image
+                        source={require('../assets/images/capture (1).png')}
+                            style={{ width: 24, height: 24, tintColor: pathname === '/hair-detection' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
+                    </Pressable>
+
+                <Pressable 
+                    onPress={() => router.push('/journal')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/journal' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                    <Image
+                        source={require('../assets/images/agenda 1.png')}
+                            style={{ width: 24, height: 24, tintColor: pathname === '/journal' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
+                    </Pressable>
+
+                <Pressable 
+                    onPress={() => router.push('/favorites')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/favorites' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                    <Image
+                        source={require('../assets/images/heart (1).png')}
+                            style={{ width: 24, height: 24, tintColor: pathname === '/favorites' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
+                    </Pressable>
       </View>
     </View>
   );

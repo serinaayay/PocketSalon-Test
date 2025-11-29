@@ -11,6 +11,7 @@ import { ScalpCondition } from "../lib/hairRoutines";
 import { uploadHairScan } from "../lib/firebaseService";
 import { getDeviceInfo } from "../lib/deviceInfo";
 import { Octicons } from '@expo/vector-icons';
+import { BackHandler } from "react-native";
 
 const { width, height } = Dimensions.get('window');
 const frameSize = Math.min(width * 0.9, 350); 
@@ -39,6 +40,24 @@ export default function HairDetectionPage() {
       console.log('Received image from picker:', params.selectedImage);
     }
   }, [params.selectedImage]);
+
+  // Handle Android back button to close modals first
+    useEffect(() => {
+      const handler = () => {
+        if (modalVisible) {
+          return true; 
+        }
+        return false; 
+      };
+
+      const subscription = BackHandler.addEventListener("hardwareBackPress",
+        handler
+      );
+
+      return () => subscription.remove();
+    }, [modalVisible]);
+
+
 
   const handleCaptureOption = async () => {
     setShowImageSourceModal(false);
@@ -262,7 +281,9 @@ export default function HairDetectionPage() {
           visible={showImageSourceModal} 
           animationType="fade" 
           transparent={true} 
-          onRequestClose={() => setShowImageSourceModal(false)}>
+          onRequestClose={() => 
+            setShowImageSourceModal(false)}
+            >
             <View style={{
               flex: 1,
               justifyContent: "center",
@@ -294,7 +315,9 @@ export default function HairDetectionPage() {
         visible={showScalpGuide}
         animationType="fade"
         transparent={true}
-        onRequestClose={() => setShowScalpGuide(false)}>
+        onRequestClose={() => {
+            setShowScalpGuide(false); 
+          }}>
 
           <View style={{
               flex: 1,
@@ -339,22 +362,30 @@ export default function HairDetectionPage() {
         </Modal>
 
         {/* Third Modal: Scalp Condition */}
-        <Modal 
-          visible={modalVisible} 
-          animationType="slide" 
-          transparent={true} 
-          onRequestClose={() => setModalVisible(false)}>
-            <View style={{
-              flex: 1,
+        {modalVisible && (
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.3)",  // transparent still allowed
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: "rgba(0, 0, 0, 0.3)" 
-            }}>
+              elevation: 999,
+              zIndex: 999,
+            }}
+          >
 
           <View style={{backgroundColor: '#FFF2E4', width: 340, height: 420, alignSelf: "center", borderRadius: 10, paddingTop: 40, position: 'relative'}}>
 
             <Pressable
-              onPress={() => setShowScalpGuide(true)}
+                onPress={() =>{
+                  setModalVisible(false);
+                  setShowScalpGuide(true); 
+                }}
+
               style={{ position: 'absolute', top: 10, right: 10, flexDirection: 'row', alignItems: 'center' }}>
             
               <Text className="text-[#3F2305] font-normal italic text-sm mr-2">Scalp Condition Guide</Text>
@@ -435,7 +466,8 @@ export default function HairDetectionPage() {
           </Pressable>
           </View>
           </View>
-        </Modal>
+    )}
+
 
         
 {/* Image Frame */}

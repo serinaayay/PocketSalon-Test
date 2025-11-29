@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, Image, Pressable, Dimensions, Modal, } from "react-native";
-import { router } from "expo-router";
+import { router, usePathname } from "expo-router";
 
 const { width, height } = Dimensions.get('window');
 
@@ -199,7 +199,10 @@ const NaturalRemedies = () => {
         })}
 
       </ScrollView>
-      <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 shadow-lg">
+            <View 
+              className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 
+              self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 
+              shadow-lg border-2 border-[#FFF2E4]">
 
         {/* Home Icon */}
                     <View className="flex-1 flex-row justify-around">
