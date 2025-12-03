@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, ScrollView, Image, Pressable, Dimensions, Alert } from "react-native";
 import { router, usePathname} from "expo-router";
 import { getHairAnalysisHistory, HairAnalysis, clearAllData } from "../lib/db";
-import { Svg as SvgNS, Circle as CircleNS, G as GNS, Text as SvgText } from "react-native-svg";
+import { Svg as SvgNS, Circle as CircleNS, G as GNS, Text as SvgText, } from "react-native-svg";
+import Animated, { useSharedValue, useAnimatedProps, withTiming, Easing } from 'react-native-reanimated';
 const { width, height } = Dimensions.get('window');
 
 const journal = () => {
@@ -11,16 +12,34 @@ const journal = () => {
   const [error, setError] = React.useState<string | null>(null);
   const pathname = usePathname();
 
+
   const CircularProgress = ({ percentage, size = 120, strokeWidth = 12 }: { percentage: number; size?: number; strokeWidth?: number }) => {
+    const PI = 3.141592653589793;
     const radius = (size - strokeWidth) / 2;
-    const circumference = 2 * Math.PI * radius;
-    const healthyOffset = circumference - (percentage / 100) * circumference;
+    const circumference = 2 * PI * radius;
     const center = size / 2;
+
+    const AnimatedCircle = Animated.createAnimatedComponent(CircleNS);
+    const progress = useSharedValue(0);
+
+  React.useEffect(() => {
+    progress.value = withTiming(percentage, {
+      duration: 1000,
+      easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+    });
+  }, [percentage]);
+
+  const animatedProps = useAnimatedProps(() => {
+    const offset = circumference - (progress.value / 100) * circumference;
+    return {
+      strokeDashoffset: offset,
+    };
+  });
 
     return (
       <View style={{ width: size, height: size }}>
         <SvgNS width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-          <GNS rotation='' origin={`${center}, ${center}`}>
+          <GNS origin={`${center}, ${center}`}>
             {/* Red damage circle (background) */}
             <CircleNS
               cx={center}
@@ -32,7 +51,7 @@ const journal = () => {
               strokeOpacity={1}
             />
             {/* Green healthy circle (foreground) */}
-            <CircleNS
+            <AnimatedCircle
               cx={center}
               cy={center}
               r={radius}
@@ -40,7 +59,7 @@ const journal = () => {
               strokeWidth={strokeWidth}
               fill="transparent"
               strokeDasharray={circumference}
-              strokeDashoffset={healthyOffset}
+              animatedProps={animatedProps}
               strokeLinecap="round"
               transform={`rotate(-90 ${center} ${center})`}
             />
@@ -53,7 +72,7 @@ const journal = () => {
               fill="#3F2305"
               fontWeight="bold"
             >
-              {`${Math.round(percentage)}%`}
+              {`${percentage}%`}
             </SvgText>
             {/* Healthy label */}
             <SvgText
@@ -190,7 +209,7 @@ const journal = () => {
           </View>
         )}
       </ScrollView>
-      <View className="absolute bottom-5 self-center h-16 w-11/12 bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg border-2 border-[#FFF2E4]">
+      <View className="absolute bottom-5 self-center h-16 w-11/12 bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg border-4 border-[#A68E6C]">
                 <Pressable 
                     onPress={() => router.push('/homepage')}
                     className="items-center justify-center"

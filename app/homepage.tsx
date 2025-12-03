@@ -4,8 +4,9 @@ import React from "react";
 import { router, usePathname } from "expo-router";
 import Accordion from "@/components/Accordion";
 import data from "./data";
-
+import * as motion from "motion/react-client"
 const { width, height } = Dimensions.get('window');
+import { MotiView } from 'moti';
 
 const HomePage = () => {
   const pathname = usePathname();
@@ -66,7 +67,7 @@ const HomePage = () => {
 
                 <View className="items-center w-40">
                   <Pressable className="active:opacity-70" onPress={() => router.push('/healthy-hair-guide')}>
-                    <View className="w-24 h-24 rounded-full bg-[#C16C10] justify-center items-center">
+                    <View className="w-24 h-24 rounded-full bg-[#9B6A36] justify-center items-center">
                       <Image source={require('../assets/images/hairdresser.png')} className="w-14 h-14"/>
                     </View>
                   </Pressable>
@@ -75,7 +76,7 @@ const HomePage = () => {
 
                 <View className="items-center w-40">
                   <Pressable className="active:opacity-70" onPress={() => router.push('/natural-remedies')}>
-                    <View className="w-24 h-24 rounded-full bg-[#EC8313] justify-center items-center">
+                    <View className="w-24 h-24 rounded-full bg-[#BD8242] justify-center items-center">
                       <Image source={require('../assets/images/healthy.png')} className="w-14 h-14"/>
                     </View>
                   </Pressable>
@@ -86,7 +87,16 @@ const HomePage = () => {
           </View>
 
           <View className=" mt-6">
-            <View className="bg-[#3F2305] rounded-xl p-4 mb-7 w-11/12 self-center"
+            <MotiView
+              from={{ opacity: 0, scale: 0.9,}}
+              animate={{ opacity: 1, scale: 1, translateY: 0 }}
+              transition={{
+                type: 'timing', 
+                duration: 600,
+                delay: 200,
+              }}
+            >
+            <View className="bg-[#5B3E20] rounded-xl p-4 mb-7 w-11/12 self-center"
                   style={{
                     shadowColor: "#000",             
                     shadowOffset: { width: 0, height: 4 }, 
@@ -95,7 +105,7 @@ const HomePage = () => {
                     elevation: 5,                    
                   }}>
               <Text className="text-white text-2xl font-bold mb-1">Did you know?</Text>
-              <Text className="text-white text-xs mb-2">
+              <Text className="text-white text-sm mb-2">
                 Knowing your hair type and hair damage level is crucial for effective hair care.
                 By understanding these factors, you can choose the right products and treatments to maintain healthy hair!
               </Text>
@@ -110,11 +120,11 @@ const HomePage = () => {
                     shadowRadius: 6,                
                     elevation: 3,    
                  }}>
-                  <Text className="text-[#3F2305] text-xl font-extrabold">Start hair analysis</Text>
+                  <Text className="text-[#5B3E20] text-xl font-extrabold">Start hair analysis</Text>
                 </Pressable>
               </View>
             </View>
-            <View className="bg-[#3F2305] rounded-xl p-4 w-11/12 self-center"
+            <View className="bg-[#5B3E20] rounded-xl p-4 w-11/12 self-center"
                   style={{
                     shadowColor: "#000",             
                     shadowOffset: { width: 0, height: 4 }, 
@@ -123,18 +133,26 @@ const HomePage = () => {
                     elevation: 5,    
                   }}>
               <Text className="text-white text-2xl font-bold mb-1">Did you know?</Text>
-              <Text className="text-white text-xs mb-2">
+              <Text className="text-white text-sm mb-2">
                 Using right hair care products based on your hair type can significantly improve your hair health.
 
                 Different hair types have different needs, and using products tailored to your hair type can help maintain moisture, reduce damage, and enhance overall appearance!
               </Text>
               <View className="flex-row justify-end">
                 <Pressable className="bg-[#F2EAD3] px-4 py-3 rounded-lg flex-row items-center w-50 justify-center"
-                onPress={() => router.push('/healthy-hair-guide')}>
-                    <Text className="text-[#3F2305] text-xl font-extrabold">Read more</Text>
+                onPress={() => router.push('/healthy-hair-guide')}
+                style={{
+                    shadowColor: "#000",             
+                    shadowOffset: { width: 0, height: 4 }, 
+                    shadowOpacity: 10,          
+                    shadowRadius: 6,                
+                    elevation: 3,    
+                 }}>
+                    <Text className="text-[#5B3E20] text-xl font-extrabold">Read more</Text>
                 </Pressable>
               </View>
             </View>
+            </MotiView>
 
             <View className="flex items-center justify-center mt-20">
               <Text className="text-[#3F2305] text-4xl font-bold text-center wrap-1 mb-5">Frequently Asked Questions (FAQs)</Text>
@@ -157,7 +175,7 @@ const HomePage = () => {
           </View>
         </View>
       </ScrollView>
-      <View className="absolute bottom-5 self-center h-16 w-11/12 bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg border-2 border-[#FFF2E4]">
+      <View className="absolute bottom-5 self-center h-16 w-11/12 bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg border-4 border-[#A68E6C]">
                 <Pressable 
                     onPress={() => router.push('/homepage')}
                     className="items-center justify-center"

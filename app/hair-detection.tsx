@@ -251,7 +251,7 @@ export default function HairDetectionPage() {
               alignItems: "center",
               backgroundColor: "rgba(0, 0, 0, 0.5)" 
             }}>
-          <View className="w-96 bg-[#3F2305] rounded-2xl px-5 py-4 mb-4">
+          <View className="w-96 bg-[#6D3C09] rounded-2xl px-5 py-4 mb-4">
             <Text className="text-[#FAF7F0] font-extrabold text-xl text-center">
               Cropping Guidelines:
             </Text>
@@ -297,13 +297,13 @@ export default function HairDetectionPage() {
             
 
             <Pressable 
-              className="bg-[#3F2305] py-4 px-6 rounded-xl w-60 self-center items-center mb-4"
+              className="bg-[#6D3C09] py-4 px-6 rounded-xl w-60 self-center items-center mb-4"
               onPress={handleCaptureOption}>
               <Text className="text-[#FAF7F0] text-xl font-bold">Capture Photo</Text>
             </Pressable>
 
             <Pressable 
-              className="bg-[#3F2305] py-4 px-6 rounded-xl w-60 self-center items-center mb-4"
+              className="bg-[#6D3C09] py-4 px-6 rounded-xl w-60 self-center items-center mb-4"
               onPress={handleUploadOption}>
               <Text className="text-[#FAF7F0] text-xl font-bold"> Upload Image</Text>
             </Pressable>
@@ -399,7 +399,7 @@ export default function HairDetectionPage() {
             </Pressable>
             <Text className="text-2xl text-center font-bold mt-1"> What is your Scalp Condition?</Text>
             <Pressable 
-                className="bg-[#3F2305] py-2 px-4 rounded-xl w-64 self-center items-center justify-center mt-5 mb-3 flex-row"
+                className="bg-[#6D3C09] py-2 px-4 rounded-xl w-64 self-center items-center justify-center mt-5 mb-3 flex-row"
                 onPress={() => {
                   setScalpCondition('Oily Scalp');
                   setModalVisible(false); }}>
@@ -413,7 +413,7 @@ export default function HairDetectionPage() {
               </Pressable>
 
             <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-64 self-center items-center justify-center mb-3 flex-row"
+              className="bg-[#6D3C09] py-2 px-4 rounded-xl w-64 self-center items-center justify-center mb-3 flex-row"
               onPress={() => {
                 setScalpCondition('Dry Scalp');
                 setModalVisible(false);
@@ -428,7 +428,7 @@ export default function HairDetectionPage() {
             </Pressable>
 
             <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-64 self-center items-center justify-center mb-3 flex-row"
+              className="bg-[#6D3C09] py-2 px-4 rounded-xl w-64 self-center items-center justify-center mb-3 flex-row"
               onPress={() => {
                 setScalpCondition('Dandruff');
                 setModalVisible(false);
@@ -442,7 +442,7 @@ export default function HairDetectionPage() {
             </Pressable>
 
             <Pressable 
-              className="bg-[#3F2305] py-2 px-4 rounded-xl w-65 self-center items-center justify-center mb-12 flex-row"
+              className="bg-[#6D3C09] py-2 px-4 rounded-xl w-65 self-center items-center justify-center mb-12 flex-row"
               onPress={() => {
                 setScalpCondition('Normal Scalp');
                 setModalVisible(false);

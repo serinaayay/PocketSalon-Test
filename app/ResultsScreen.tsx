@@ -1,10 +1,10 @@
 import {View, Text, Image, Pressable, ScrollView, Dimensions, Animated, Linking, TouchableOpacity, Modal} from 'react-native';
 import { router, useLocalSearchParams, usePathname } from 'expo-router';
-import React from 'react';
 import { recommendProducts, getProductImage, getPriceCategory, Product } from '../lib/productRecommendations';
 import { addFavorite, removeFavorite, isFavorite } from '../lib/favorites';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { Svg as SvgNS, Circle as CircleNS, G as GNS, Text as SvgText } from "react-native-svg";
+import React, { useState } from 'react';
 
 const { width, height } = Dimensions.get('window');
 
@@ -103,7 +103,7 @@ const CircularProgress = ({ percentage, size = 120, strokeWidth = 12 }: { percen
   const circumference = 2 * Math.PI * radius;
   const healthyOffset = circumference - (percentage / 100) * circumference;
   const center = size / 2;
-
+  const [expanded, setExpanded] = useState(false);
   return (
     <View style={{ width: size, height: size }}>
       <SvgNS width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -219,7 +219,7 @@ const RemedyCard = ({ remedy }: { remedy: Remedy }) => {
               />
             </View>
             
-            <Text className="text-white text-xl font-bold text-center mb-2" numberOfLines={2}>
+            <Text className="text-white text-2xl font-bold text-center mb-2" numberOfLines={2}>
               {remedy.name}
             </Text>
             <ScrollView 
@@ -227,7 +227,7 @@ const RemedyCard = ({ remedy }: { remedy: Remedy }) => {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingHorizontal: 4 }}
             >
-              <Text className="text-white text-xs text-center leading-4">
+              <Text className="text-white text-sm text-center leading-4" style={{lineHeight: 20}}>
                 {remedy.howToUse}
               </Text>
             </ScrollView>
@@ -367,6 +367,9 @@ const FlipCard = ({ product, reorderProducts }: { product: Product, reorderProdu
     transform: [{ rotateY: backInterpolate }],
   };
 
+  
+  const [expanded, setExpanded] = useState(false);
+
   return (
     <View className='items-center'>
     <View style={{ width: 256, height: 500 }}>
@@ -392,17 +395,30 @@ const FlipCard = ({ product, reorderProducts }: { product: Product, reorderProdu
             />
           </View>
           
-          <Text className="text-white text-xl font-bold text-center mb-2" numberOfLines={2}>
+          <Text className="text-white text-xl font-bold text-center mb-2">
             {product.name}
           </Text>
-          <ScrollView 
-            style={{ maxHeight: 120, marginBottom: 8 }} 
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 4 }}
+          <ScrollView
+            style={{ flex: 1, maxHeight: 120, marginBottom: 8 }}
+            showsVerticalScrollIndicator={true}
+            contentContainerStyle={{ paddingHorizontal: 8 }}
           >
-            <Text className="text-white text-xs text-center">
+          <View style={{ width: '100%', marginBottom: 8, paddingHorizontal: 8 }}>
+            <Text
+              className="text-white text-sm"
+              numberOfLines={expanded ? undefined : 4}
+              style={{ flexWrap: 'wrap', textAlign: 'center' }}>
+
               {product.description}
             </Text>
+          
+          <TouchableOpacity onPress={() => setExpanded(!expanded)}>
+            <Text className="text-blue-400 text-center mt-2">
+              {expanded ? "Show Less" : "Read More"}
+            </Text>
+        </TouchableOpacity>
+        </View>
+
           </ScrollView>
           <View className="items-center mt-auto pb-2">
             <Text className="text-[#F2D8A7] text-3xl font-bold mb-2">
@@ -999,7 +1015,7 @@ const ResultsScreen = () => {
                         flex: 1,
                         justifyContent: 'center',
                         alignItems: 'center',
-                        backgroundColor: 'rgba(0, 0, 0, 0.11)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
                     }}>
                     <View className="w-96 bg-[#3F2305] rounded-2xl px-5 py-4 mb-4">
                         <Text className="text-[#FAF7F0] italic font-normal text-lg text-center">
@@ -1246,7 +1262,7 @@ const ResultsScreen = () => {
                 <View className="flex-row items-center my-3 mx-8">
                     <View className="items-center" style={{ width: width * 0.28 }}>
                         <View 
-                            className="items-center justify-center bg-[#FFF2E4] rounded-full mr-5 shadow-2xl"
+                            className="items-center justify-center mr-5"
                             style={{ 
                                 width: width * 0.30,
                                 height: width * 0.30,
@@ -1270,13 +1286,13 @@ const ResultsScreen = () => {
                     </View>
 
                     {/* Hair Type description */}
-                    <View className="bg-[#3F2305] rounded-[15px] justify-center shadow-lg"
+                    <View className="bg-[#6D3C09] rounded-[15px] justify-center shadow-lg"
                         style={{ 
                             width: width * 0.6,
                             minHeight: height * 0.10,
                             marginLeft: width * 0.02
                         }}>
-                        <Text className="text-white text-sm font-medium p-4 text-justify">
+                        <Text className="text-white text-md font-normal p-4 text-justify" style={{ lineHeight: 20 }}>
                             {hairType && hairTypeDescriptions[hairType] 
                               ? hairTypeDescriptions[hairType] 
                               : hairType 
@@ -1308,7 +1324,7 @@ const ResultsScreen = () => {
                 <View className="flex-row items-center">
                     <View className="items-center" style={{ width: width * 0.28 }}>
                     <View 
-                        className="items-center justify-center bg-[#FFF2E4] rounded-full mr-4 shadow-2xl"
+                        className="items-center justify-center mr-4"
                         style={{ 
                             width: width * 0.30,
                             height: width * 0.30,
@@ -1335,13 +1351,13 @@ const ResultsScreen = () => {
                     </Text>
                     </View>
                     <View 
-                    className="bg-[#3F2305] rounded-[15px] justify-center shadow-lg"
+                    className="bg-[#6D3C09] rounded-[15px] justify-center shadow-lg"
                     style={{ 
                         width: width * 0.6,
                         minHeight: height * 0.16,
                         marginLeft: width * 0.02,
                     }}>
-                        <Text className="text-white text-sm font-medium p-4 text-justify">
+                        <Text className="text-white text-md font-normal p-4 text-justify" style={{ lineHeight: 20 }}>
                             {damageDescription || 'Hair analysis complete.'}
                         </Text>
                     </View>
@@ -1374,13 +1390,13 @@ const ResultsScreen = () => {
                                     size={width * 0.3} 
                                     strokeWidth={12} />
                             </View>
-                            <View className="bg-[#3F2305] rounded-[15px] justify-center shadow-lg"
+                            <View className="bg-[#6D3C09] rounded-[15px] justify-center shadow-lg"
                                 style={{ 
                                     width: width * 0.6,
                                     minHeight: height * 0.10,
                                     marginLeft: width * 0.04
                                 }}>
-                                <Text className="text-white text-sm font-medium p-4 text-justify">
+                                <Text className="text-white text-md font-medium p-4 text-justify" style={{lineHeight: 20}}>
                                     Your hair is {Math.round(hairHealthScore)}% healthy. This score reflects the overall condition of your hair based on the analysis of damage and texture.
                                 </Text>
                             </View>
@@ -1418,7 +1434,7 @@ const ResultsScreen = () => {
                     </View>
 
                     {/* price legend */}
-                    <View className="mx-5 my-5 bg-[#3F2305] py-4 px-6 rounded-2xl shadow-lg mb-8">
+                    <View className="mx-5 my-5 bg-[#9B6A36] py-4 px-6 rounded-2xl shadow-lg mb-8">
                         <Text className="text-white text-xl font-bold text-center">
                             Price legend
                         </Text>
@@ -1451,7 +1467,7 @@ const ResultsScreen = () => {
                 {/* View Personalized Routine Button */}
                 <View className="mx-8 my-6">
                     <Pressable 
-                        className="bg-[#3F2305] py-4 px-6 rounded-2xl shadow-lg"
+                        className="bg-[#9B6A36] py-4 px-6 rounded-2xl shadow-lg"
                         onPress={() => {
                             // Ensure we have the actual damage level value
                             const actualDamageLevel = damageLevel && damageLevel.trim() ? damageLevel : 'Healthy';
@@ -1479,7 +1495,7 @@ const ResultsScreen = () => {
                         <Text className="text-white text-xl font-bold text-center">
                             View Your Personalized Routine
                         </Text>
-                        <Text className="text-white text-sm text-center mt-2">
+                        <Text className="text-white text-md text-center mt-2">
                             Get detailed care instructions for your hair
                         </Text>
                     </Pressable>
@@ -1513,61 +1529,55 @@ const ResultsScreen = () => {
 
             </ScrollView>
 
-            <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg">
-                <Pressable 
-                    onPress={() => router.push('/homepage')}
-                    className="items-center justify-center"
-                    style={{ width: 44, height: 44 }}>
-                    <View className={`items-center justify-center ${pathname === '/homepage' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
-                        <Image
-                            source={require('../assets/images/house 1.png')}
-                            style={{ width: 24, height: 24, tintColor: pathname === '/homepage' ? '#3F2305' : '#FFFFFF' }}
-                            resizeMode="contain"/>
-                    </View>
-                </Pressable>
+        <View className="absolute bottom-5 self-center h-16 w-11/12 bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg border-4 border-[#A68E6C]">
+                  <Pressable 
+                      onPress={() => router.push('/homepage')}
+                      className="items-center justify-center"
+                      style={{ width: 44, height: 44 }}>
+                      <View className={`items-center justify-center ${pathname === '/homepage' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                          <Image
+                          source={require('../assets/images/house 1.png')}
+                              style={{ width: 24, height: 24, tintColor: pathname === '/homepage' ? '#3F2305' : '#FFFFFF' }}
+                              resizeMode="contain"/>
+                      </View>
+                      </Pressable>
 
-                <Pressable 
-                    onPress={() => router.push('/hair-detection')}
-                    className="items-center justify-center"
-                    style={{ width: 44, height: 44 }}>
-                    <View className={`items-center justify-center ${pathname === '/hair-detection' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
-                        <Image
-                            source={require('../assets/images/capture (1).png')}
-                            style={{ width: 24, height: 24, tintColor: pathname === '/hair-detection' ? '#3F2305' : '#FFFFFF' }}
-                            resizeMode="contain"/>
-                    </View>
-                </Pressable>
+                  <Pressable 
+                      onPress={() => router.push('/hair-detection')}
+                      className="items-center justify-center"
+                      style={{ width: 44, height: 44 }}>
+                      <View className={`items-center justify-center ${pathname === '/hair-detection' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                      <Image
+                          source={require('../assets/images/capture (1).png')}
+                              style={{ width: 24, height: 24, tintColor: pathname === '/hair-detection' ? '#3F2305' : '#FFFFFF' }}
+                              resizeMode="contain"/>
+                      </View>
+                      </Pressable>
 
-                <Pressable 
-                    onPress={() => router.push({
-                        pathname: '/journal',
-                        params: {
-                            hair_health_score: hairHealthScore ? hairHealthScore.toString() : '',
-                            image_uri: imageUri ? imageUri : '',
-                        },
-                    })}
-                    className="items-center justify-center"
-                    style={{ width: 44, height: 44 }}>
-                    <View className={`items-center justify-center ${pathname === '/journal' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
-                        <Image
-                            source={require('../assets/images/agenda 1.png')}
-                            style={{ width: 24, height: 24, tintColor: pathname === '/journal' ? '#3F2305' : '#FFFFFF' }}
-                            resizeMode="contain"/>
-                    </View>
-                </Pressable>
+                  <Pressable 
+                      onPress={() => router.push('/journal')}
+                      className="items-center justify-center"
+                      style={{ width: 44, height: 44 }}>
+                      <View className={`items-center justify-center ${pathname === '/journal' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                      <Image
+                          source={require('../assets/images/agenda 1.png')}
+                              style={{ width: 24, height: 24, tintColor: pathname === '/journal' ? '#3F2305' : '#FFFFFF' }}
+                              resizeMode="contain"/>
+                      </View>
+                      </Pressable>
 
-                <Pressable 
-                    onPress={() => router.push('/favorites')}
-                    className="items-center justify-center"
-                    style={{ width: 44, height: 44 }}>
-                    <View className={`items-center justify-center ${pathname === '/favorites' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
-                        <Image
-                            source={require('../assets/images/heart (1).png')}
-                            style={{ width: 24, height: 24, tintColor: pathname === '/favorites' ? '#3F2305' : '#FFFFFF' }}
-                            resizeMode="contain"/>
-                    </View>
-                </Pressable>
-          </View>
+                  <Pressable 
+                      onPress={() => router.push('/favorites')}
+                      className="items-center justify-center"
+                      style={{ width: 44, height: 44 }}>
+                      <View className={`items-center justify-center ${pathname === '/favorites' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                      <Image
+                          source={require('../assets/images/heart (1).png')}
+                              style={{ width: 24, height: 24, tintColor: pathname === '/favorites' ? '#3F2305' : '#FFFFFF' }}
+                              resizeMode="contain"/>
+                      </View>
+                      </Pressable>
+        </View>
         </View>
     );
 };
