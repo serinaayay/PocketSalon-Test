@@ -282,7 +282,32 @@ export default function FavoritesPage() {
           </ScrollView>
         )}
       </ScrollView>
-      <View className="absolute bottom-5 self-center h-16 w-11/12 bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg border-2 border-[#FFF2E4]">
+
+            {/* Floating Chatbot Button */}
+                  <Pressable
+                    onPress={() => router.push('/chatbot')}
+                    style={{
+                      position: 'absolute',
+                      right: 24,
+                      bottom: 95,
+                      width: 56,
+                      height: 56,
+                      borderRadius: 28,
+                      borderColor: '#BD8242',
+                      borderWidth: 3,
+                      backgroundColor: '#6D3C09',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      shadowColor: '#000',
+                      shadowOpacity: 0.25,
+                      shadowRadius: 4,
+                      shadowOffset: { width: 0, height: 2 },
+                      elevation: 8,
+                    }}
+                  >
+                    <Ionicons name="chatbubble-ellipses-outline" size={26} color="#FFF2E4" />
+                  </Pressable>
+      <View className="absolute bottom-5 self-center h-16 w-11/12 bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg border-4 border-[#A68E6C]">
                 <Pressable 
                     onPress={() => router.push('/homepage')}
                     className="items-center justify-center"

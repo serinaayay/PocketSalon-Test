@@ -13,7 +13,28 @@ const HomePage = () => {
   
   // Get greeting based on time of day
   const getGreeting = () => {
-    const hour = new Date().getHours();
+    const hour = new Date().getHours();            {/* Floating Chatbot Button */}
+                <Pressable
+                  onPress={() => router.push('/chatbot')}
+                  style={{
+                    position: 'absolute',
+                    right: 24,
+                    bottom: 95,
+                    width: 56,
+                    height: 56,
+                    borderRadius: 28,
+                    borderColor: '#ffffffff',
+                    borderWidth: 2,
+                    backgroundColor: '#6D3C09',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    shadowColor: '#000',
+                    shadowOpacity: 0.25,
+                    shadowRadius: 4,
+                    shadowOffset: { width: 0, height: 2 },
+                    elevation: 8,
+                  }}
+                ></Pressable>
     if (hour >= 5 && hour < 12) {
       return "Good Morning";
     } else if (hour >= 12 && hour < 17) {

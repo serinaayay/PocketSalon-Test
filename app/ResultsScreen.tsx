@@ -1,10 +1,10 @@
 import {View, Text, Image, Pressable, ScrollView, Dimensions, Animated, Linking, TouchableOpacity, Modal} from 'react-native';
 import { router, useLocalSearchParams, usePathname } from 'expo-router';
+import React from 'react';
 import { recommendProducts, getProductImage, getPriceCategory, Product } from '../lib/productRecommendations';
 import { addFavorite, removeFavorite, isFavorite } from '../lib/favorites';
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons, FontAwesome, Entypo} from '@expo/vector-icons';
 import { Svg as SvgNS, Circle as CircleNS, G as GNS, Text as SvgText } from "react-native-svg";
-import React, { useState } from 'react';
 
 const { width, height } = Dimensions.get('window');
 
@@ -103,7 +103,7 @@ const CircularProgress = ({ percentage, size = 120, strokeWidth = 12 }: { percen
   const circumference = 2 * Math.PI * radius;
   const healthyOffset = circumference - (percentage / 100) * circumference;
   const center = size / 2;
-  const [expanded, setExpanded] = useState(false);
+
   return (
     <View style={{ width: size, height: size }}>
       <SvgNS width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -219,7 +219,7 @@ const RemedyCard = ({ remedy }: { remedy: Remedy }) => {
               />
             </View>
             
-            <Text className="text-white text-2xl font-bold text-center mb-2" numberOfLines={2}>
+            <Text className="text-white text-xl font-bold text-center mb-2" numberOfLines={2}>
               {remedy.name}
             </Text>
             <ScrollView 
@@ -227,7 +227,7 @@ const RemedyCard = ({ remedy }: { remedy: Remedy }) => {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingHorizontal: 4 }}
             >
-              <Text className="text-white text-sm text-center leading-4" style={{lineHeight: 20}}>
+              <Text className="text-white text-xs text-center leading-4">
                 {remedy.howToUse}
               </Text>
             </ScrollView>
@@ -272,7 +272,7 @@ const RemedyCard = ({ remedy }: { remedy: Remedy }) => {
               </Text>
             </View>
             <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-              <Text className="text-white text-sm mb-2 text-justify leading-5">
+              <Text className="text-white text-lg mb-2 text-justify leading-5">
                 {remedy.description}
               </Text>
             </ScrollView>
@@ -367,9 +367,6 @@ const FlipCard = ({ product, reorderProducts }: { product: Product, reorderProdu
     transform: [{ rotateY: backInterpolate }],
   };
 
-  
-  const [expanded, setExpanded] = useState(false);
-
   return (
     <View className='items-center'>
     <View style={{ width: 256, height: 500 }}>
@@ -386,7 +383,8 @@ const FlipCard = ({ product, reorderProducts }: { product: Product, reorderProdu
         ]}
         pointerEvents={flipped ? 'none' : 'auto'}
       >
-        <View className="w-64 bg-[#3F2305] rounded-xl shadow-lg p-4 items-center self-center" style={{ height: 500 }}>
+        <View className="w-64 bg-[#3F2305] rounded-xl shadow-lg p-4 items-center self-center" style={{ height: 500, justifyContent: 'space-between' }}>
+          <View style={{ width: '100%', alignItems: 'center' }}>
           {/* Product Image */}
           <View className="w-full bg-[#cfaf8d] rounded-lg mb-3 flex justify-center items-center" style={{ height: 180 }}>
             <Image
@@ -395,37 +393,28 @@ const FlipCard = ({ product, reorderProducts }: { product: Product, reorderProdu
             />
           </View>
           
-          <Text className="text-white text-xl font-bold text-center mb-2">
+          <Text className="text-white text-xl font-bold text-center mb-2" numberOfLines={2}>
             {product.name}
           </Text>
-          <ScrollView
-            style={{ flex: 1, maxHeight: 120, marginBottom: 8 }}
-            showsVerticalScrollIndicator={true}
-            contentContainerStyle={{ paddingHorizontal: 8 }}
-          >
-          <View style={{ width: '100%', marginBottom: 8, paddingHorizontal: 8 }}>
-            <Text
-              className="text-white text-sm"
-              numberOfLines={expanded ? undefined : 4}
-              style={{ flexWrap: 'wrap', textAlign: 'center' }}>
-
-              {product.description}
-            </Text>
+            <View style={{ marginBottom: 8, width: '100%', maxHeight: 100 }}>
+              <ScrollView
+                nestedScrollEnabled
+                showsVerticalScrollIndicator={false}
+              >
+                <Text className="text-white text-sm text-center" style={{ flexWrap: 'wrap' }}>
+                  {product.description}
+                </Text>
+              </ScrollView>
+            </View>
+          </View>
           
-          <TouchableOpacity onPress={() => setExpanded(!expanded)}>
-            <Text className="text-blue-400 text-center mt-2">
-              {expanded ? "Show Less" : "Read More"}
-            </Text>
-        </TouchableOpacity>
-        </View>
-
-          </ScrollView>
-          <View className="items-center mt-auto pb-2">
+          <View style={{ width: '100%', alignItems: 'center' }}>
+            <View className="items-center pb-2">
             <Text className="text-[#F2D8A7] text-3xl font-bold mb-2">
               {getPriceCategory(product.price)}
             </Text>
           </View>
-          <View className="flex-row items-center justify-center flex-wrap gap-2 mt-1 px-2" style={{ zIndex: 1000 }}>
+            <View className="flex-row items-center justify-center flex-wrap gap-2 px-2" style={{ zIndex: 1000 }}>
             <TouchableOpacity
               onPress={() => {
                 console.log('Ingredients button pressed');
@@ -486,6 +475,7 @@ const FlipCard = ({ product, reorderProducts }: { product: Product, reorderProdu
               />
             </TouchableOpacity>
           </View>
+            </View>
           </View>
         </View>
       </Animated.View>
@@ -533,30 +523,20 @@ const FlipCard = ({ product, reorderProducts }: { product: Product, reorderProdu
               
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-
-            {product.ingredients && product.ingredients.length > 0 ? (
-
-              product.ingredients.map((ingredient, index) => (
-
-                <Text key={index} className="text-white text-sm mb-2">
-
-                  • {ingredient}
-
-                </Text>
-
-              ))
-
-            ) : (
-
-              <Text className="text-white text-sm text-center">
-
-                No ingredient information available
-
+          <ScrollView
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}>
+                    {product.ingredients && product.ingredients.length > 0 ? (
+                      product.ingredients.map((ingredient, index) => (
+                        <Text key={index} className="text-white text-sm mb-2" style={{ flexWrap: 'wrap' }}>
+                          • {ingredient}
+                    </Text>
+                  ))
+                ) : (
+                  <Text className="text-white text-sm text-center">
+                    No ingredient information available
               </Text>
-
             )}
-
           </ScrollView>
 
         </View>
@@ -726,6 +706,14 @@ const normalizeDamageLabel = (label: string | undefined): string | undefined => 
   return normalized;
 };
 
+const formatConfidencePercentage = (value?: number) => {
+  if (value === undefined) {
+    return undefined;
+  }
+  const boundedPercentage = Math.min(100, Math.max(0, value * 100));
+  return `${boundedPercentage.toFixed(2)}%`;
+};
+
 const ResultsScreen = () => {
     const pathname = usePathname();
     const params = useLocalSearchParams();
@@ -737,11 +725,7 @@ const ResultsScreen = () => {
     const damageLevel = params.damage_level as string | undefined;
     const damageConfidence = params.damage_confidence as string | number | undefined;
     const imageUri = params.image_uri as string | undefined;
-    const hairHealthScore = (() => {
-      const val = params.hair_health_score as string | undefined;
-      const parsed = val ? parseFloat(val) : NaN;
-      return !isNaN(parsed) ? parsed : 50; // Default to 50 if parsing fails
-    })();
+    const hairHealthScore = params.hair_health_score ? parseFloat(params.hair_health_score as string) : null;
     const hairTypePredictionsParamRaw = params.hair_type_predictions as string | string[] | undefined;
     const hairTypePredictionsParam = Array.isArray(hairTypePredictionsParamRaw)
       ? hairTypePredictionsParamRaw[0]
@@ -872,6 +856,13 @@ const ResultsScreen = () => {
       return map;
     }, [damagePredictionsParam]);
 
+    const likelyDamageTypes = React.useMemo(() => {
+      return orderedDamageTypes.filter(type => {
+        const value = damageConfidenceMap[type];
+        return typeof value === 'number' && value >= 0.5;
+      });
+    }, [damageConfidenceMap]);
+
     const primaryHairConfidence = React.useMemo(() => {
       if (typeof hairConfidence === 'number') {
         return hairConfidence;
@@ -905,7 +896,7 @@ const ResultsScreen = () => {
           return [...filtered, product]
         }
       });
-  };
+    };
 
     // Extract base damage type from damage level for product recommendations
     const getBaseDamageType = React.useMemo(() => {
@@ -1075,6 +1066,7 @@ const ResultsScreen = () => {
                                   hairType === type && primaryHairConfidence !== undefined
                                     ? primaryHairConfidence
                                     : hairTypeConfidenceMap[type];
+                                const formattedConfidence = formatConfidencePercentage(confidenceValue);
                                 const isDetectedType = hairType === type;
                                 return (
                                     <View
@@ -1118,9 +1110,7 @@ const ResultsScreen = () => {
                                                     isDetectedType ? 'text-white' : 'text-[#3F2305]'
                                                 }`}
                                             >
-                                                {confidenceValue !== undefined
-                                                    ? `${(confidenceValue * 100).toFixed(2)}%`
-                                                    : 'N/A'}
+                                                {formattedConfidence ?? 'N/A'}
                                             </Text>
                                             <Text
                                                 className={`text-xs ${
@@ -1179,18 +1169,24 @@ const ResultsScreen = () => {
                             contentContainerStyle={{ paddingBottom: 8 }}
                         >
                             {orderedDamageTypes.map(type => {
-                                const confidenceValue =
-                                  normalizedDamageForConfidence === type && primaryDamageConfidence !== undefined
-                                    ? primaryDamageConfidence
-                                    : damageConfidenceMap[type];
+                                const confidenceValue = damageConfidenceMap[type];
+                                const formattedConfidence = formatConfidencePercentage(confidenceValue);
+                                // Check if confidence is greater than 50%
+                                const isLikely = confidenceValue !== undefined && confidenceValue >= 0.5;
+                                
+                                // Detected type is the primary detected one, but we also mark others as likely if > 50%
                                 const isDetectedType = normalizedDamageForConfidence
                                   ? type === normalizedDamageForConfidence
                                   : false;
+                                
+                                // Determine background color: dark brown for detected/likely, light for others
+                                const isHighlighted = isDetectedType || isLikely;
+
                                 return (
                                     <View
                                         key={type}
                                         className={`flex-row items-center justify-between px-4 py-3 mb-3 rounded-2xl ${
-                                            isDetectedType ? 'bg-[#3F2305]' : 'bg-[#F2EAD3]'
+                                            isHighlighted ? 'bg-[#3F2305]' : 'bg-[#F2EAD3]'
                                         }`}
                                     >
                                         <View className="flex-row items-center flex-1">
@@ -1201,40 +1197,38 @@ const ResultsScreen = () => {
                                                         width: 42,
                                                         height: 42,
                                                         resizeMode: 'contain',
-                                                        tintColor: isDetectedType ? '#FFFFFF' : undefined,
+                                                        tintColor: isHighlighted ? '#FFFFFF' : undefined,
                                                     }}
                                                 />
                                             )}
                                             <View className="ml-3 flex-1">
                                                 <Text
                                                     className={`text-lg font-semibold ${
-                                                        isDetectedType ? 'text-white' : 'text-[#3F2305]'
+                                                        isHighlighted ? 'text-white' : 'text-[#3F2305]'
                                                     }`}
                                                 >
-                                                    {type}{isDetectedType ? ' ✓' : ''}
+                                                    {type}{isHighlighted ? ' ✓' : ''}
                                                 </Text>
                                                 <Text
                                                     className={`text-xs ${
-                                                        isDetectedType ? 'text-white/80' : 'text-[#3F2305]/70'
+                                                        isHighlighted ? 'text-white/80' : 'text-[#3F2305]/70'
                                                     }`}
                                                 >
-                                                    {isDetectedType ? 'Detected Damage Type' : 'Alternative'}
+                                                    {isDetectedType ? 'Detected Damage Type' : (isLikely ? 'Likely Damage Type' : 'Alternative')}
                                                 </Text>
                                             </View>
                                         </View>
                                         <View className="items-end">
                                             <Text
                                                 className={`text-xl font-bold ${
-                                                    isDetectedType ? 'text-white' : 'text-[#3F2305]'
+                                                    isHighlighted ? 'text-white' : 'text-[#3F2305]'
                                                 }`}
                                             >
-                                                {confidenceValue !== undefined
-                                                    ? `${(confidenceValue * 100).toFixed(2)}%`
-                                                    : 'N/A'}
+                                                {formattedConfidence ?? 'N/A'}
                                             </Text>
                                             <Text
                                                 className={`text-xs ${
-                                                    isDetectedType ? 'text-white/70' : 'text-[#3F2305]/70'
+                                                    isHighlighted ? 'text-white/70' : 'text-[#3F2305]/70'
                                                 }`}
                                             >
                                                 Confidence
@@ -1262,7 +1256,7 @@ const ResultsScreen = () => {
                 <View className="flex-row items-center my-3 mx-8">
                     <View className="items-center" style={{ width: width * 0.28 }}>
                         <View 
-                            className="items-center justify-center mr-5"
+                            className="items-center justify-center rounded-full mr-5"
                             style={{ 
                                 width: width * 0.30,
                                 height: width * 0.30,
@@ -1292,7 +1286,7 @@ const ResultsScreen = () => {
                             minHeight: height * 0.10,
                             marginLeft: width * 0.02
                         }}>
-                        <Text className="text-white text-md font-normal p-4 text-justify" style={{ lineHeight: 20 }}>
+                        <Text className="text-white text-lg font-normal p-4 text-justify" style={{ lineHeight: 20 }}>
                             {hairType && hairTypeDescriptions[hairType] 
                               ? hairTypeDescriptions[hairType] 
                               : hairType 
@@ -1303,15 +1297,16 @@ const ResultsScreen = () => {
                 </View>
 
                 <View className="flex-row justify-end items-center mx-8">
-                    <Text className="text-m mb-4 font-bold text-[#5B3E20]">
-                        Confidence: {primaryHairConfidence !== undefined ? `${(primaryHairConfidence * 100).toFixed(2)}%` : 'N/A'}
+                    <Text className="text-m mb-4 font-bold text-[#3F2305]">
+                        Confidence: {formatConfidencePercentage(primaryHairConfidence) ?? 'N/A'}
                     </Text>
                     <Pressable
                         onPress={() => setIsHairModalVisible(true)}
                         className="ml-3 mb-4 bg-[#3F2305] rounded-full items-center justify-center shadow-md"
-                        style={{ width: 30, height: 30 }}
-                    >
-                        <FontAwesome name="question" size={16} color="#FFF2E4" />
+                        style={{ width: 30, height: 30 }}>
+
+                        <Entypo name="magnifying-glass" size={20} color="#FFF2E4"/>
+                        
                     </Pressable>
                 </View>
 
@@ -1321,8 +1316,8 @@ const ResultsScreen = () => {
                     Hair Damage Check!
                 </Text>
 
-                <View className="flex-row items-center">
-                    <View className="items-center" style={{ width: width * 0.28 }}>
+                <View className="flex-row items-center self-center">
+                    <View className="items-center self-center" style={{ width: width * 0.28 }}>
                     <View 
                         className="items-center justify-center mr-4"
                         style={{ 
@@ -1365,15 +1360,14 @@ const ResultsScreen = () => {
 
                 <View className="flex-row justify-end items-center mx-1 mt-5 mb-5">
                     <Text className="text-m mb-4 font-bold text-[#5B3E20]">
-                        Confidence: {primaryDamageConfidence !== undefined ? `${(primaryDamageConfidence * 100).toFixed(2)}%` : 'N/A'}
+                        Confidence: {formatConfidencePercentage(primaryDamageConfidence) ?? 'N/A'}
                     </Text>
-                    
                     <Pressable
                         onPress={() => setIsDamageModalVisible(true)}
                         className="ml-3 mb-4 bg-[#3F2305] rounded-full items-center justify-center shadow-md"
                         style={{ width: 30, height: 30 }}
                     >
-                        <FontAwesome name="question"  size={16} color="#FFF2E4" />
+                        <Entypo name="magnifying-glass" size={20} color="#FFF2E4" />
                     </Pressable>
                 </View>
                 
@@ -1385,10 +1379,7 @@ const ResultsScreen = () => {
                         </Text>
                         <View className="flex-row items-center">
                             <View className="items-center" style={{ width: width * 0.28, alignItems: 'center', marginLeft: width * 0.03 }}>
-                                    <CircularProgress 
-                                    percentage={hairHealthScore} 
-                                    size={width * 0.3} 
-                                    strokeWidth={12} />
+                                    <CircularProgress percentage={hairHealthScore} size={width * 0.30} strokeWidth={12} />
                             </View>
                             <View className="bg-[#6D3C09] rounded-[15px] justify-center shadow-lg"
                                 style={{ 
@@ -1396,7 +1387,7 @@ const ResultsScreen = () => {
                                     minHeight: height * 0.10,
                                     marginLeft: width * 0.04
                                 }}>
-                                <Text className="text-white text-md font-medium p-4 text-justify" style={{lineHeight: 20}}>
+                                <Text className="text-white text-md font-medium p-4 text-justify" style={{ lineHeight: 20 }}>
                                     Your hair is {Math.round(hairHealthScore)}% healthy. This score reflects the overall condition of your hair based on the analysis of damage and texture.
                                 </Text>
                             </View>
@@ -1407,8 +1398,6 @@ const ResultsScreen = () => {
 
                 <Text className="text-lg font-bold mb-10 mt-10 text-[#3F2305] text-center">Disclaimer: This study is experimental; The recommended products below are 
                     for guidance and suggestions only. Consult a professional. </Text>
-                
-      
              
                 {/* Product Recommendations Row */}
                 <View className="mx-8 my-16">
@@ -1480,6 +1469,7 @@ const ResultsScreen = () => {
                                 scalp_condition: scalpCondition || 'Normal Scalp',
                                 raw_damageLevel: damageLevel,
                                 raw_getBaseDamageType: getBaseDamageType,
+                                likely_damage_types: likelyDamageTypes,
                             });
                             
                             router.push({
@@ -1489,6 +1479,7 @@ const ResultsScreen = () => {
                                     damage_level: actualDamageLevel,
                                     damage_type: actualDamageType,
                                     scalp_condition: scalpCondition || 'Normal Scalp',
+                                    likely_damage_types: JSON.stringify(likelyDamageTypes),
                                 }
                             });
                         }}>
@@ -1529,55 +1520,86 @@ const ResultsScreen = () => {
 
             </ScrollView>
 
-        <View className="absolute bottom-5 self-center h-16 w-11/12 bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg border-4 border-[#A68E6C]">
-                  <Pressable 
-                      onPress={() => router.push('/homepage')}
-                      className="items-center justify-center"
-                      style={{ width: 44, height: 44 }}>
-                      <View className={`items-center justify-center ${pathname === '/homepage' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
-                          <Image
-                          source={require('../assets/images/house 1.png')}
-                              style={{ width: 24, height: 24, tintColor: pathname === '/homepage' ? '#3F2305' : '#FFFFFF' }}
-                              resizeMode="contain"/>
-                      </View>
-                      </Pressable>
+            {/* Floating Chatbot Button */}
+            <Pressable
+              onPress={() => router.push('/chatbot')}
+              style={{
+                position: 'absolute',
+                right: 24,
+                bottom: 95,
+                width: 56,
+                height: 56,
+                borderRadius: 28,
+                borderColor: '#BD8242',
+                borderWidth: 3,
+                backgroundColor: '#6D3C09',
+                justifyContent: 'center',
+                alignItems: 'center',
+                shadowColor: '#000',
+                shadowOpacity: 0.25,
+                shadowRadius: 4,
+                shadowOffset: { width: 0, height: 2 },
+                elevation: 8,
+              }}
+            >
+              <Ionicons name="chatbubble-ellipses-outline" size={26} color="#FFF2E4" />
+            </Pressable>
 
-                  <Pressable 
-                      onPress={() => router.push('/hair-detection')}
-                      className="items-center justify-center"
-                      style={{ width: 44, height: 44 }}>
-                      <View className={`items-center justify-center ${pathname === '/hair-detection' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
-                      <Image
-                          source={require('../assets/images/capture (1).png')}
-                              style={{ width: 24, height: 24, tintColor: pathname === '/hair-detection' ? '#3F2305' : '#FFFFFF' }}
-                              resizeMode="contain"/>
-                      </View>
-                      </Pressable>
+            <View className="absolute bottom-5 self-center h-16 w-11/12 bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg border-4 border-[#A68E6C]">
+                <Pressable 
+                    onPress={() => router.push('/homepage')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/homepage' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                        <Image
+                            source={require('../assets/images/house 1.png')}
+                            style={{ width: 24, height: 24, tintColor: pathname === '/homepage' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
+                </Pressable>
 
-                  <Pressable 
-                      onPress={() => router.push('/journal')}
-                      className="items-center justify-center"
-                      style={{ width: 44, height: 44 }}>
-                      <View className={`items-center justify-center ${pathname === '/journal' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
-                      <Image
-                          source={require('../assets/images/agenda 1.png')}
-                              style={{ width: 24, height: 24, tintColor: pathname === '/journal' ? '#3F2305' : '#FFFFFF' }}
-                              resizeMode="contain"/>
-                      </View>
-                      </Pressable>
+                <Pressable 
+                    onPress={() => router.push('/hair-detection')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/hair-detection' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                        <Image
+                            source={require('../assets/images/capture (1).png')}
+                            style={{ width: 24, height: 24, tintColor: pathname === '/hair-detection' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
+                </Pressable>
 
-                  <Pressable 
-                      onPress={() => router.push('/favorites')}
-                      className="items-center justify-center"
-                      style={{ width: 44, height: 44 }}>
-                      <View className={`items-center justify-center ${pathname === '/favorites' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
-                      <Image
-                          source={require('../assets/images/heart (1).png')}
-                              style={{ width: 24, height: 24, tintColor: pathname === '/favorites' ? '#3F2305' : '#FFFFFF' }}
-                              resizeMode="contain"/>
-                      </View>
-                      </Pressable>
-        </View>
+                <Pressable 
+                    onPress={() => router.push({
+                        pathname: '/journal',
+                        params: {
+                            hair_health_score: hairHealthScore ? hairHealthScore.toString() : '',
+                            image_uri: imageUri ? imageUri : '',
+                        },
+                    })}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/journal' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                        <Image
+                            source={require('../assets/images/agenda 1.png')}
+                            style={{ width: 24, height: 24, tintColor: pathname === '/journal' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
+                </Pressable>
+
+                <Pressable 
+                    onPress={() => router.push('/favorites')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/favorites' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
+                        <Image
+                            source={require('../assets/images/heart (1).png')}
+                            style={{ width: 24, height: 24, tintColor: pathname === '/favorites' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
+                </Pressable>
+          </View>
         </View>
     );
 };

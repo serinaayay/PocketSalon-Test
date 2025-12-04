@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, Pressable, Dimensions, Image, Modal, Animated, Linking, TouchableOpacity } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, usePathname } from 'expo-router';
 import { getHairRoutine, mapDamageLevelToRoutine, mapHairTypeToRoutine, mapDamageTypeToRoutine, ScalpCondition } from '../lib/hairRoutines';
 import { recommendProducts, getProductImage, getPriceCategory, Product } from '../lib/productRecommendations';
 import { addFavorite, removeFavorite, isFavorite } from '../lib/favorites';
@@ -496,6 +496,7 @@ const FlipCard = ({ product, reorderProducts }: { product: Product, reorderProdu
 
 export default function PersonalizedRoutine() {
   const params = useLocalSearchParams();
+  const pathname = usePathname();
   
   // Get parameters from navigation
   const scalpCondition = (params.scalp_condition as ScalpCondition) || 'Normal Scalp';
@@ -907,41 +908,54 @@ export default function PersonalizedRoutine() {
       </ScrollView>
 
       {/* Bottom Navigation */}
-      <View className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 shadow-lg">
-            <View className="flex-1 flex-row justify-around">
-                <View className="flex-col items-center">
-                    <Pressable className="2 justify-center"
-                    onPress={() => router.push('/homepage')}>
+      <View className="absolute bottom-5 self-center h-16 w-11/12 bg-[#3F2305] rounded-full flex-row items-center justify-around px-2 py-2 shadow-lg border-4 border-[#A68E6C]">
+                <Pressable 
+                    onPress={() => router.push('/homepage')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/homepage' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
                         <Image
                         source={require('../assets/images/house 1.png')}
-                        className="w-8 h-8"/>
+                            style={{ width: 24, height: 24, tintColor: pathname === '/homepage' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
                     </Pressable>
-                </View>
-                <View className="flex-col items-center">
-                    <Pressable className="2 justify-center"
-                    onPress={() => router.push('/hair-detection')}>
+
+                <Pressable 
+                    onPress={() => router.push('/hair-detection')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/hair-detection' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
                     <Image
                         source={require('../assets/images/capture (1).png')}
-                        className="w-9 h-9"/>
+                            style={{ width: 24, height: 24, tintColor: pathname === '/hair-detection' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
                     </Pressable>
-                </View>
-                <View className="flex-col items-center">
-                    <Pressable className="2 justify-center"
-                    onPress={() => router.push('/journal')}>
+
+                <Pressable 
+                    onPress={() => router.push('/journal')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/journal' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
                     <Image
                         source={require('../assets/images/agenda 1.png')}
-                        className="w-9 h-9"/>
+                            style={{ width: 24, height: 24, tintColor: pathname === '/journal' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
                     </Pressable>
-                </View>
-                <View className="flex-col items-center">
-                    <Pressable className="2 justify-center"
-                    onPress={() => router.push('/favorites')}>
+
+                <Pressable 
+                    onPress={() => router.push('/favorites')}
+                    className="items-center justify-center"
+                    style={{ width: 44, height: 44 }}>
+                    <View className={`items-center justify-center ${pathname === '/favorites' ? 'bg-white rounded-full' : ''}`} style={{ width: 44, height: 44 }}>
                     <Image
                         source={require('../assets/images/heart (1).png')}
-                        className="w-9 h-9"/>
+                            style={{ width: 24, height: 24, tintColor: pathname === '/favorites' ? '#3F2305' : '#FFFFFF' }}
+                            resizeMode="contain"/>
+                    </View>
                     </Pressable>
-                </View>
-            </View>
       </View>
 
       {/* Disclaimer Modal */}

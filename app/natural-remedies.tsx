@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, Image, Pressable, Dimensions, Modal, } from "react-native";
 import { router, usePathname } from "expo-router";
-
+import { Ionicons } from "@expo/vector-icons";
 const { width, height } = Dimensions.get('window');
 
 const remedies = [
@@ -199,6 +199,32 @@ const NaturalRemedies = () => {
         })}
 
       </ScrollView>
+            {/* Floating Chatbot Button */}
+            <Pressable
+              onPress={() => router.push('/chatbot')}
+              style={{
+                position: 'absolute',
+                right: 24,
+                bottom: 95,
+                width: 56,
+                height: 56,
+                borderRadius: 28,
+                borderColor: '#BD8242',
+                borderWidth: 3,
+                backgroundColor: '#6D3C09',
+                justifyContent: 'center',
+                alignItems: 'center',
+                shadowColor: '#000',
+                shadowOpacity: 0.25,
+                shadowRadius: 4,
+                shadowOffset: { width: 0, height: 2 },
+                elevation: 8,
+                marginBottom: 21
+              }}
+            >
+              <Ionicons name="chatbubble-ellipses-outline" size={26} color="#FFF2E4" />
+            </Pressable>
+
             <View 
               className="absolute left-2 right-0 bottom-2 mb-10 ml-3 h-16 w-11/12 
               self-center bg-[#3F2305] rounded-full flex-row items-center px-2 py-2 
